@@ -1,0 +1,17 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Optimizer	stochasticsqp.py	/^from torch.optim.optimizer import Optimizer, required$/;"	i
+StochasticSQP	stochasticsqp.py	/^class StochasticSQP(Optimizer):$/;"	c
+__init__	stochasticsqp.py	/^    def __init__(self, params, lr=required, $/;"	m	class:StochasticSQP
+__setstate__	stochasticsqp.py	/^    def __setstate__(self, state):$/;"	m	class:StochasticSQP	file:
+copy	stochasticsqp.py	/^import copy$/;"	i
+np	stochasticsqp.py	/^import numpy as np$/;"	i
+printerHeader	stochasticsqp.py	/^    def printerHeader(self):$/;"	m	class:StochasticSQP
+printerIteration	stochasticsqp.py	/^    def printerIteration(self,every=1):$/;"	m	class:StochasticSQP
+required	stochasticsqp.py	/^from torch.optim.optimizer import Optimizer, required$/;"	i
+step	stochasticsqp.py	/^    def step(self, closure=None):$/;"	m	class:StochasticSQP
+torch	stochasticsqp.py	/^import torch$/;"	i
