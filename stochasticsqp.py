@@ -153,3 +153,6 @@ class StochasticSQP(Optimizer):
                 self.trial_merit,
                 self.trial_ratio
                 ))
+
+
+print('TEST')
