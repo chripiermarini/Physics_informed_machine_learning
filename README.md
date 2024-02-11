@@ -2,10 +2,9 @@
 Using Stochastic SQP algorithm to solve physics-informed machine learning problem
 
 Solve a problem :
-``
-python solve Spring
-``
-
+```
+python solve.py Spring
+```
 
 `stochasticsqp.py` is the optimizer, where the `step` method is to compute the step to update neural network parameters. This `step` method is a simplified version of Stochastic SQP method in [Berahas, Albert S., et al. "Sequential quadratic optimization for nonlinear equality constrained stochastic optimization." SIAM Journal on Optimization 31.2 (2021): 1352-1379.]
 
