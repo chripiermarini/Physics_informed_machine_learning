@@ -1,10 +1,36 @@
 import torch
 from stochasticsqp import *
-from problem_spring import Spring
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
 torch.manual_seed(10000)
 np.random.seed(10000)
+import sys
+
+# Import all problems fro directory `problems`
+import os
+import importlib.util
+def import_all_classes_from_directory(directory):
+    classes = {}
+    for filename in os.listdir(directory):
+        if filename.endswith('.py'):
+            module_name = filename[:-3]  # Remove '.py' to get the module name
+            module_path = os.path.join(directory, filename)
+            
+            # Import the module
+            spec = importlib.util.spec_from_file_location(module_name, module_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            
+            # Iterate through attributes of the module
+            for attribute_name in dir(module):
+                attribute = getattr(module, attribute_name)
+                if isinstance(attribute, type):  # Check if it's a class
+                    classes[attribute_name] = attribute
+    return classes 
+directory_path = './problems'
+all_problems = import_all_classes_from_directory(directory_path)
+# Now all_problems is a dictionary where keys are names of problem classes and values are problem objects
+
 
 def run(optimizer, problem, max_iter = 10000):
 
@@ -32,7 +58,9 @@ def run(optimizer, problem, max_iter = 10000):
 if __name__ == '__main__':
     ## Initialize optimizer
 
-    problem = Spring(device, n_obj_sample = 500, n_constrs = 10)
+    problem_name = sys.argv[1]
+
+    problem = all_problems['Spring'](device, n_obj_sample = 500, n_constrs = 10)
 
     optimizer = StochasticSQP(problem.net.parameters(),
                           lr=0.001,
