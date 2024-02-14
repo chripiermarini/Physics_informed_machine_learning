@@ -60,14 +60,14 @@ if __name__ == '__main__':
 
     problem_name = sys.argv[1]
 
-    problem = all_problems['Spring'](device, n_obj_sample = 500, n_constrs = 10)
+    problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 1)
 
     optimizer = StochasticSQP(problem.net.parameters(),
-                          lr=0.001,
+                          lr=1.0,
                           n_parameters = problem.n_parameters, 
                           n_constrs = problem.n_constrs,
                           merit_param_init = 1, 
                           ratio_param_init = 1,
                          )
     
-    run(optimizer, problem,  max_iter = 10)
+    run(optimizer, problem,  max_iter = 100)

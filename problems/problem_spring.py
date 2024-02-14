@@ -118,13 +118,13 @@ class Spring:
         """
 
         # NN forward to compute the output of sample for constraints
-        u_constr_pred = self.net(self.domain_constr_tensor) 
-    
+        u_constr_pred = self.net(self.domain_constr_tensor)
+
         # Compute the derivative of output with respect to domain
         u_derivative_to_domain = torch.autograd.grad(u_constr_pred.sum(), self.domain_constr_tensor, create_graph=True)[0]
 
         # Compute constraint value
-        c = u_derivative_to_domain[:,0] - 2*u_derivative_to_domain[:,1] - u_constr_pred.reshape(-1)  
+        c = u_derivative_to_domain[:,0] - 2*u_derivative_to_domain[:,1] - u_constr_pred.reshape(-1)
         c_value = c.data
 
         # Compute Jacobian
@@ -140,7 +140,3 @@ class Spring:
             J_value[i,:] = grads
 
         return c_value, J_value
-
-
-
-

@@ -9,7 +9,7 @@ class TwoHiddenLayerFCNN(nn.Module):
         self.n_output = n_output
         self.hidden_layer1 = nn.Linear(self.n_input,self.n_neurons)
         self.hidden_layer2 = nn.Linear(self.n_neurons,self.n_neurons)
-        self.output_layer = nn.Linear(self.n_neurons,self.n_output)
+        self.output_layer = nn.Linear(self.n_neurons,self.n_output, bias = False)
 
     def forward(self, inputs):
         layer1_out = torch.sigmoid(self.hidden_layer1(inputs))

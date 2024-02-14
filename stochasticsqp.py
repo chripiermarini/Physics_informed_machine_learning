@@ -19,7 +19,6 @@ class StochasticSQP(Optimizer):
         ratio_param_init: initial \xi
         step_size_decay : factor for decreasing stepsize, i.e., alpha = step_size_decay * alpha
     """
-
     def __init__(self, params, lr=required, 
                  n_parameters = 0, 
                  n_constrs = 0, 
@@ -40,6 +39,7 @@ class StochasticSQP(Optimizer):
         self.epsilon = epsilon
         self.trial_merit = 1.0
         self.trial_ratio = 1.0
+        self.norm_d = 0.0
 
     def __setstate__(self, state):
         super(StochasticSQP, self).__setstate__(state)
@@ -76,13 +76,13 @@ class StochasticSQP(Optimizer):
         system_solution = torch.linalg.solve(ls_matrix, ls_rhs)
         d = system_solution[:self.n_parameters]
         y = system_solution[self.n_parameters:]
+        self.norm_d = torch.norm(d)
 
         ## norm of d_k equal to 0 exception
         if torch.linalg.norm(d, ord = 2) <= 10**(-4):
             self.trial_merit = 10 **(10)
             self.trial_ratio = 10 **(10)
             self.step_size = 1
-
         else:
             ## Update merit parameter
             # define trial merit parameter
@@ -136,13 +136,13 @@ class StochasticSQP(Optimizer):
         return loss
     
     def printerHeader(self):
-        print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
+        print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
               .format('Iter', 'Loss', '||c||', 'merit_f','stepsize','merit_param','ratio_param',
-                      'trial_merit', 'trial_ratio'))
+                      'trial_merit', 'trial_ratio', 'norm_d'))
 
     def printerIteration(self,every=1):
         if np.mod(self.state['iter'],every) == 0:
-            print('{:8d} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e}'.format(
+            print('{:8d} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e}'.format(
                 self.state['iter'], 
                 self.state['f'], 
                 torch.linalg.norm(self.state['c'], 1), 
@@ -151,8 +151,6 @@ class StochasticSQP(Optimizer):
                 self.merit_param,
                 self.ratio_param,
                 self.trial_merit,
-                self.trial_ratio
+                self.trial_ratio,
+                self.norm_d
                 ))
-
-
-print('TEST')
