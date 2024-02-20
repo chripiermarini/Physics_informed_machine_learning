@@ -47,6 +47,8 @@ def run(optimizer, problem, max_iter = 10000):
         optimizer.state['g'] = g
         optimizer.state['c'] = c
         optimizer.state['J'] = J
+        optimizer.state["f_g_hand"]= problem.objective_func_and_grad
+        optimizer.state["c_J_hand"] = problem.constraint_func_and_grad
 
         # Take a step inside optimizer
         optimizer.step()
@@ -58,16 +60,17 @@ def run(optimizer, problem, max_iter = 10000):
 if __name__ == '__main__':
     ## Initialize optimizer
 
-    problem_name = sys.argv[1]
+    problem_name = "Darcy" #sys.argv[1]
 
     problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 1)
 
     optimizer = StochasticSQP(problem.net.parameters(),
-                          lr=1.0,
+                          lr= 10,
                           n_parameters = problem.n_parameters, 
                           n_constrs = problem.n_constrs,
                           merit_param_init = 1, 
                           ratio_param_init = 1,
+                          step_opt= 2
                          )
     
     run(optimizer, problem,  max_iter = 100)

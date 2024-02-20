@@ -78,7 +78,7 @@ class Spring:
         return domain_obj, u_obj, domain_constr
     
 
-    def objective_func_and_grad(self, optimizer):
+    def objective_func_and_grad(self, optimizer, no_grad = False):
         """
         Compute objective function value and gradient value
         Output: 
@@ -98,17 +98,20 @@ class Spring:
         optimizer.zero_grad()
         f.backward(retain_graph=True)
 
-        # Assign derivative to gradient value
-        g_value = torch.zeros(self.n_parameters)
-        i=0
-        for name, param in self.net.named_parameters():
-            grad_l = len(param.grad.view(-1))
-            g_value[i:i+grad_l] = param.grad.view(-1)
-            i += grad_l
-        return  f_value, g_value
+        if no_grad is True:
+            return f_value
+        else:
+            # Assign derivative to gradient value
+            g_value = torch.zeros(self.n_parameters)
+            i = 0
+            for name, param in self.net.named_parameters():
+                grad_l = len(param.grad.view(-1))
+                g_value[i:i + grad_l] = param.grad.view(-1)
+                i += grad_l
+            return f_value, g_value
 
     
-    def constraint_func_and_grad(self, optimizer):
+    def constraint_func_and_grad(self, optimizer, no_grad = False):
         """
         Compute constraint function value and Jacobian value
         Output: 
@@ -127,16 +130,19 @@ class Spring:
         c = u_derivative_to_domain[:,0] - 2*u_derivative_to_domain[:,1] - u_constr_pred.reshape(-1)
         c_value = c.data
 
-        # Compute Jacobian
-        J_value = torch.zeros(self.n_constrs, self.n_parameters)
-        for i in range(self.n_constrs):
-            optimizer.zero_grad()
+        if no_grad is True:
+            return c_value
+        else:
+            # Compute Jacobian
+            J_value = torch.zeros(self.n_constrs, self.n_parameters)
+            for i in range(self.n_constrs):
+                optimizer.zero_grad()
 
-            # Backward of each constraint function
-            c[i].backward(retain_graph=True)
-            grads = torch.Tensor() #dict()
-            for name, param in self.net.named_parameters():
-                grads = torch.cat((grads, param.grad.view(-1)),0)
-            J_value[i,:] = grads
+                # Backward of each constraint function
+                c[i].backward(retain_graph=True)
+                grads = torch.Tensor()  # dict()
+                for name, param in self.net.named_parameters():
+                    grads = torch.cat((grads, param.grad.view(-1)), 0)
+                J_value[i, :] = grads
+            return c_value, J_value
 
-        return c_value, J_value

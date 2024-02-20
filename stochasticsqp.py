@@ -18,6 +18,9 @@ class StochasticSQP(Optimizer):
         merit_param_init: initial \tau 
         ratio_param_init: initial \xi
         step_size_decay : factor for decreasing stepsize, i.e., alpha = step_size_decay * alpha
+        sigma :
+        epsilon: ratio parameter for numerical stability
+        step_opt: option variable to set specific stepsize selection ( 1 for simple function reduction, 2 for Armijo)
     """
     def __init__(self, params, lr=required, 
                  n_parameters = 0, 
@@ -26,7 +29,8 @@ class StochasticSQP(Optimizer):
                  ratio_param_init = 1, 
                  step_size_decay = 0.5,
                  sigma = 0.5,
-                 epsilon= 0.5):
+                 epsilon= 0.5,
+                 step_opt= 1):
         defaults = dict()
         super(StochasticSQP, self).__init__(params, defaults)
         self.n_parameters = n_parameters
@@ -40,6 +44,8 @@ class StochasticSQP(Optimizer):
         self.trial_merit = 1.0
         self.trial_ratio = 1.0
         self.norm_d = 0.0
+        self.initial_params = params
+        self.step_opt = step_opt
 
     def __setstate__(self, state):
         super(StochasticSQP, self).__setstate__(state)
@@ -62,7 +68,6 @@ class StochasticSQP(Optimizer):
         g = self.state['g']
         c = self.state['c']
         f = self.state['f']
-        #H = self.state("H")
 
         ls_matrix = torch.cat((torch.cat((H, torch.transpose(J,0,1)), 1),
                                torch.cat((J, torch.zeros(self.n_constrs,self.n_constrs)), 1)), 0)
@@ -104,35 +109,54 @@ class StochasticSQP(Optimizer):
             if self.ratio_param > self.trial_ratio:
                 self.ratio_param = self.trial_ratio * (1 - self.epsilon)
 
-            ## Update stepsize
-            # the stepsize is different from the paper, but a simple one:
-            # if the current merit function value is greater than previous merit function, then
-            #   decrease the stepsize
-            # otherwise
-            #   do not change stepsize
-            #what do I implement?
-
         self.state['cur_merit_f'] = self.merit_param * f + torch.linalg.norm(c, 1)
         if 'iter' not in self.state:
             self.state['iter'] = 0
         else:
             self.state['iter'] += 1
-            if self.state['cur_merit_f'] > self.state['pre_merit_f']:
-                self.step_size = self.step_size_decay * self.step_size
-        self.state['pre_merit_f'] = self.state['cur_merit_f']
 
-        ## Update parameters
-        assert len(self.param_groups) == 1
-        group = self.param_groups[0]
-        d_p_i_start = 0
-        for p in group['params']:
-            if p.grad is None:
-                continue
-            d_p_i_end = d_p_i_start + len(p.view(-1))
-            d_p = d[d_p_i_start:d_p_i_end].reshape(p.shape)
-            p.data.add_(d_p, alpha=self.step_size)
-            d_p_i_start = d_p_i_end
-            
+        #get current values of parameters, f is the current phi
+
+        """
+        New step-size method
+
+        """
+        alpha_pre = 0.0
+        phi = self.merit_param * f + torch.linalg.norm(c, 1)
+        for k in range(10**10):
+
+            ## Update parameters
+            assert len(self.param_groups) == 1
+            group = self.param_groups[0]
+            d_p_i_start = 0
+            for p in group['params']:
+                if p.grad is None:
+                    continue
+                d_p_i_end = d_p_i_start + len(p.view(-1))
+                d_p = d[d_p_i_start:d_p_i_end].reshape(p.shape)
+                p.data.add_(d_p, alpha=self.step_size-alpha_pre)
+                d_p_i_start = d_p_i_end
+
+            #compute objective, constraints in new point using new values
+            f_new = self.state["f_g_hand"](self, no_grad = True)
+            c_new = self.state["c_J_hand"](self, no_grad = True)
+            phi_new = self.merit_param*f_new + torch.linalg.norm(c_new, ord= 1)
+
+            #perfrom linesearch procedure
+            if self.step_opt == 1: #simple decrease
+                condition = phi_new < phi
+            elif self.step_opt == 2: #armijo
+                condition = (phi_new <=
+                             phi - self.step_size*(self.merit_param * torch.matmul(g, d) - torch.linalg.norm(c, ord=1)))
+
+            #either accept the new point or reduce step_size
+            if condition == True:
+                break
+            else:
+                alpha_pre = self.step_size
+                self.step_size = self.step_size * self.step_size_decay
+
+
         return loss
     
     def printerHeader(self):
