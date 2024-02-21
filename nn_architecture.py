@@ -7,6 +7,7 @@ class TwoHiddenLayerFCNN(nn.Module):
         self.n_input = n_input
         self.n_neurons = n_neurons
         self.n_output = n_output
+        # the layer parameters are initialized by default
         self.hidden_layer1 = nn.Linear(self.n_input,self.n_neurons)
         self.hidden_layer2 = nn.Linear(self.n_neurons,self.n_neurons)
         self.output_layer = nn.Linear(self.n_neurons,self.n_output, bias = False)

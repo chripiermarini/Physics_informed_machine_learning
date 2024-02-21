@@ -178,3 +178,5 @@ class StochasticSQP(Optimizer):
                 self.trial_ratio,
                 self.norm_d
                 ))
+            if np.mod(self.state['iter'],every*20) == 0:
+                self.printerHeader()
