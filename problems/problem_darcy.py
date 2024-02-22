@@ -43,7 +43,7 @@ class Darcy:
         # Initialize NN
         self.n_input = 2
         self.n_output = 1
-        self.net = TwoHiddenLayerFCNN(self.n_input, self.n_output)
+        self.net = OneHiddenLayerFCNN(self.n_input, self.n_output)
         self.net.to(device)
         self.n_parameters = self.count_parameters(self.net)
 
@@ -103,7 +103,7 @@ class Darcy:
                                                  create_graph=True)
         u_obj_derivative = torch.cat((first_u_derivative[0], first_u_derivative[1]), dim=1)
 
-        v = 2  # diffusion coefficient
+        v = 1  # diffusion coefficient
         divergent_argument = torch.mul(v,u_obj_derivative)
 
         # compute the divergent (second derivative of x1 + second derivative of x2)

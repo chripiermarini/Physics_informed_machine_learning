@@ -82,9 +82,11 @@ class StochasticSQP(Optimizer):
         d = system_solution[:self.n_parameters]
         y = system_solution[self.n_parameters:]
         self.norm_d = torch.norm(d)
+        
+        self.kkt_norm = torch.norm(g + torch.matmul(torch.transpose(J,0,1), y), float('inf'))
 
         ## norm of d_k equal to 0 exception
-        if torch.linalg.norm(d, ord = 2) <= 10**(-4):
+        if torch.linalg.norm(d, ord = 2) <= 10**(-8):
             self.trial_merit = 10 **(10)
             self.trial_ratio = 10 **(10)
             self.step_size = 1
@@ -123,7 +125,8 @@ class StochasticSQP(Optimizer):
         """
         alpha_pre = 0.0
         phi = self.merit_param * f + torch.linalg.norm(c, 1)
-        for k in range(10**10):
+        self.inner_k = 0
+        for self.inner_k in range(10**3):
 
             ## Update parameters
             assert len(self.param_groups) == 1
@@ -147,7 +150,7 @@ class StochasticSQP(Optimizer):
                 condition = phi_new < phi
             elif self.step_opt == 2: #armijo
                 condition = (phi_new <=
-                             phi - self.step_size*(self.merit_param * torch.matmul(g, d) - torch.linalg.norm(c, ord=1)))
+                             phi + 0.001*self.step_size*(self.merit_param * torch.matmul(g, d) - torch.linalg.norm(c, ord=1)))
 
             #either accept the new point or reduce step_size
             if condition == True:
@@ -155,18 +158,18 @@ class StochasticSQP(Optimizer):
             else:
                 alpha_pre = self.step_size
                 self.step_size = self.step_size * self.step_size_decay
-
+            self.printerIteration()
 
         return loss
     
     def printerHeader(self):
-        print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
+        print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
               .format('Iter', 'Loss', '||c||', 'merit_f','stepsize','merit_param','ratio_param',
-                      'trial_merit', 'trial_ratio', 'norm_d'))
+                      'trial_merit', 'trial_ratio', 'norm_d','kkt_norm', 'inner_Iter'))
 
     def printerIteration(self,every=1):
         if np.mod(self.state['iter'],every) == 0:
-            print('{:8d} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e}'.format(
+            print('{:8d} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11d}'.format(
                 self.state['iter'], 
                 self.state['f'], 
                 torch.linalg.norm(self.state['c'], 1), 
@@ -176,7 +179,9 @@ class StochasticSQP(Optimizer):
                 self.ratio_param,
                 self.trial_merit,
                 self.trial_ratio,
-                self.norm_d
+                self.norm_d,
+                self.kkt_norm,
+                self.inner_k
                 ))
-            if np.mod(self.state['iter'],every*20) == 0:
+            if np.mod(self.state['iter'],every*20) == 0 and (self.state['iter'] != 0):
                 self.printerHeader()

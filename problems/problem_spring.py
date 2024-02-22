@@ -44,7 +44,7 @@ class Spring:
         # Initialize NN
         self.n_input = 2
         self.n_output = 1
-        self.net = TwoHiddenLayerFCNN(self.n_input, self.n_output) 
+        self.net = OneHiddenLayerFCNN(self.n_input, self.n_output) 
         self.net.to(device)
         self.n_parameters = self.count_parameters(self.net)
 
