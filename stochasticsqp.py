@@ -22,14 +22,18 @@ class StochasticSQP(Optimizer):
         epsilon: ratio parameter for numerical stability
         step_opt: option variable to set specific stepsize selection ( 1 for simple function reduction, 2 for Armijo)
     """
+    
+    sigma=0.5
+    epsilon=1e-6
+    eta=1e-4 # line search parameter
+    buffer=1e-5
+    
     def __init__(self, params, lr=required, 
                  n_parameters = 0, 
                  n_constrs = 0, 
                  merit_param_init = 1,
                  ratio_param_init = 1, 
                  step_size_decay = 0.5,
-                 sigma = 0.5,
-                 epsilon= 0.5,
                  step_opt= 1):
         defaults = dict()
         super(StochasticSQP, self).__init__(params, defaults)
@@ -38,9 +42,8 @@ class StochasticSQP(Optimizer):
         self.merit_param = merit_param_init
         self.ratio_param = ratio_param_init
         self.step_size = lr
+        self.step_size_init = lr
         self.step_size_decay = step_size_decay
-        self.sigma= sigma
-        self.epsilon = epsilon
         self.trial_merit = 1.0
         self.trial_ratio = 1.0
         self.norm_d = 0.0
@@ -60,6 +63,11 @@ class StochasticSQP(Optimizer):
         Here, we also define an example of the Hessian matrix //
         The H matrix is set as torch.eye(self.n_parameters)
         """
+        if 'iter' not in self.state:
+            self.state['iter'] = 0
+        else:
+            self.state['iter'] += 1
+        
         loss = None
         H = torch.eye(self.n_parameters)
 
@@ -85,6 +93,11 @@ class StochasticSQP(Optimizer):
         
         self.kkt_norm = torch.norm(g + torch.matmul(torch.transpose(J,0,1), y), float('inf'))
 
+        dHd = torch.matmul(torch.matmul(d, H), d)
+        gd = torch.matmul(g, d)
+        gd_plus_max_dHd_0 = gd + torch.max(dHd, torch.tensor(0))
+        c_norm_1 = torch.linalg.norm(c, ord=1)
+
         ## norm of d_k equal to 0 exception
         if torch.linalg.norm(d, ord = 2) <= 10**(-8):
             self.trial_merit = 10 **(10)
@@ -93,40 +106,36 @@ class StochasticSQP(Optimizer):
         else:
             ## Update merit parameter
             # define trial merit parameter
-            if torch.matmul(g, d) + torch.max(torch.matmul(torch.matmul(d, H), d), 0)[0] <= 0:
+            if gd_plus_max_dHd_0 <= 0:
                 self.trial_merit = 10 ** 10
             else:
-                self.trial_merit = (((1 - self.sigma) * torch.linalg.norm(c, ord=1)) /
-                                    (torch.matmul(g, d) + torch.max(torch.matmul(torch.matmul(d, H), d), 0)[0]))
+                self.trial_merit = ((1 - self.sigma) * c_norm_1) / gd_plus_max_dHd_0
 
             if self.merit_param > self.trial_merit:
                 self.merit_param = self.trial_merit * (1 - self.epsilon)
 
             ## Update ratio parameter
             # since d is the solution of the linear system, it entails delta_q defined through the formula (2.4)
-            delta_q = (- self.merit_param * (torch.matmul(g, d)
-                                             + 0.5 * torch.max(torch.matmul(torch.matmul(d, H), d), 0)[
-                                                 0]) + torch.linalg.norm(c, ord=1))
-            self.trial_ratio = delta_q / (self.merit_param * torch.linalg.norm(d, ord=2) ** (2))
+            delta_q = - self.merit_param * (gd + 0.5 * torch.max(dHd, torch.tensor(0))) + c_norm_1
+            self.trial_ratio = delta_q / (self.merit_param * self.norm_d ** (2))
             if self.ratio_param > self.trial_ratio:
-                self.ratio_param = self.trial_ratio * (1 - self.epsilon)
+                self.ratio_param = self.trial_ratio * (1 - self.epsilon) 
 
-        self.state['cur_merit_f'] = self.merit_param * f + torch.linalg.norm(c, 1)
-        if 'iter' not in self.state:
-            self.state['iter'] = 0
-        else:
-            self.state['iter'] += 1
+        
+        """
+        Line Search step-size
 
+        """
         #get current values of parameters, f is the current phi
-
-        """
-        New step-size method
-
-        """
+        self.state['cur_merit_f'] = self.merit_param * f + torch.linalg.norm(c, 1)
+        self.state['phi_new'] = self.state['cur_merit_f']
+        self.state['search_rhs'] = 0
+        
         alpha_pre = 0.0
         phi = self.merit_param * f + torch.linalg.norm(c, 1)
-        self.inner_k = 0
-        for self.inner_k in range(10**3):
+        self.ls_k = 0
+        self.step_size = self.step_size_init
+        for self.ls_k in range(10**3):
 
             ## Update parameters
             assert len(self.param_groups) == 1
@@ -143,37 +152,39 @@ class StochasticSQP(Optimizer):
             #compute objective, constraints in new point using new values
             f_new = self.state["f_g_hand"](self, no_grad = True)
             c_new = self.state["c_J_hand"](self, no_grad = True)
-            phi_new = self.merit_param*f_new + torch.linalg.norm(c_new, ord= 1)
+            self.state['phi_new']= self.merit_param*f_new + torch.linalg.norm(c_new, ord= 1)
 
             #perfrom linesearch procedure
             if self.step_opt == 1: #simple decrease
-                condition = phi_new < phi
+                self.state['search_rhs'] = self.state['cur_merit_f']
             elif self.step_opt == 2: #armijo
-                condition = (phi_new <=
-                             phi + 0.001*self.step_size*(self.merit_param * torch.matmul(g, d) - torch.linalg.norm(c, ord=1)))
-
-            #either accept the new point or reduce step_size
-            if condition == True:
+                delta_q = - self.merit_param * (gd + 0.5 * torch.max(dHd, torch.tensor(0))) + c_norm_1
+                self.state['search_rhs'] = self.state['cur_merit_f'] - self.eta*self.step_size*delta_q
+            
+            #either accept the new point or reduce step_size, add buffer for computation precision
+            if self.state['phi_new'] < self.state['search_rhs'] + self.buffer:
                 break
             else:
                 alpha_pre = self.step_size
                 self.step_size = self.step_size * self.step_size_decay
-            self.printerIteration()
+            #self.printerIteration()
 
         return loss
     
     def printerHeader(self):
-        print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
-              .format('Iter', 'Loss', '||c||', 'merit_f','stepsize','merit_param','ratio_param',
-                      'trial_merit', 'trial_ratio', 'norm_d','kkt_norm', 'inner_Iter'))
+        print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
+              .format('Iter', 'Loss', '||c||_1', 'merit_f', 'phi_new', 'search_rhs','stepsize','merit_param','ratio_param',
+                      'trial_merit', 'trial_ratio', 'norm_d','kkt_norm', 'ls_Iter'))
 
     def printerIteration(self,every=1):
         if np.mod(self.state['iter'],every) == 0:
-            print('{:8d} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11d}'.format(
+            print('{:8d} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11d}'.format(
                 self.state['iter'], 
                 self.state['f'], 
                 torch.linalg.norm(self.state['c'], 1), 
                 self.state['cur_merit_f'],
+                self.state['phi_new'],
+                self.state['search_rhs'],
                 self.step_size,
                 self.merit_param,
                 self.ratio_param,
@@ -181,7 +192,7 @@ class StochasticSQP(Optimizer):
                 self.trial_ratio,
                 self.norm_d,
                 self.kkt_norm,
-                self.inner_k
+                self.ls_k
                 ))
             if np.mod(self.state['iter'],every*20) == 0 and (self.state['iter'] != 0):
                 self.printerHeader()

@@ -2,8 +2,8 @@ import torch
 from stochasticsqp import *
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
-torch.manual_seed(10000)
-np.random.seed(10000)
+torch.manual_seed(28)
+np.random.seed(28)
 import sys
 
 # Import all problems fro directory `problems`
@@ -54,18 +54,18 @@ def run(optimizer, problem, max_iter = 10000):
         optimizer.step()
 
         # Print out
-        optimizer.printerIteration(every=1)
+        optimizer.printerIteration(every=10)
     
 
 if __name__ == '__main__':
     ## Initialize optimizer
 
-    problem_name = "Darcy" #sys.argv[1]
+    problem_name = "Darcy" #"Darcy" #sys.argv[1]
 
-    problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 1)
+    problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 10)
 
     optimizer = StochasticSQP(problem.net.parameters(),
-                          lr= 10,
+                          lr= 0.1,
                           n_parameters = problem.n_parameters, 
                           n_constrs = problem.n_constrs,
                           merit_param_init = 1, 
@@ -73,4 +73,4 @@ if __name__ == '__main__':
                           step_opt= 2
                          )
     
-    run(optimizer, problem,  max_iter = 100)
+    run(optimizer, problem,  max_iter = int(1e4))
