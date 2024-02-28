@@ -60,7 +60,7 @@ def run(optimizer, problem, max_iter = 10000):
 if __name__ == '__main__':
     ## Initialize optimizer
 
-    problem_name = "Darcy" #"Darcy" #sys.argv[1]
+    problem_name = "Darcy" #"Spring" #sys.argv[1]
 
     problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 10)
 
