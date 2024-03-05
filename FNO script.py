@@ -18,6 +18,7 @@ train_loader, test_loaders, data_processor = load_darcy_flow_small(
         test_batch_sizes=[32, 32],
         positional_encoding=True
 )
+
 data_processor = data_processor.to(device)
 
 model = FNO(n_modes=(16, 16), hidden_channels=64,
