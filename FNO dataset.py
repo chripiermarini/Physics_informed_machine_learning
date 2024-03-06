@@ -48,3 +48,4 @@ def pde_model(train_sample):
     return p_matrix, out
 
 p_matrix, out = pde_model(train_sample)
+print("boh")

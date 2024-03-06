@@ -55,6 +55,14 @@ class StochasticSQP(Optimizer):
     def __setstate__(self, state):
         super(StochasticSQP, self).__setstate__(state)
 
+    def initialize_param(self, initial_value = 1):
+        ## Update parameters
+        assert len(self.param_groups) == 1
+        group = self.param_groups[0]
+        for p in group['params']:
+            p.data.add_(initial_value, alpha=self.step_size)
+        return
+
     def step(self, closure=None):
         """ Performs a single optimization step.
         Arguments:
@@ -166,6 +174,9 @@ class StochasticSQP(Optimizer):
                 self.state['search_rhs'] = self.state['cur_merit_f'] - self.eta*self.step_size*delta_q
             
             #either accept the new point or reduce step_size, add buffer for computation precision
+            #print("right_hand:", self.state['phi_new'])
+            #print(" left_hand:", self.state['search_rhs'] + self.buffer)
+            #print("----------------------------------------------------")
             if self.state['phi_new'] < self.state['search_rhs'] + self.buffer:
                 break
             else:
@@ -176,12 +187,7 @@ class StochasticSQP(Optimizer):
         return loss
     
     def printerHeader(self):
-        print('-------------------StochasticSQPOptimizer----------------')
-        print('Problem name:          ', self.problem.name)
-        print('Number of parameters:  ', self.n_parameters)
-        print('Number of constraints: ', self.n_constrs)
-        print('Sample size:           ', self.problem.n_obj_sample)
-        print('---------------------------------------------------------')
+
         
         print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
               .format('Iter', 'Loss', '||c||_1', 'merit_f', 'phi_new', 'search_rhs','stepsize','merit_param','ratio_param',

@@ -20,7 +20,7 @@ class TwoHiddenLayerFCNN(nn.Module):
         return output
 
 class OneHiddenLayerFCNN(nn.Module):
-    def __init__(self, n_input, n_output, n_neurons=1024):
+    def __init__(self, n_input, n_output, n_neurons=64):
         super(OneHiddenLayerFCNN, self).__init__()
         self.n_input = n_input
         self.n_neurons = n_neurons
