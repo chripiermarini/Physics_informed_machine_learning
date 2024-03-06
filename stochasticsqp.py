@@ -34,7 +34,8 @@ class StochasticSQP(Optimizer):
                  merit_param_init = 1,
                  ratio_param_init = 1, 
                  step_size_decay = 0.5,
-                 step_opt= 1):
+                 step_opt= 1,
+                 problem=None):
         defaults = dict()
         super(StochasticSQP, self).__init__(params, defaults)
         self.n_parameters = n_parameters
@@ -49,6 +50,7 @@ class StochasticSQP(Optimizer):
         self.norm_d = 0.0
         self.initial_params = params
         self.step_opt = step_opt
+        self.problem = problem
 
     def __setstate__(self, state):
         super(StochasticSQP, self).__setstate__(state)
@@ -174,6 +176,13 @@ class StochasticSQP(Optimizer):
         return loss
     
     def printerHeader(self):
+        print('-------------------StochasticSQPOptimizer----------------')
+        print('Problem name:          ', self.problem.name)
+        print('Number of parameters:  ', self.n_parameters)
+        print('Number of constraints: ', self.n_constrs)
+        print('Sample size:           ', self.problem.n_obj_sample)
+        print('---------------------------------------------------------')
+        
         print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
               .format('Iter', 'Loss', '||c||_1', 'merit_f', 'phi_new', 'search_rhs','stepsize','merit_param','ratio_param',
                       'trial_merit', 'trial_ratio', 'norm_d','kkt_norm', 'ls_Iter'))

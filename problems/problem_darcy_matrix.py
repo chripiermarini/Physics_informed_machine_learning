@@ -11,13 +11,15 @@ from neuralop.datasets import load_darcy_flow_small
 
 class DarcyMatrix:
     n_discretize = 16
-    hidden_channels=4
+    hidden_channels=16
     def __init__(self, device, n_obj_sample=500, n_constrs=10, n_test_sample=1):
         """
         Input: 
             n_obj_sample:   int, the number of pictures for training sample, each picture will have n_discretize * n_discretize pixel samples
             n_constrs:      int, the number of pixels on the boundary used for constraints. These pixels will be sampled from the boundary pixels of all the pictures.
         """
+        # Set problem name
+        self.name = 'DarcyMatrix(' + 'n_discretize' + str(self.n_discretize) +  ', hidden_channels' + str(self.hidden_channels) +')'
         
         # Initialize NN
         self.net = FNOLocal(n_discretize = self.n_discretize, hidden_channels=self.hidden_channels)

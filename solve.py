@@ -62,8 +62,8 @@ if __name__ == '__main__':
 
     problem_name = "DarcyMatrix" #"Spring" #sys.argv[1]
 
-    problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 20)    
-    print(problem.input[problem.constr_pixel_idx[:,0],1:3,problem.constr_pixel_idx[:,1],problem.constr_pixel_idx[:,2]])
+    problem = all_problems[problem_name](device, n_obj_sample = 1000, n_constrs = 30)    
+    #print(problem.input[problem.constr_pixel_idx[:,0],1:3,problem.constr_pixel_idx[:,1],problem.constr_pixel_idx[:,2]])
 
     optimizer = StochasticSQP(problem.net.parameters(),
                           lr= 0.1,
@@ -71,8 +71,9 @@ if __name__ == '__main__':
                           n_constrs = problem.n_constrs,
                           merit_param_init = 1, 
                           ratio_param_init = 1,
-                          step_opt= 2
+                          step_opt= 2,
+                          problem = problem
                          )
-    f,g = problem.objective_func_and_grad(optimizer)
-    c,J = problem.constraint_func_and_grad(optimizer)
+    #f,g = problem.objective_func_and_grad(optimizer)
+    #c,J = problem.constraint_func_and_grad(optimizer)
     run(optimizer, problem,  max_iter = int(1e4))
