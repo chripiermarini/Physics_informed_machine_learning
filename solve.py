@@ -54,15 +54,16 @@ def run(optimizer, problem, max_iter = 10000):
         optimizer.step()
 
         # Print out
-        optimizer.printerIteration(every=10)
+        optimizer.printerIteration(every=1)
     
 
 if __name__ == '__main__':
     ## Initialize optimizer
 
-    problem_name = "Darcy" #"Spring" #sys.argv[1]
+    problem_name = "DarcyMatrix" #"Spring" #sys.argv[1]
 
-    problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 10)
+    problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 20)    
+    print(problem.input[problem.constr_pixel_idx[:,0],1:3,problem.constr_pixel_idx[:,1],problem.constr_pixel_idx[:,2]])
 
     optimizer = StochasticSQP(problem.net.parameters(),
                           lr= 0.1,
@@ -72,5 +73,6 @@ if __name__ == '__main__':
                           ratio_param_init = 1,
                           step_opt= 2
                          )
-    
+    f,g = problem.objective_func_and_grad(optimizer)
+    c,J = problem.constraint_func_and_grad(optimizer)
     run(optimizer, problem,  max_iter = int(1e4))

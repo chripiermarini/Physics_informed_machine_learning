@@ -142,8 +142,10 @@ class StochasticSQP(Optimizer):
             group = self.param_groups[0]
             d_p_i_start = 0
             for p in group['params']:
-                if p.grad is None:
-                    continue
+                #print(p.view(-1).shape)
+                # TODO: check of p.grad is None
+                #if p.grad is None:
+                #    continue
                 d_p_i_end = d_p_i_start + len(p.view(-1))
                 d_p = d[d_p_i_start:d_p_i_end].reshape(p.shape)
                 p.data.add_(d_p, alpha=self.step_size-alpha_pre)

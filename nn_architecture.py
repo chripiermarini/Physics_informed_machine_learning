@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from neuralop.models import FNO
 
 class TwoHiddenLayerFCNN(nn.Module):
     def __init__(self, n_input, n_output, n_neurons=16):
@@ -32,3 +33,15 @@ class OneHiddenLayerFCNN(nn.Module):
         out = torch.sigmoid(self.hidden_layer(inputs))
         output = self.output_layer(out) ## For regression, no activation is used in output layer
         return output
+
+class FNOLocal(nn.Module):
+    def __init__(self, n_discretize=16, hidden_channels=16):
+        super(FNOLocal, self).__init__()
+        self.FNO = FNO(n_modes = (n_discretize, n_discretize), 
+                       hidden_channels=hidden_channels,
+                       in_channels=3,
+                       out_channels=1)
+        
+    def forward(self, inputs):
+        out = self.FNO(inputs)
+        return out
