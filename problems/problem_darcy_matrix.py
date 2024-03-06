@@ -125,7 +125,7 @@ class DarcyMatrix:
         p_matrix = - (second_derivative_x1[0] + second_derivative_x2[0]) - 1
 
         # Compute objective value: MSE over all interior pixels
-        n_sample_pixel_interior = self.n_obj_sample * (self.n_discretize-1) * (self.n_discretize-1)
+        n_sample_pixel_interior = self.n_obj_sample * (self.n_discretize-2) * (self.n_discretize-2)
         f = (torch.linalg.matrix_norm(p_matrix[:,1:(self.n_discretize-1), 1:(self.n_discretize-1)])**2).sum()
         f = f / n_sample_pixel_interior
         f_value = f.data
