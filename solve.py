@@ -7,6 +7,7 @@ import numpy as np
 torch.manual_seed(28)
 np.random.seed(28)
 import sys
+import numpy as np
 
 # Import all problems fro directory `problems`
 import os
@@ -39,11 +40,10 @@ all_problems = import_all_classes_from_directory(directory_path)
 
 # Now all_problems is a dictionary where keys are names of problem classes and values are problem objects
 
-
-def run(optimizer, problem, max_iter=1000):
+def run(optimizer, problem, max_iter = 10000, save_every=10):
     optimizer.printerHeader()
 
-    optimizer.initialize_param(1)
+    optimizer.initialize_param(0.01)
 
     for epoch in range(max_iter):
         # Compute f, g, c, J
@@ -64,24 +64,26 @@ def run(optimizer, problem, max_iter=1000):
         # Print out
         optimizer.printerIteration(every=1)
 
+        if np.mod(epoch,save_every) == 0:
+            # path for saving trained NN
+            path='mdl/nn_epoch%s_%s' %(epoch, problem_name)
+            problem.save_net(path)
+    
 
 if __name__ == '__main__':
     ## Initialize optimizer
 
     problem_name = "DarcyMatrix"  # "Spring" #sys.argv[1]
 
-    problem = all_problems[problem_name](device, n_obj_sample=10, n_constrs=3)
-    # print(problem.input[problem.constr_pixel_idx[:,0],1:3,problem.constr_pixel_idx[:,1],problem.constr_pixel_idx[:,2]])
+    problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 30)    
 
     optimizer = StochasticSQP(problem.net.parameters(),
-                              lr=0.07,
-                              n_parameters=problem.n_parameters,
-                              n_constrs=problem.n_constrs,
-                              merit_param_init=1,
-                              ratio_param_init=1,
-                              step_opt=2,
-                              problem=problem
-                              )
-    # f,g = problem.objective_func_and_grad(optimizer)
-    # c,J = problem.constraint_func_and_grad(optimizer)
-    run(optimizer, problem, max_iter=int(1e4))
+                          lr= 0.5,
+                          n_parameters = problem.n_parameters, 
+                          n_constrs = problem.n_constrs,
+                          merit_param_init = 1, 
+                          ratio_param_init = 1,
+                          step_opt= 2,
+                          problem = problem
+                         )
+    run(optimizer, problem,  max_iter = int(200), save_every=20)

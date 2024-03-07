@@ -32,7 +32,7 @@ class DarcyMatrix:
         self.n_test_sample = n_test_sample
         
         # shape of input : [batch_size, 3, n_discretize, n_discretize], in the 3 channels, the first channel is nu(x), second is x1, and third is x2 
-        self.input = self.generate_sample(device)
+        self.input, self.test_input_data, self.test_ground_truth = self.generate_sample(device)
         
         # Set indices pixels for constraints and fixed it
         self.constr_pixel_idx = self.set_constraint_pixel_idx()
@@ -55,7 +55,12 @@ class DarcyMatrix:
         res = data_processor.preprocess(train_loader.dataset[:])
         input_data = res['x']  
 
-        return input_data
+        test_loader = test_loaders[self.n_discretize]
+        res_test = data_processor.preprocess(test_loader.dataset[:])
+        test_input_data = res_test['x']  
+        test_ground_truth = res_test['y']
+
+        return input_data, test_input_data, test_ground_truth
 
     def set_constraint_pixel_idx(self):
         # randomly select self.n_constrs number of pixels from the boundary of all the samples
@@ -130,6 +135,7 @@ class DarcyMatrix:
         f = (torch.linalg.matrix_norm(p_matrix[:,1:(self.n_discretize-1), 1:(self.n_discretize-1)])**2).sum()
         f = f / n_sample_pixel_interior
         f_value = f.data
+        # TODO use torch.mse
         
         # Backward of objective function
         optimizer.zero_grad()
@@ -190,3 +196,10 @@ class DarcyMatrix:
                     i += grad_l
 
             return c_value, J_value
+
+    def save_net(self,path):
+        torch.save(self.net.state_dict(), path)
+
+    def load_net(self,path):
+        self.net.load_state_dict(torch.load(path))
+        self.net.eval()
