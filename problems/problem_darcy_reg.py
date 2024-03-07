@@ -10,7 +10,7 @@ from neuralop.datasets import load_darcy_flow_small
 """
 
 
-class DarcyMatrix:
+class DarcyMatrixReg:
     n_discretize = 16
     hidden_channels = 4
 
