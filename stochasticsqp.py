@@ -146,7 +146,7 @@ class StochasticSQP(Optimizer):
         phi = self.merit_param * f + torch.linalg.norm(c, 1)
         self.ls_k = 0
         self.step_size = self.step_size_init
-        for self.ls_k in range(10**3):
+        for self.ls_k in range(10):
 
             ## Update parameters
             assert len(self.param_groups) == 1
@@ -180,7 +180,7 @@ class StochasticSQP(Optimizer):
             else:
                 alpha_pre = self.step_size
                 self.step_size = self.step_size * self.step_size_decay
-            self.printerIteration()
+            #self.printerIteration()
 
         return loss
     
@@ -194,15 +194,17 @@ class StochasticSQP(Optimizer):
     
     def printerHeader(self):
         
-        print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
-              .format('Iter', 'Loss', '||c||_1', 'merit_f', 'phi_new', 'search_rhs','stepsize','merit_param','ratio_param',
+        print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
+              .format('Iter', 'f', 'f_interior', 'f_boundary', '||c||_1', 'merit_f', 'phi_new', 'search_rhs','stepsize','merit_param','ratio_param',
                       'trial_merit', 'trial_ratio', 'norm_d','kkt_norm', 'ls_Iter'))
 
     def printerIteration(self,every=1):
         if np.mod(self.state['iter'],every) == 0:
-            print('{:8d} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11d}'.format(
+            print('{:8d} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11d}'.format(
                 self.state['iter'], 
                 self.state['f'], 
+                self.state['f_interior'], 
+                self.state['f_boundary'], 
                 torch.linalg.norm(self.state['c'], 1), 
                 self.state['cur_merit_f'],
                 self.state['phi_new'],
