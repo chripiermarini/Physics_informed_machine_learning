@@ -1,57 +1,29 @@
 import torch
 from stochasticsqp import *
-
+from problems.problem_darcy_matrix_old import DarcyMatrixOld
+from problems.problem_darcy_matrix import DarcyMatrix
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
-
-torch.manual_seed(28)
-np.random.seed(28)
+torch.set_default_device(device)
+torch.manual_seed(22)
+np.random.seed(22)
 import sys
-import numpy as np
 
-# Import all problems fro directory `problems`
-import os
-import importlib.util
-
-
-def import_all_classes_from_directory(directory):
-    classes = {}
-    for filename in os.listdir(directory):
-        if filename.endswith('.py'):
-            module_name = filename[:-3]  # Remove '.py' to get the module name
-            module_path = os.path.join(directory, filename)
-
-            # Import the module
-            spec = importlib.util.spec_from_file_location(module_name, module_path)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-
-            # Iterate through attributes of the module
-            for attribute_name in dir(module):
-                attribute = getattr(module, attribute_name)
-                if isinstance(attribute, type):  # Check if it's a class
-                    classes[attribute_name] = attribute
-    return classes
-
-
-directory_path = './problems'
-all_problems = import_all_classes_from_directory(directory_path)
-
-
-# Now all_problems is a dictionary where keys are names of problem classes and values are problem objects
 
 def run(optimizer, problem, max_iter = 10000, save_every=10):
     optimizer.printerHeader()
 
-    optimizer.initialize_param(0.01)
+    optimizer.initialize_param(0.05)
 
-    for epoch in range(max_iter):
+    for epoch in range(max_iter+1):
         # Compute f, g, c, J
-        f, g = problem.objective_func_and_grad(optimizer)
+        f, f_interior, f_boundary, g = problem.objective_func_and_grad(optimizer, return_multiple_f=True)
         c, J = problem.constraint_func_and_grad(optimizer)
 
         # Update f, g, c, J to optimizer
         optimizer.state['f'] = f
+        optimizer.state['f_interior'] = f_interior
+        optimizer.state['f_boundary'] = f_boundary
         optimizer.state['g'] = g
         optimizer.state['c'] = c
         optimizer.state['J'] = J
@@ -72,11 +44,9 @@ def run(optimizer, problem, max_iter = 10000, save_every=10):
 
 if __name__ == '__main__':
     ## Initialize optimizer
-
     problem_name = "DarcyMatrix"  # "Spring" #sys.argv[1]
-
-    problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 30)    
-
+    problem = eval(problem_name)(device, n_obj_sample = 10, n_constrs = 3, reg=1)
+    
     optimizer = StochasticSQP(problem.net.parameters(),
                           lr= 0.5,
                           n_parameters = problem.n_parameters, 
@@ -84,6 +54,6 @@ if __name__ == '__main__':
                           merit_param_init = 1, 
                           ratio_param_init = 1,
                           step_opt= 2,
-                          problem = problem
+                          problem = problem,
                          )
     run(optimizer, problem,  max_iter = int(200), save_every=20)
