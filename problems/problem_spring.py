@@ -39,7 +39,15 @@ and #outputs = 1
 
 """
 class Spring:
-    def __init__(self, device, n_obj_sample = 500, n_constrs = 10):
+    name = "Spring"
+
+    n_discretization = 100
+    def __init__(self, device, n_obj_sample = 10, n_constrs = 3, reg = 1, constraint_type='boundary'):
+
+        '''
+        Input: 
+            constraint_type: str, either 'boundary' or 'pde'
+        '''
 
         # Initialize NN
         self.n_input = 2
@@ -47,38 +55,68 @@ class Spring:
         self.net = OneHiddenLayerFCNN(self.n_input, self.n_output) 
         self.net.to(device)
         self.n_parameters = self.count_parameters(self.net)
+        self.reg = torch.tensor(reg)
+        self.constraint_type = constraint_type
 
         # Generate sample
         self.n_obj_sample = n_obj_sample
         self.n_constrs = n_constrs
-        self.domain_obj, self.u_obj, self.domain_constr = self.generate_sample()
+        x_obj, self.domain_boundary, self.u_boundary, self.domain_interior, self.constr_row_select = self.generate_sample()
 
         # Construct tensor of generated sample 
-        self.domain_obj_tensor = Variable(torch.from_numpy(self.domain_obj).float(), requires_grad=False).to(device)
-        self.u_obj_tensor = Variable(torch.from_numpy(self.u_obj).float(), requires_grad=False).to(device)
-        self.domain_constr_tensor = Variable(torch.from_numpy(self.domain_constr).float(), requires_grad=True).to(device)
-        self.mse_cost_function = torch.nn.MSELoss() # Mean squared error
+        self.domain_boundary_tensor = Variable(torch.from_numpy(self.domain_boundary).float(), requires_grad=False).to(device)
+        self.u_boundary_tensor = Variable(torch.from_numpy(self.u_boundary).float(), requires_grad=False).to(device)
+        self.domain_interior_tensor = Variable(torch.from_numpy(self.domain_interior).float(), requires_grad=True).to(device)
         
+        self.mse_cost_function = torch.nn.MSELoss() # Mean squared error
+
+                
     def count_parameters(self, nn_net):
         return sum(p.numel() for p in nn_net.parameters() if p.requires_grad)
 
     def generate_sample(self):
         """
-        Generate domain_obj, u_obj, domain_constr
-        """ 
+        Generate boundary points, interior points for both unconstrained and constrained case
+        Be careful: when in unconstrained case, the number of samples for the objective function is
+        double (S_B and S_i)
+
+        n_obj_sample controls the number of x we have
+
+        if constr is zero, we automatically generate 10 different t's
+        If constr is not zero, we automatically generate n_constr different t's
+        """
+
         # Boundary sample for objective
         x_obj = np.random.uniform(low=0.0, high=2.0, size=(self.n_obj_sample,1))
-        t_obj = np.zeros((self.n_obj_sample,1))
-        domain_obj = np.concatenate((x_obj, t_obj), axis = 1)
-        u_obj = 6*np.exp(-3*x_obj)
-        # Interior sample for constraints (no need pde true solution)
-        x_constr = np.random.uniform(low=0.0, high=2.0, size=(self.n_constrs,1))
-        t_constr = np.random.uniform(low=0.0, high=1.0, size=(self.n_constrs,1))
-        domain_constr = np.concatenate((x_constr, t_constr), axis = 1)
-        return domain_obj, u_obj, domain_constr
+        t_boundary = np.zeros((self.n_obj_sample,1))
+        domain_boundary = np.concatenate((x_obj, t_boundary), axis = 1) #S_B
+
+        #boundary true pde solution
+        u_boundary = 6*np.exp(-3*x_obj)
+
+        # Interior sample for objective
+        step = float(1 / self.n_discretization)
+        t_interior = np.arange(start=0.0, stop=1.0 * (1+step) , step=step)
+        t_interior = t_interior[1:]
+        t_interior = t_interior.reshape((self.n_discretization,1))
+        domain_interior = np.column_stack((np.meshgrid(x_obj,t_interior)[0].flatten(),
+                               np.meshgrid(x_obj,t_interior)[1].flatten()))
+        
+        # Generate sample for constraints
+        
+        # If constraints are some points on boundary conditions, then the subsample are from domain_boundary
+        # If constraints are some points on pde conditions, then the subsample are from domain_interior
+        if self.constraint_type == 'boundary':
+            n_domain_boundary = domain_boundary.shape[0]
+            constr_row_select = np.random.randint(0, n_domain_boundary, size=(self.n_constrs))
+        elif self.constraint_type == 'pde':
+            n_domain_interior = domain_interior.shape[0]
+            constr_row_select = np.random.randint(0, n_domain_interior, size=(self.n_constrs))
+        
+        return x_obj, domain_boundary, u_boundary, domain_interior, constr_row_select
     
 
-    def objective_func_and_grad(self, optimizer, no_grad = False):
+    def objective_func_and_grad(self, optimizer, no_grad = False, return_multiple_f=False):
         """
         Compute objective function value and gradient value
         Output: 
@@ -87,11 +125,26 @@ class Spring:
             optimizer: the optimizer object 
         """
 
+        #### differential operator
+        # NN forward to compute the output of sample for constraint
+        u_interior_pred = self.net(self.domain_interior_tensor)
+
+        # Compute the derivative of output with respect to domain
+        u_derivative_to_domain = torch.autograd.grad(u_interior_pred.sum(), self.domain_interior_tensor, create_graph=True)[
+            0]
+
+        differential_operator = u_derivative_to_domain[:, 0] - 2 * u_derivative_to_domain[:, 1] - u_interior_pred.reshape(-1)
+        interior_loss = self.mse_cost_function(differential_operator, torch.zeros(differential_operator.shape))
+
+        ### boundary loss
         # NN forward to compute the output of sample for objective function
-        u_obj_pred = self.net(self.domain_obj_tensor) 
+        u_boundary_pred = self.net(self.domain_boundary_tensor)
+        boundary_loss = self.mse_cost_function(u_boundary_pred, self.u_boundary_tensor)
+
+        ##compute objective function
+        f = interior_loss + self.reg * boundary_loss
 
         # Compute objective value
-        f = self.mse_cost_function(u_obj_pred, self.u_obj_tensor)
         f_value = f.data
 
         # Backward of objective function
@@ -99,7 +152,10 @@ class Spring:
         f.backward(retain_graph=True)
 
         if no_grad is True:
-            return f_value
+            if return_multiple_f:
+                return f_value, interior_loss.data, boundary_loss.data
+            else:
+                return f_value
         else:
             # Assign derivative to gradient value
             g_value = torch.zeros(self.n_parameters)
@@ -108,7 +164,10 @@ class Spring:
                 grad_l = len(param.grad.view(-1))
                 g_value[i:i + grad_l] = param.grad.view(-1)
                 i += grad_l
-            return f_value, g_value
+            if return_multiple_f:
+                return f_value, interior_loss.data, boundary_loss.data, g_value
+            else:
+                return f_value, g_value
 
     
     def constraint_func_and_grad(self, optimizer, no_grad = False):
@@ -119,16 +178,22 @@ class Spring:
         Arguments:
             optimizer: the optimizer object 
         """
+        
+        if self.constraint_type == 'boundary':
+            domain_boundary_constr = self.domain_boundary_tensor[self.constr_row_select]
+            u_boundary_constr = self.u_boundary_tensor[self.constr_row_select]
+            u_boundary_pred = self.net(domain_boundary_constr)
+            c = u_boundary_pred - u_boundary_constr
+        elif self.constraint_type == 'pde':
+            domain_interior_constr = self.domain_interior_tensor[self.constr_row_select]
+            u_interior_pred = self.net(domain_interior_constr)
+            u_derivative_to_domain = torch.autograd.grad(u_interior_pred.sum(), domain_interior_constr, create_graph=True)[
+            0]
+            differential_operator = u_derivative_to_domain[:, 0] - 2 * u_derivative_to_domain[:, 1] - u_interior_pred.reshape(-1)
+            c = differential_operator
 
-        # NN forward to compute the output of sample for constraints
-        u_constr_pred = self.net(self.domain_constr_tensor)
-
-        # Compute the derivative of output with respect to domain
-        u_derivative_to_domain = torch.autograd.grad(u_constr_pred.sum(), self.domain_constr_tensor, create_graph=True)[0]
-
-        # Compute constraint value
-        c = u_derivative_to_domain[:,0] - 2*u_derivative_to_domain[:,1] - u_constr_pred.reshape(-1)
         c_value = c.data
+        c_value = c_value.reshape(c_value.shape[0])
 
         if no_grad is True:
             return c_value
@@ -144,5 +209,20 @@ class Spring:
                 for name, param in self.net.named_parameters():
                     grads = torch.cat((grads, param.grad.view(-1)), 0)
                 J_value[i, :] = grads
-            return c_value, J_value
 
+            return c_value, J_value
+        
+        
+    
+    def save_net(self,path):
+        torch.save(self.net.state_dict(), path)
+
+    def load_net(self,path):
+        self.net.load_state_dict(torch.load(path,map_location=torch.device('cpu')))
+        self.net.eval()
+        
+    def get_u_true(self,domains):
+        # domains.shape = [n, 2]
+        # u(x,t) = 6e^{-3x-2t}
+        u = 6 * np.e **  (-3 * domains[:,0] - 2 * domains[:,1])
+        return u

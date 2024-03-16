@@ -26,7 +26,7 @@ class StochasticSQP(Optimizer):
     sigma=0.5
     epsilon=1e-6
     eta=1e-4 # line search parameter
-    buffer=1e-5
+    buffer=0
     
     def __init__(self, params, lr=required, 
                  n_parameters = 0, 
