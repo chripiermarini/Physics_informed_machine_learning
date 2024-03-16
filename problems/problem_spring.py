@@ -48,11 +48,11 @@ class Spring:
         Input: 
             constraint_type: str, either 'boundary' or 'pde'
         '''
-
         # Initialize NN
         self.n_input = 2
         self.n_output = 1
-        self.net = OneHiddenLayerFCNN(self.n_input, self.n_output) 
+        #self.net = OneHiddenLayerFCNN(self.n_input, self.n_output, n_neurons = 512) 
+        self.net = TwoHiddenLayerFCNN(self.n_input, self.n_output,n_neurons = 64) 
         self.net.to(device)
         self.n_parameters = self.count_parameters(self.net)
         self.reg = torch.tensor(reg)
@@ -92,7 +92,7 @@ class Spring:
         domain_boundary = np.concatenate((x_obj, t_boundary), axis = 1) #S_B
 
         #boundary true pde solution
-        u_boundary = 6*np.exp(-3*x_obj)
+        u_boundary = 6* np.e ** (-3*x_obj)
 
         # Interior sample for objective
         step = float(1 / self.n_discretization)

@@ -10,8 +10,17 @@ torch.manual_seed(22)
 np.random.seed(22)
 import sys
 torch.set_printoptions(precision=8)
+import matplotlib.pyplot as plt
 
-
+def plot(u_true, u_pred, t, save_file_name):
+    # Data for plotting
+ 
+    fig, (ax0, ax1) = plt.subplots(2, 1, layout='constrained')
+    ax0.plot(t, u_true)
+    ax0.set_ylabel('u_true')
+    ax1.plot(t, u_pred)
+    ax1.set_ylabel('u_pred')
+    fig.savefig(save_file_name)
 
 
 def check_gradient(optimizer, problem):
@@ -49,7 +58,7 @@ def check_gradient(optimizer, problem):
 def run(optimizer, problem, max_iter = 10000, save_every=10):
     optimizer.printerHeader()
 
-    optimizer.initialize_param(1)
+    optimizer.initialize_param(0.1)
 
     #check_gradient(optimizer, problem)
 
@@ -78,7 +87,19 @@ def run(optimizer, problem, max_iter = 10000, save_every=10):
             # path for saving trained NN
             path='mdl/nn_epoch%s_%s' %(epoch, problem_name)
             problem.save_net(path)
-    
+        evaluate(problem, epoch)
+
+
+def evaluate(problem,epoch):
+    u_true = problem.get_u_true(problem.domain_interior)
+    u_pred = problem.net(problem.domain_interior_tensor)
+    u_pred = u_pred.reshape(-1)
+    u_pred = u_pred.detach().numpy()
+    err = np.linalg.norm(u_true - u_pred,2)
+    t_np = problem.domain_interior_tensor[:,1].detach().numpy()
+    if epoch == 200:
+        plot(u_true, u_pred, t_np, '%s_%s.png' %(problem.name, epoch))
+    print(err)
 
 if __name__ == '__main__':
     ## Initialize optimizer
@@ -95,13 +116,6 @@ if __name__ == '__main__':
                           problem = problem,
                          )
     
-    run(optimizer, problem,  max_iter = int(2000), save_every=200)
+    run(optimizer, problem,  max_iter = int(200), save_every=1)
     
-    problem.load_net('mdl/nn_epoch2000_Spring')
-   
-    u_true = torch.tensor(problem.get_u_true(problem.domain_interior))
-    u_pred = problem.net(problem.domain_interior_tensor)
-    u_pred = u_pred.reshape(-1)
-    print(torch.norm(u_true - u_pred))
     
-
