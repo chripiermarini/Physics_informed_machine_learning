@@ -87,10 +87,10 @@ class StochasticSQP(Optimizer):
         
         if 'iter' not in self.state:
             self.state['iter'] = 0
-            self.state['g_square_sum'] = g**2
+            self.state['g_square_sum'] = (1-self.beta2) * g**2
         else:
             self.state['iter'] += 1
-            self.state['g_square_sum'] = (1-self.beta2)*self.state['g_square_sum'] +  self.beta2 * g**2
+            self.state['g_square_sum'] = self.beta2 * self.state['g_square_sum'] +  (1-self.beta2) * g**2
         
         loss = None
 
