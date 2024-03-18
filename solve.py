@@ -177,6 +177,9 @@ if __name__ == '__main__':
     optimizer_name = sys.argv[1] #'sqp'  # adam or sgd or sqp
 
     # Try different lr, mu, beta2    
-    run(optimizer_name, problem,  lr=1e-1, mu = 100, beta2 = 0.999, max_iter = int(100000), save_every=100, save_plot_every=1000)
+    lr = 1e-1
+    mu = 100
+    beta2 = 0.999
+    run(optimizer_name, problem,  lr=lr, mu = mu, beta2 = beta2, max_iter = int(100000), save_every=100, save_plot_every=1000)
     
     
