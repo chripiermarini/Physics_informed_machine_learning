@@ -35,7 +35,9 @@ class StochasticSQP(Optimizer):
                  ratio_param_init = 1, 
                  step_size_decay = 0.5,
                  step_opt= 1,
-                 problem=None):
+                 problem=None,
+                 mu=100,
+                 beta2 = 0.999):
         defaults = dict()
         super(StochasticSQP, self).__init__(params, defaults)
         self.n_parameters = n_parameters
@@ -51,6 +53,8 @@ class StochasticSQP(Optimizer):
         self.initial_params = params
         self.step_opt = step_opt
         self.problem = problem
+        self.mu = mu
+        self.beta2 = beta2 
         self.printerBeginningSummary()
 
     def __setstate__(self, state):
@@ -74,19 +78,23 @@ class StochasticSQP(Optimizer):
         Here, we also define an example of the Hessian matrix //
         The H matrix is set as torch.eye(self.n_parameters)
         """
-        if 'iter' not in self.state:
-            self.state['iter'] = 0
-        else:
-            self.state['iter'] += 1
         
-        loss = None
-        H = torch.eye(self.n_parameters)
-
         ## Compute step
         J = self.state['J']
         g = self.state['g']
         c = self.state['c']
         f = self.state['f']
+        
+        if 'iter' not in self.state:
+            self.state['iter'] = 0
+            self.state['g_square_sum'] = g**2
+        else:
+            self.state['iter'] += 1
+            self.state['g_square_sum'] = (1-self.beta2)*self.state['g_square_sum'] +  self.beta2 * g**2
+        
+        loss = None
+
+        H =  torch.diag(torch.sqrt(self.state['g_square_sum'] + self.mu)) #torch.eye(self.n_parameters)
 
         ls_matrix = torch.cat((torch.cat((H, torch.transpose(J,0,1)), 1),
                                torch.cat((J, torch.zeros(self.n_constrs,self.n_constrs)), 1)), 0)
@@ -146,7 +154,7 @@ class StochasticSQP(Optimizer):
         phi = self.merit_param * f + torch.linalg.norm(c, 1)
         self.ls_k = 0
         self.step_size = self.step_size_init
-        for self.ls_k in range(10):
+        for self.ls_k in range(1):
 
             ## Update parameters
             assert len(self.param_groups) == 1
