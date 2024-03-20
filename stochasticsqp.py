@@ -94,7 +94,9 @@ class StochasticSQP(Optimizer):
         
         loss = None
 
-        H =  torch.diag(torch.sqrt(self.state['g_square_sum'] + self.mu)) #torch.eye(self.n_parameters)
+        H_diag = torch.sqrt(self.state['g_square_sum'] + self.mu)
+        H =  torch.diag(H_diag) #torch.eye(self.n_parameters)
+        self.state['H_diag'] = H_diag
 
         ls_matrix = torch.cat((torch.cat((H, torch.transpose(J,0,1)), 1),
                                torch.cat((J, torch.zeros(self.n_constrs,self.n_constrs)), 1)), 0)
@@ -174,7 +176,8 @@ class StochasticSQP(Optimizer):
             f_new = self.state["f_g_hand"](self, no_grad = True)
             c_new = self.state["c_J_hand"](self, no_grad = True)
             self.state['phi_new']= self.merit_param*f_new + torch.linalg.norm(c_new, ord= 1)
-
+            self.state['alpha_sqp'] = self.step_size-alpha_pre
+            
             #perfrom linesearch procedure
             if self.step_opt == 1: #simple decrease
                 self.state['search_rhs'] = self.state['cur_merit_f']

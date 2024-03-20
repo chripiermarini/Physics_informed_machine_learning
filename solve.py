@@ -84,9 +84,9 @@ def run(optimizer_name, problem, max_iter = 10000, save_every=10, save_plot_ever
     
     #optimizer.printerHeader()
     print('%10s: %10s\n%10s: %10s' %('Problem',problem.name, 'Optimizer',optimizer_name))
-    print('%10s: %10s\n%10s: %10s\n%10s: %10s' %('lr',lr, 'mu',mu, 'beta',beta2))
+    print('%10s: %10s\n%10s: %10s\n%10s: %10s' %('lr',lr, 'mu',mu, 'beta2',beta2))
     print('-'*40)
-    print('%4s %11s %11s %11s ' %('epoch', 'f', 'f_interior', 'f_boundary'))
+    print('%5s %11s %11s %11s %11s %11s' %('epoch', 'f', 'f_interior', 'f_boundary', 'alpha_max', 'alpha_min'))
 
     #optimizer.initialize_param(0.1)
 
@@ -95,13 +95,15 @@ def run(optimizer_name, problem, max_iter = 10000, save_every=10, save_plot_ever
     
     files = []
     
+    suffix='%s_%s_%s' %(lr, mu, beta2)
+
     # plot the result as training progresses
     u_pred = problem.net(problem.t_all).detach()
     problem.plot_result(0,problem.t_all,problem.u_all, u_pred, problem.t_fitting, problem.u_fitting,problem.t_pde.detach(), save_file=None)
-    file = 'plots/nn_%.8i_%s_%s.png' %(0, problem.name, optimizer_name) 
+    file = 'plots/nn_%.8i_%s_%s_%s.png' %(0, problem.name, optimizer_name, suffix) 
     plt.savefig(file, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
     files.append(file)
-    
+
     for epoch in range(max_iter+1):
         # Compute f, g, c, J
         f,f_interior,f_boundary, g = problem.objective_func_and_grad(optimizer,return_multiple_f = True)
@@ -127,12 +129,33 @@ def run(optimizer_name, problem, max_iter = 10000, save_every=10, save_plot_ever
                 for i in diff:
                     f_g_test.write(str(i.detach().numpy())+'\n')
                 
-        # Print out
+        # Print out for SQP Optimizer
         #optimizer.printerIteration(every=100)
+
+        if optimizer_name == 'adam':
+            alpha_adam_init = optimizer.param_groups[0]['lr']
+            beta1_adam,beta2_adam = optimizer.param_groups[0]['betas']
+            eps_adam = optimizer.param_groups[0]['eps']
+            alphak = alpha_adam_init * np.sqrt(1-beta2_adam**(epoch+1)) / (1-beta1_adam**(epoch+1)) 
+            vt = torch.tensor([])
+            mt = torch.tensor([])
+            for group in optimizer.param_groups:
+                for p in group['params']:
+                    state = optimizer.state[p]
+                    vt = torch.concat((vt,state['exp_avg_sq'].view(-1)))
+                    mt = torch.concat((mt,state['exp_avg'].view(-1)))
+            alpha_adam = alphak / (torch.sqrt(vt) + eps_adam)
+            alpha_max = torch.max(alpha_adam)
+            alpha_min = torch.min(alpha_adam)
+            # x0 - x1 should be equal to alpha_max * mt. They have small difference now. 
+        elif optimizer_name == 'sqp':
+            alpha_sqp = optimizer.state['alpha_sqp'] / optimizer.state['H_diag']
+            alpha_max = torch.max(alpha_sqp)
+            alpha_min = torch.min(alpha_sqp)
 
         if np.mod(epoch,save_every) == 0:
             # path for saving trained NN
-            print('%4s %11.4e %11.4e %11.4e ' %(epoch, f, f_interior, f_boundary))
+            print('%5s %11.4e %11.4e %11.4e %11.4e %11.4e ' %(epoch, f, f_interior, f_boundary, alpha_max, alpha_min))
             # path='mdl/nn_epoch%s_%s_%s' %(epoch, problem.name, optimizer_name)
             # problem.save_net(path)
             # evaluate_spring_new(problem, epoch)
@@ -143,11 +166,11 @@ def run(optimizer_name, problem, max_iter = 10000, save_every=10, save_plot_ever
         if np.mod(epoch,save_plot_every) == 0:
             u_pred = problem.net(problem.t_all).detach()
             problem.plot_result(epoch+1,problem.t_all,problem.u_all, u_pred, problem.t_fitting, problem.u_fitting,problem.t_pde.detach(), save_file=None)
-            file = 'plots/nn_%.8i_%s_%s.png' %(epoch+1, problem.name, optimizer_name) 
+            file = 'plots/nn_%.8i_%s_%s_%s.png' %(epoch+1, problem.name, optimizer_name, suffix) 
             plt.savefig(file, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
             files.append(file)
             plt.close("all")
-    problem.save_gif_PIL("plots/pinn_%s_%s.gif" %(problem.name, optimizer_name), files, fps=20, loop=0)
+    problem.save_gif_PIL("plots/pinn_%s_%s_%s.gif" %(problem.name, optimizer_name, suffix), files, fps=20, loop=0)
 
 def evaluate(problem,epoch):
     #u_true = problem.get_u_true(
@@ -174,11 +197,15 @@ if __name__ == '__main__':
     problem_name = "SpringNew"  # "Spring" #sys.argv[1]
     problem = eval(problem_name)(device, n_obj_sample = 1, n_constrs = 0, constraint_type='pde', reg=1e-4)
 
-    optimizer_name = sys.argv[1] #'sqp'  # adam or sgd or sqp
+    # optimizer_name = sys.argv[1] #'sqp'  # adam or sgd or sqp
 
-    # Try different lr, mu, beta2    
-    lr = 1e-1
-    mu = 100
+    # # Try different lr, mu, beta2    
+    # lr    = float(sys.argv[2])# 1e-1
+    # mu    = float(sys.argv[3])# 10
+    # beta2 = float(sys.argv[4])# 0.999
+    optimizer_name = 'sqp'
+    lr    = 1e-3
+    mu    = 1e-7
     beta2 = 0.999
     run(optimizer_name, problem,  lr=lr, mu = mu, beta2 = beta2, max_iter = int(100000), save_every=100, save_plot_every=1000)
     
