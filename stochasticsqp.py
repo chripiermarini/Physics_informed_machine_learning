@@ -231,3 +231,13 @@ class StochasticSQP(Optimizer):
                 ))
             if np.mod(self.state['iter'],every*20) == 0 and (self.state['iter'] != 0):
                 self.printerHeader()
+
+    def load_pretrain_state(self,optim_path):
+        state = torch.load(optim_path)
+        self.state['iter'] = state['iter']
+        self.state['g_square_sum'] = state['g_square_sum']
+        
+    def save_pretrain_state(self,optim_path):
+        state = {'iter': self.state['iter'], 
+                'g_square_sum': self.state['g_square_sum']}
+        torch.save(state, optim_path)
