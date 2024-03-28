@@ -35,9 +35,8 @@ class SpringNew:
 
         '''
         Input: 
-            constraint_type: str, only 'pde'
+            constraint_type: str, only 'pde' or 'fitting'
         '''
-        assert(constraint_type == 'pde')
         # Initialize NN
         self.n_input = 1
         self.n_output = 1
@@ -88,6 +87,9 @@ class SpringNew:
         if self.constraint_type == 'pde':
             n_t_pde = t_pde.shape[0]
             constr_row_select = np.random.randint(0, n_t_pde, size=(self.n_constrs))
+        elif self.constraint_type == 'fitting':
+            n_t_fitting = t_fitting.shape[0]
+            constr_row_select = np.random.randint(0, n_t_fitting, size=(self.n_constrs))
         
         return t_all, u_all, t_fitting, u_fitting, t_pde, constr_row_select
     
@@ -156,6 +158,11 @@ class SpringNew:
             t_pde_constr = self.t_pde[self.constr_row_select]
             u_pde_constr_pred = self.net(t_pde_constr)
             c = self.pde(u_pde_constr_pred, t_pde_constr)
+        elif self.constraint_type == 'fitting':
+            t_fitting_constr = self.t_fitting[self.constr_row_select]
+            u_fitting_constr = self.u_fitting[self.constr_row_select]
+            u_fitting_constr_pred = self.net(t_fitting_constr)
+            c = u_fitting_constr_pred - u_fitting_constr 
 
         c_value = c.data
         c_value = c_value.reshape(-1)
