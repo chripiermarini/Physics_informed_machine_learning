@@ -55,7 +55,7 @@ class StochasticSQP(Optimizer):
         self.problem = problem
         self.mu = mu
         self.beta2 = beta2 
-        self.printerBeginningSummary()
+        #self.printerBeginningSummary()
 
     def __setstate__(self, state):
         super(StochasticSQP, self).__setstate__(state)
@@ -148,6 +148,7 @@ class StochasticSQP(Optimizer):
 
         """
         #get current values of parameters, f is the current phi
+        self.state['merit_param'] = self.merit_param
         self.state['cur_merit_f'] = self.merit_param * f + torch.linalg.norm(c, 1)
         self.state['phi_new'] = self.state['cur_merit_f']
         self.state['search_rhs'] = 0
@@ -174,6 +175,7 @@ class StochasticSQP(Optimizer):
 
             #compute objective, constraints in new point using new values
             f_new = self.state["f_g_hand"](self, no_grad = True)
+            f_new = f_new['f'].data
             c_new = self.state["c_J_hand"](self, no_grad = True)
             self.state['phi_new']= self.merit_param*f_new + torch.linalg.norm(c_new, ord= 1)
             self.state['alpha_sqp'] = self.step_size-alpha_pre
