@@ -8,20 +8,20 @@ file_suffix: test               # str, all the leaf output file name will contai
 maxiter: 50000                  # Total number of epochs
 save_model_every: 100           # Save models and logs per [such] iterations
 save_plot_every: 1000           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
-stdout : 1                      # 0: print to screen, 1: print to log file
+stdout : 0                      # 0: print to screen, 1: print to log file
 
 problem:                        # Parameters for problem
-  name  : SpringFormal
+  name  : Burgers
   regs:                           # regularization multipliers of different losses composing objective function
     pde     : 1.0e-4
-    boundary: 0
-    fitting : 1
-  n_constrs: 3                    # number of constraints
-  constrs_area_percent: [0.14, 0.4, 0.7]     # list of length n_constrs. the constraints applies at percentage of t_max
-  constraint_type : pde       # pde, or fitting, or boundary, or other
+    boundary: 1
+    fitting : 0
+  n_constrs: 1                   # number of constraints ---
+  constrs_area_percent: [0.14]     # list of length n_constrs. the constraints applies at percentage of t_max
+  constraint_type : pde       # pde, or boundary
   batch_size: full            # str full or int batch_size #TODO
   nn_name       : FCN           # neural network name. This should be a class in nn_architecture.py
-  nn_input      : 1
+  nn_input      : 2
   nn_output     : 1
   nn_parameters:                # The keys can be different for different neural network
     n_hidden: 32
@@ -34,7 +34,7 @@ problem:                        # Parameters for problem
   n_group_pde_parameters: 1     # int. number of group of pde parameters
   n_train_obj_samples_per_group: # number of samples of different losses composing objective function
     pde     : 30
-    boundary: 0
+    boundary: 10
     fitting : 10
   fitting_area_percent: 0.4      # the largest percentage of range of t_max that fitting data covers, unique for spring
   n_test_obj_samples_per_group:  # number of samples of different losses composing objective function #TODO

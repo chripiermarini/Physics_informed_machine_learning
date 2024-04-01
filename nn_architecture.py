@@ -59,7 +59,7 @@ class FCN(nn.Module):
                         nn.Sequential(*[
                             nn.Linear(N_HIDDEN, N_HIDDEN),
                             activation()]) for _ in range(N_LAYERS-1)])
-        self.fce = nn.Linear(N_HIDDEN, N_OUTPUT)
+        self.fce = nn.Linear(N_HIDDEN, N_OUTPUT, bias= False)
         
     def forward(self, x):
         x = self.fcs(x)

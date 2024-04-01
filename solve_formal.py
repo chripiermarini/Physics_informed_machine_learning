@@ -1,10 +1,10 @@
 import torch
 from stochasticsqp import *
-from problems.problem_darcy_matrix_old import DarcyMatrixOld
 from problems.problem_darcy_matrix import DarcyMatrix
-from problems.problem_spring import Spring
 from problems.problem_spring_new import SpringNew
 from problems.problem_spring_formal import SpringFormal
+from problems.problem_burgers import Burgers
+from problems.problem_chemistry import Chemistry
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
 torch.set_default_device(DEVICE)
@@ -140,7 +140,8 @@ def run(config):
         log_f = open(log_file_name,'w')
     elif config['stdout'] == 0:
         log_f = None
-        
+
+
     # reload the model and optimizer. Now only apply to sqp optimizer
     if (config['optimizer']['pretrain'] is not None) and (config['optimizer']['name'] == 'sqp'):
         epoch_start = config['optimizer']['pretrain']['epoch_start']
@@ -151,6 +152,7 @@ def run(config):
         optimizer.load_pretrain_state(optim_path)
     else:
         epoch_start=0
+
         
     #printer header
     headers = printerBeginningSummary(config, log_f)
@@ -237,31 +239,40 @@ def run(config):
         # Add time elapse
         t_end = time.time() - t_start
         values['elapse'] = int(t_end)
-            
+
+        """ 
         # Save model and optimizer parameters
         if np.mod(epoch+1-epoch_start,config['save_model_every']) == 0:
             save_model(folders, epoch+1, problem, optimizer, config)
-            
+        """
+
         # Print Iteration Information   
         if np.mod(epoch-epoch_start,config['save_model_every']) == 0:
             printRow(log_f,type='value',headers=headers,values=values)
-                
+
+        """ 
         # Plot prediction
         if np.mod(epoch-epoch_start,config['save_plot_every']) == 0:
             file = plot_prediction(folders, epoch+1, problem, config)
             files.append(file)
-    
+         
+        
     # Plot GIF
     plot_gif(folders, problem, config, files)
+    """
 
     # Close file IO
     if config['stdout'] == 1:
         log_f.close()
 
 if __name__ == '__main__':
-    with open("conf/conf.yaml") as f:
+
+    problem_name = 'chemistry'
+    with open('conf/conf_'+problem_name+'.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-            
+
+    #config['problem']['constraint_type'] = 'pde'
+    config['problem']['n_constrs'] = 1
     # train
     run(config)
     

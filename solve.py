@@ -4,6 +4,7 @@ from problems.problem_darcy_matrix_old import DarcyMatrixOld
 from problems.problem_darcy_matrix import DarcyMatrix
 from problems.problem_spring import Spring
 from problems.problem_spring_new import SpringNew
+from problems.problem_chemistry import Chemistry
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
 torch.set_default_device(device)
@@ -160,13 +161,15 @@ def run(optimizer_name, problem_name,  n_constrs, constraint_type,
     #x0 = get_x(problem)
     
     files = []
-    
+
+    """ 
     # plot the initial predition
     u_pred = problem.net(problem.t_all).detach()
     problem.plot_result(epoch_start,problem.t_all,problem.u_all, u_pred, problem.t_fitting, problem.u_fitting,problem.t_pde.detach(), save_file=None)
     file = '%s/nn_%.8i_%s.png' %(PLOTS_DIR,epoch_start, suffix) 
     plt.savefig(file, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
     files.append(file)
+    """
     
     t_start = time.time()
 
@@ -234,7 +237,8 @@ def run(optimizer_name, problem_name,  n_constrs, constraint_type,
         if np.mod(epoch-epoch_start,save_model_every) == 0:
             # Printout
             print('%5s %11.4e %11.4e %11.4e %11.4e %11.4e ' %(epoch, f, f_interior, f_boundary, alpha_max, alpha_min),file=log_f)
-                
+
+    """ 
         # plot the result as training progresses
         if np.mod(epoch-epoch_start,save_plot_every) == 0:
             u_pred = problem.net(problem.t_all).detach()
@@ -246,7 +250,7 @@ def run(optimizer_name, problem_name,  n_constrs, constraint_type,
     t_end = time.time() - t_start
     print('Running time: %s' %(t_end), file=log_f)
     problem.save_gif_PIL("%s/pinn_%s_%s.gif" %(PLOTS_DIR,max_iter,suffix), files, fps=20, loop=0)
-
+    """
 def evaluate(problem,epoch):
     #u_true = problem.get_u_true(
     u_pred = problem.net(problem.domain_interior_tensor)
@@ -261,9 +265,9 @@ def evaluate(problem,epoch):
 
 if __name__ == '__main__':
 
-    problem_name = "SpringNew"  
+    problem_name = "DarcyMatrix"
     optimizer_name = 'sqp'          # adam or sgd or sqp 
-    n_constrs = 0
+    n_constrs = 1
     constraint_type='pde'
     lr    = 1e-3
     mu    = 1e-7
@@ -271,7 +275,7 @@ if __name__ == '__main__':
     file_suffix="type1"             # None or a str, like "type1", etc.
     stdout = 1                      # 0: print to screen, 1: print to a .log/ directory
     maxiter=100000
-    save_model_every=100
+    save_model_every=1
     save_plot_every=1000             # maxiter / save_plot_every better not exceed 500
     
     pretrain = {                        

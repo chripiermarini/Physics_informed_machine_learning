@@ -1,4 +1,5 @@
 import random
+import numpy as np
 from .problem_base import BaseProblem
 from nn_architecture import *
 import torch
@@ -6,12 +7,13 @@ from neuralop.datasets import load_darcy_flow_small
 
 """
 ## Problem Statement Darcy
+# We use this one!
 """
 
 class DarcyMatrix(BaseProblem):
     n_discretize = 16
     hidden_channels= 4
-    def __init__(self, device, n_obj_sample=500, n_constrs=10, n_test_sample=1, reg=0):
+    def __init__(self, device, n_obj_sample=100, n_constrs=3, n_test_sample=1, reg=0, constraint_type = 'pde'):
         """
         Input:
             n_obj_sample:   int, the number of pictures for training sample, each picture will have n_discretize * n_discretize pixel samples
@@ -20,7 +22,8 @@ class DarcyMatrix(BaseProblem):
             reg:            float (>=0), multiplier for the term of boundary conditions violation that will be added to the objective function
         """
         # Set problem name
-        self.name = 'DarcyMatrix(' + 'n_discretize' + str(self.n_discretize) +  ', hidden_channels' + str(self.hidden_channels) +')'
+        self.name = ('DarcyMatrix(' + 'n_discretize' + str(self.n_discretize) +  ', hidden_channels'
+                     + str(self.hidden_channels) +')')
 
         # Initialize NN
         self.net = FNOLocal(n_discretize = self.n_discretize, hidden_channels=self.hidden_channels)
@@ -45,9 +48,17 @@ class DarcyMatrix(BaseProblem):
         # Assign regularization multiplier 
         self.reg = torch.tensor(reg)
 
+        self.mse_func = torch.nn.MSELoss()
+
     def generate_sample(self, device):
         """
         Generate input tensor
+
+        input_data is composed by n_obj points, which are 3 images of 16x16 pixels
+        the first image is nu, the second are values from 0 to 1 from left to right,
+        the third are values from 0 to 1 from top to bottom
+
+        ground_truth are labels, following the same structure (only one image for each data points)
         """
         train_loader, test_loaders, data_processor = load_darcy_flow_small(
             n_train=self.n_obj_sample,
@@ -71,6 +82,8 @@ class DarcyMatrix(BaseProblem):
         return input_data, ground_truth, test_input_data, test_ground_truth
 
     def set_boundary_pixel_idx(self):
+        """ This function creates all the indexes to select the points at the boundaries
+        of the 16x16 pixel image"""
         boundary_idx = torch.zeros(self.n_boundary_pixels_each_sample,2)
 
         # Assign x1 idx
@@ -110,11 +123,26 @@ class DarcyMatrix(BaseProblem):
         constr_pixel_idx = constr_pixel_idx.to(torch.int32)
         return constr_pixel_idx
 
+    def apply_frame(self, tensor, discretize):
+        # Create a 16x16 tensor filled with zeros
+        tensor_16x16 = np.zeros(shape=(tensor.shape[0], discretize, discretize))
+
+        # Place the 14x14 tensor at the center of the 16x16 tensor
+        tensor_16x16[:, 1:15, 1:15] = tensor[:]
+
+        # Set the first row, last row, first column, and last column to ones
+        tensor_16x16[:, 0, :] = 1  # Top row
+        tensor_16x16[:, -1, :] = 1  # Bottom row
+        tensor_16x16[:, :, 0] = 1  # Leftmost column
+        tensor_16x16[:, :, -1] = 1  # Rightmost column
+
+        return torch.Tensor(tensor_16x16)
+
     def objective_func(self,return_multiple_f=False):
         # separate x1 and x2 from sample and set they require_grad
-        nu = self.input[:,0,:,:]
-        x1 = self.input[:,1,:,:].requires_grad_(True)
-        x2 = self.input[:,2,:,:].requires_grad_(True)
+        nu = self.input[:,0,:,:] #1 and 0 values
+        x1 = self.input[:,1,:,:].requires_grad_(True) #from 0 to 1 starting from left to right
+        x2 = self.input[:,2,:,:].requires_grad_(True) #from 0 to 1 starting from top to bottom
         
         # NN forward
         out = self.net(torch.stack((nu, x1, x2), 1)).requires_grad_(True)
@@ -125,24 +153,46 @@ class DarcyMatrix(BaseProblem):
                                            create_graph=True,
                                            allow_unused=True)
         div_argument = [nu * first_derivative[i] for i in range(len(first_derivative))]
+
+        """
         second_derivative_x1 = torch.autograd.grad(outputs=div_argument[0].sum(), inputs=x1, create_graph=True)[0]
         second_derivative_x2 = torch.autograd.grad(outputs=div_argument[1].sum(), inputs=x2, create_graph=True)[0]
-        
-        mse_func = torch.nn.MSELoss()
+
         
         # PDE residual of size torch.Size([n_obj_sample, n_discretize, n_discretize])
         p_matrix = - (second_derivative_x1 + second_derivative_x2) - 1
         
+        """ 
+        first_derivative_nu_x1 = (
+                    ((nu[:,1:self.n_discretize - 1, 2:self.n_discretize] - nu[:,1:self.n_discretize - 1, 1:self.n_discretize - 1]) > 0) * 16 +
+                    ((nu[:,1:self.n_discretize - 1, 1:self.n_discretize - 1] - nu[:,1:self.n_discretize - 1,
+                                                                   2:self.n_discretize]) > 0) * -16)  # CORRECT//SHAPE 14X14
+
+        first_derivative_nu_x1 = self.apply_frame(first_derivative_nu_x1, self.n_discretize)
+
+        first_derivative_nu_x2 = (
+                    ((nu[:,0:self.n_discretize-2,1:self.n_discretize - 1] - nu[:,1:self.n_discretize - 1,1:self.n_discretize - 1]) > 0) * 16 +
+                    ((nu[:,1:self.n_discretize - 1, 1:self.n_discretize - 1] - nu[:,0:self.n_discretize - 2,
+                                                                   1:self.n_discretize - 1]) > 0) * -16)  # CORRECT//SHAPE 14X14
+
+        first_derivative_nu_x2 = self.apply_frame(first_derivative_nu_x2, self.n_discretize)
+
+        second_derivative_x1 = torch.autograd.grad(outputs=div_argument[0].sum(), inputs=x1, create_graph=True)[0]
+        second_derivative_x2 = torch.autograd.grad(outputs=div_argument[1].sum(), inputs=x2, create_graph=True)[0]
+
+        p_matrix = (first_derivative_nu_x1 * first_derivative[0] + second_derivative_x1 +
+                    first_derivative_nu_x2 * first_derivative[1] + second_derivative_x2)
+
         # Indexing the P matrix of interior points
         p_matrix = p_matrix[:,1:(self.n_discretize-1), 1:(self.n_discretize-1)]
         
         # Compute PDE residual: MSE over all interior pixels       
-        f_interior = mse_func(p_matrix, torch.zeros(p_matrix.shape))
+        f_interior = self.mse_func(p_matrix, torch.zeros(p_matrix.shape))
         
         # Compute boundary conditions residual over all boundary pixels
         out_boundary = out[:,0,self.boundary_idx[:,0],self.boundary_idx[:,1]]
         out_boundary_true = torch.zeros(out_boundary.shape)
-        f_boundary = mse_func(out_boundary,out_boundary_true)
+        f_boundary = self.mse_func(out_boundary,out_boundary_true)
         
         # Combine the objective function
         f = f_interior + self.reg * f_boundary
