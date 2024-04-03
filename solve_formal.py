@@ -78,7 +78,7 @@ def printRow(log_f, type='header', headers=[],values={}):
 def printerBeginningSummary(config, log_f):
     print('-'*60, file=log_f)
     print(yaml.dump(config), file=log_f)
-    headers = ['epoch', 'f', 'f_pde', 'f_boundary', 'f_fitting', 'othermse',
+    headers = ['epoch', 'f', 'f_pde', 'f_boundary', 'f_fitting',
                 '||c||inf', '||c||1' ,'elapse']
     if config['optimizer']['name'] == 'sqp':
         headers = headers + ['H_max', 'H_min', 'merit_f', 'alpha', 'tau']
@@ -117,6 +117,9 @@ def run(config):
     # Load problem instance
     problem = eval(config['problem']['name'])(DEVICE,config['problem'])
     
+    # Add problem number of parameters to config
+    config['problem']['n_parameters'] = problem.n_parameters
+
     # Load optimizer
     if config['optimizer']['name'] == 'adam':
         optimizer = torch.optim.Adam(problem.net.parameters(),lr=config['optimizer']['lr'])
@@ -184,10 +187,6 @@ def run(config):
         values['f_pde'] = fs['pde'].data
         values['f_boundary'] = fs['boundary'].data
         values['f_fitting'] = fs['fitting'].data
-        if config['problem']['constraint_type'] == 'other':
-            values['othermse'] = torch.mean(c**2)
-        else:
-            values['othermse'] = torch.tensor(0.)
         if config['problem']['n_constrs'] > 0:
             values['||c||inf'] = torch.norm(c,p=float('inf'))
         else:
@@ -271,8 +270,6 @@ if __name__ == '__main__':
     with open('conf/conf_'+problem_name+'.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
-    #config['problem']['constraint_type'] = 'pde'
-    config['problem']['n_constrs'] = 3
     # train
     run(config)
     
