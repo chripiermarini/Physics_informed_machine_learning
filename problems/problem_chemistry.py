@@ -107,9 +107,9 @@ class Chemistry(BaseProblemFormal):
     def generate_sample(self):
         """ This function reads the .txt files and extract data to feed the objective function
         Remember that y has dimension 4"""
-        t = tensor_from_file('problems/srinivas_input_t.txt', self.n_obj_sample).requires_grad_(True)
-        y_initial = tensor_from_file('problems/srinivas_input_y_initial.txt', self.n_obj_sample)
-        y_label = tensor_from_file('problems/srinivas_input_y_label.txt', self.n_obj_sample)
+        t = tensor_from_file('chemistry_data_folder/chemistry_input_t.txt', self.n_obj_sample).requires_grad_(True)
+        y_initial = tensor_from_file('chemistry_data_folder/chemistry_input_y_initial.txt', self.n_obj_sample)
+        y_label = tensor_from_file('chemistry_data_folder/chemistry_input_y_label.txt', self.n_obj_sample)
         constr_row_select = np.random.randint(0, self.n_obj_sample, size=self.n_constrs)
 
         return t, y_initial, y_label, constr_row_select

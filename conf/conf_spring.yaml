@@ -18,7 +18,7 @@ problem:                        # Parameters for problem
     fitting : 1
   n_constrs: 3                    # number of constraints ---
   constrs_area_percent: [0.14, 0.4, 0.7]     # list of length n_constrs. the constraints applies at percentage of t_max
-  constraint_type : pde       # pde, or fitting, or boundary, or other
+  constraint_type : pde       # pde, or fitting
   batch_size: full            # str full or int batch_size #TODO
   nn_name       : FCN           # neural network name. This should be a class in nn_architecture.py
   nn_input      : 1

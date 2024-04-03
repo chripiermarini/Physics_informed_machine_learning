@@ -267,12 +267,12 @@ def run(config):
 
 if __name__ == '__main__':
 
-    problem_name = 'chemistry'
+    problem_name = 'burgers'
     with open('conf/conf_'+problem_name+'.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     #config['problem']['constraint_type'] = 'pde'
-    config['problem']['n_constrs'] = 1
+    config['problem']['n_constrs'] = 3
     # train
     run(config)
     

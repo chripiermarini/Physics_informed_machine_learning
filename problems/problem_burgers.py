@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from problems.problem_base_formal import BaseProblemFormal
 import random
+import pandas as pd
 
 """ Problem statement Burgers' equation"""
 
@@ -30,17 +31,32 @@ class Burgers(BaseProblemFormal):
         self.n_constrs = self.conf['n_constrs']
 
         # Generate sample
-        self.n_obj_sample = (self.conf['n_train_obj_samples_per_group']['pde'] +
-                             self.conf['n_train_obj_samples_per_group']['boundary'] +
-                             self.conf['n_train_obj_samples_per_group']['fitting'])
+        self.n_obj_sample_pde = self.conf['n_train_obj_samples_per_group']['pde']
+        self.n_obj_sample_boundary = self.conf['n_train_obj_samples_per_group']['boundary']
+        self.n_obj_sample_fitting = self.conf['n_train_obj_samples_per_group']['fitting']
 
         self.n_constrs = self.conf['n_constrs']
-        self.pde_dataset, self.t_all, self.x_all, self.constr_row_select = self.generate_sample()
+
+        (self.pde_dataset,
+         self.IC_dataset,
+         self.periodic_condition_dataset,
+         self.fitting_dataset,
+         self.constr_row_select) = self.generate_sample()
+
+        ### we select only a subset of the whole dataset
+        self.pde_dataset = self.pde_dataset.sample(frac=1).reset_index(drop=True)[:self.n_obj_sample_pde] #shuffled dataset
+        self.IC_dataset = self.IC_dataset[:self.n_obj_sample_boundary]
+        self.periodic_condition_dataset = self.periodic_condition_dataset[:self.n_obj_sample_boundary]
+        self.fitting_dataset = self.fitting_dataset.sample(frac=1).reset_index(drop=True)[:self.n_obj_sample_fitting]
+
         self.mse_cost_function = torch.nn.MSELoss()  # Mean squared error
 
     def generate_sample(self):
         # all possible couples for the pde of the objective constraints
-        constr_row_select = np.random.randint(0, self.n_obj_sample, size=self.n_constrs)
+
+        constr_row_select = np.random.randint(0, self.n_obj_sample_boundary, size=self.n_constrs)
+        '''
+        
 
         x_all = torch.linspace(0, 1, self.n_obj_sample).view(-1, 1)
         t_all = torch.linspace(0, 1, self.n_obj_sample).view(-1, 1)
@@ -54,38 +70,48 @@ class Burgers(BaseProblemFormal):
 
         perm_indices = torch.randperm(pde_dataset.shape[0])
         pde_dataset = torch.Tensor(pde_dataset[perm_indices][:self.n_obj_sample])
+        '''
+        data_folder = f'burgers_data_folder/'
+        pde_dataset = pd.read_csv(str(data_folder + 'pde_dataset.csv'), sep=',', header=0)
+        IC_dataset = pd.read_csv(str(data_folder + 'IC_dataset.csv'), sep=',', header=0)
+        periodic_condition_dataset = pd.read_csv(str(data_folder + 'periodic_condition_dataset.csv'), sep=',', header=0)
+        fitting_dataset = pd.read_csv(str(data_folder + 'fitting_dataset.csv'), sep=',', header=0)
 
-        return pde_dataset, t_all, x_all, constr_row_select
+        return pde_dataset, IC_dataset, periodic_condition_dataset, fitting_dataset, constr_row_select
 
     def initial_condition(self, x):
+        random.seed(1776526)
+        np.random.seed(1776526)
         # smoout Gaussian condition
-        #A = 1.0  # Amplitude
-        #x0 = 0  # Center of the Gaussian
-        #sigma = 0.1  # Standard deviation
+        # A = 1.0  # Amplitude
+        # x0 = 0  # Center of the Gaussian
+        # sigma = 0.1  # Standard deviation
 
         # Initial condition
-        #u_initial = A * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2))
+        # u_initial = A * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2))
 
-        #sinusoidal initial condition
-        #Parameters
+        # sinusoidal initial condition
+        # Parameters
         N = 2
 
-        array = x.detach().numpy()
+        array = x
         result = np.zeros_like(array)
         for wave_index in range(N):
-            amp = random.uniform(0,1)
-            phase = random.uniform(0, 2*np.pi)
-            freq = random.uniform(1, 4/np.pi)
+            amp = random.uniform(0, 1)
+            phase = random.uniform(0, 2 * np.pi)
+            freq = random.uniform(1, 4 / np.pi)
 
             result += amp * np.sin(2 * np.pi * freq * array + phase)
-        result = torch.Tensor(result)
         return result
 
     def pde(self, input_dataset):
-        pde_x = input_dataset[:,0].requires_grad_(True)
-        pde_t = input_dataset[:,1].requires_grad_(True)
+        x= input_dataset['x']
 
-        output = self.net(torch.stack((pde_x, pde_t), 1)).requires_grad_(True) #u(x,t) function
+        pde_x = torch.Tensor(input_dataset['x'].values).requires_grad_(True)
+        pde_t = torch.Tensor(input_dataset['t'].values).requires_grad_(True)
+        pde_u_zero = torch.Tensor(input_dataset['u_zero'].values)
+
+        output = self.net(torch.stack((pde_x, pde_t, pde_u_zero), 1)).requires_grad_(True) #u(x,t) function
         output_dt = torch.autograd.grad(outputs= output.sum(),
                                             inputs=pde_t,
                                             create_graph=True,
@@ -109,23 +135,31 @@ class Burgers(BaseProblemFormal):
         pde_function = self.pde(self.pde_dataset)
         pde_loss = self.mse_cost_function(pde_function, torch.zeros_like(pde_function))
 
-        #initial_condition
-        initial_values = self.initial_condition(self.x_all.squeeze())
-        first_boundary_input = torch.stack((self.x_all.squeeze(dim = 1), torch.zeros(self.n_obj_sample)), dim=1)
-        first_boundary_value = self.net(first_boundary_input).squeeze()
-        first_boundary_loss = self.mse_cost_function(first_boundary_value, initial_values)
+        #initial_condition_boundary
+        initial_values = torch.Tensor(self.IC_dataset['u_zero_initial'])
+        first_boundary_value = self.net(torch.stack((torch.Tensor(self.IC_dataset['x_initial']),
+                                                     torch.Tensor(self.IC_dataset['t_initial']),
+                                                     torch.Tensor(self.IC_dataset['u_zero_initial'])), 1)).squeeze()
+        ic_boundary_loss = self.mse_cost_function(first_boundary_value, initial_values)
 
         #periodic_boundary
         ### first we generate the (0,t) (1,t) couples
-        lhs_dataset = torch.stack((torch.zeros(self.n_obj_sample), self.t_all.squeeze(dim =1)), dim=1)
-        rhs_dataset = torch.stack((torch.ones(self.n_obj_sample), self.t_all.squeeze(dim = 1)), dim=1)
+        lhs_dataset = torch.stack((torch.Tensor(self.periodic_condition_dataset['x_0']),
+                                   torch.Tensor(self.periodic_condition_dataset['t']),
+                                   torch.Tensor(self.periodic_condition_dataset['u_zero_0_t'])), dim=1)
+        rhs_dataset = torch.stack((torch.Tensor(self.periodic_condition_dataset['x_1']),
+                                   torch.Tensor(self.periodic_condition_dataset['t']),
+                                   torch.Tensor(self.periodic_condition_dataset['u_zero_1_t'])), dim=1)
         second_boundary_value = self.net(lhs_dataset).squeeze() - self.net(rhs_dataset).squeeze()
-        second_boundary_loss = self.mse_cost_function(second_boundary_value, torch.zeros_like(second_boundary_value))
+        periodic_boundary_loss = self.mse_cost_function(second_boundary_value, torch.zeros_like(second_boundary_value))
 
-        boundary_loss = first_boundary_loss + second_boundary_loss
+        boundary_loss = ic_boundary_loss + periodic_boundary_loss
 
-        # boundary loss
-        fitting_loss = torch.tensor(0)
+        # fitting_loss
+        fitting_output = self.net(torch.stack((torch.Tensor(self.fitting_dataset['fitting_x']),
+                                                     torch.Tensor(self.fitting_dataset['fitting_t']),
+                                                     torch.Tensor(self.fitting_dataset['fitting_u_zero'])), 1)).squeeze()
+        fitting_loss = self.mse_cost_function(fitting_output, torch.Tensor(self.fitting_dataset['fitting_u_labels']))
 
         fs = {
             'pde': pde_loss,
@@ -141,13 +175,16 @@ class Burgers(BaseProblemFormal):
         """
 
         if self.constraint_type == 'pde':
-            pde_constr_input = self.pde_dataset[self.constr_row_select]
+            pde_constr_input = self.pde_dataset.iloc[self.constr_row_select]
             c = self.pde(pde_constr_input)
 
-        if self.constraint_type == 'boundary': #AKA initial_condition
-            constr_x = self.x_all[self.constr_row_select].squeeze(dim =1)
-            boundary_constr_input = torch.stack((constr_x, torch.zeros(self.n_constrs)), dim=1)
-            constr_initial_values = self.initial_condition(constr_x)
+        if self.constraint_type == 'boundary': #only the initial condition boundary
+
+            constr_x = torch.Tensor(self.IC_dataset['x_initial'].iloc[self.constr_row_select].values)
+            constr_t = torch.Tensor(self.IC_dataset['t_initial'].iloc[self.constr_row_select].values)
+            constr_u_zero = torch.Tensor(self.IC_dataset['u_zero_initial'].iloc[self.constr_row_select].values)
+            boundary_constr_input = torch.stack((constr_x, constr_t, constr_u_zero), dim=1)
+            constr_initial_values = torch.Tensor(self.IC_dataset['u_zero_initial'].iloc[self.constr_row_select].values)
             c = self.net(boundary_constr_input).squeeze() - constr_initial_values
         return c
 
