@@ -161,3 +161,6 @@ cython_debug/
 
 mdl/*
 *.txt
+results/mdl/*
+results/plot/*
+results/log/*
