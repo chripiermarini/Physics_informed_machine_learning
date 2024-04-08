@@ -8,8 +8,6 @@ from problems.problem_chemistry import Chemistry
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
 torch.set_default_device(DEVICE)
-np.random.seed(22)
-torch.manual_seed(123)
 import sys
 torch.set_printoptions(precision=8)
 import time
@@ -102,6 +100,8 @@ def plot_prediction(folders, epoch, problem, config):
         problem.plot_result(epoch,problem.t_test,problem.u_test, u_pred, problem.t_fitting, problem.u_fitting,problem.t_pde.detach(), save_file=None)
         plt.savefig(file, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
         plt.close("all")
+    elif problem.name == 'DarcyMatrix':
+        problem.plot_prediction(file, sample_type='test')
     return file
 
 def plot_gif(folders, problem, config, files):
@@ -110,6 +110,8 @@ def plot_gif(folders, problem, config, files):
         problem.save_gif_PIL(gif_path, files, fps=20, loop=0)
 
 def run(config):     
+    np.random.seed(22)
+    torch.manual_seed(123)
 
     # Create output folders
     folders = create_output_folders(config['output_folder'],config['sub_folders'],config['problem']['name'])
@@ -127,9 +129,8 @@ def run(config):
         optimizer = torch.optim.SGD(problem.net.parameters(),lr=config['optimizer']['lr'])
     elif config['optimizer']['name'] == 'sqp':
         optimizer = StochasticSQP(problem.net.parameters(),
-                            lr= config['optimizer']['lr'],
-                            mu = config['optimizer']['mu'],
-                            beta2=config['optimizer']['beta2'],
+                            lr = config['optimizer']['lr'],
+                            config = config['optimizer'],
                             n_parameters = problem.n_parameters, 
                             n_constrs = problem.n_constrs,
                             merit_param_init = 1, 
@@ -239,26 +240,21 @@ def run(config):
         t_end = time.time() - t_start
         values['elapse'] = int(t_end)
 
-        """ 
         # Save model and optimizer parameters
         if np.mod(epoch+1-epoch_start,config['save_model_every']) == 0:
             save_model(folders, epoch+1, problem, optimizer, config)
-        """
 
         # Print Iteration Information   
         if np.mod(epoch-epoch_start,config['save_model_every']) == 0:
             printRow(log_f,type='value',headers=headers,values=values)
 
-        """ 
         # Plot prediction
         if np.mod(epoch-epoch_start,config['save_plot_every']) == 0:
             file = plot_prediction(folders, epoch+1, problem, config)
-            files.append(file)
-         
+            files.append(file)         
         
     # Plot GIF
     plot_gif(folders, problem, config, files)
-    """
 
     # Close file IO
     if config['stdout'] == 1:
@@ -266,7 +262,7 @@ def run(config):
 
 if __name__ == '__main__':
 
-    problem_name = 'burgers'
+    problem_name = 'darcy_matrix'
     with open('conf/conf_'+problem_name+'.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 

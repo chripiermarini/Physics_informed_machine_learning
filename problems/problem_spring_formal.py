@@ -142,6 +142,12 @@ class SpringFormal(BaseProblemFormal):
     
     def plot_result(self,epoch, t,u_true, u_pred, t_fitting,u_fitting,t_pde=None, save_file=None):
         "Pretty plot training results"
+        t = t.cpu()
+        u_true = u_true.cpu()
+        u_pred = u_pred.cpu()
+        t_fitting = t_fitting.cpu()
+        u_fitting = u_fitting.cpu()
+        t_pde = t_pde.cpu()
         plt.figure(figsize=(10,4))
         plt.plot(t,u_true, color="grey", linewidth=2, alpha=0.8, label="Exact solution")
         plt.plot(t,u_pred, color="tab:blue", linewidth=4, alpha=0.8, label="Neural network prediction")

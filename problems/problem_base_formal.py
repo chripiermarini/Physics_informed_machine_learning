@@ -93,7 +93,8 @@ class BaseProblemFormal(ABC):
                     if param.grad is not None:
                         J_value[j,i:i + grad_l] = param.grad.view(-1)
                     else:
-                        print('constraint_func_and_grad', name, 'grad is none')
+                        #print('constraint_func_and_grad', name, 'grad is none')
+                        pass
                     i += grad_l
 
             return c_value, J_value
