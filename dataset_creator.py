@@ -17,12 +17,11 @@ import numpy as np
 import torch
 from scipy.integrate import odeint
 import random
-np.set_printoptions(threshold=np.inf)
 import pandas as pd
+pd.set_option('display.max_rows', None)
 
 def initial_condition(x):
-    random.seed(1776526)
-    np.random.seed(1776526)
+
     # smoout Gaussian condition
     # A = 1.0  # Amplitude
     # x0 = 0  # Center of the Gaussian
@@ -118,7 +117,7 @@ def create_burgers_dataset(n_points):
                                     'fitting_u_labels': u_labels})
     return pde_dataset, IC_dataset, periodic_condition_dataset, fitting_dataset
 
-
+''' 
 pde_dataset, IC_dataset, periodic_condition_dataset, fitting_dataset = create_burgers_dataset(30)
 
 # Create a folder to save DataFrames
@@ -129,3 +128,54 @@ periodic_condition_dataset.to_csv(data_folder + 'periodic_condition_dataset.csv'
 fitting_dataset.to_csv(data_folder + 'fitting_dataset.csv', sep = ',', index = False)
 
 df = pd.read_csv(str(data_folder +'fitting_dataset.csv'), sep=',', header=0)
+'''
+
+
+def kinetic_kosir(x, t) -> np.ndarray:
+    # A -> 2B; A <-> C; A <-> D
+    rates = [8.566 / 2, 1.191, 5.743, 10.219, 1.535]
+    return np.array([-(rates[0] + rates[1] + rates[3]) * x[0] + rates[2] * x[2] + rates[4] * x[3],
+                     2 * rates[0] * x[0],
+                     rates[1] * x[0] - rates[2] * x[2],
+                     rates[3] * x[0] - rates[4] * x[3]])
+
+def create_dataset(n_obj_sample = 100, test = False):
+    random.seed(1776526)
+    np.random.seed(1776526)
+
+    time_range = 10
+    time_discretization = time_range / 100
+    time_span = np.arange(0, time_range, time_discretization)
+
+    # np.repeat(time_span, n_obj_sample, axis = 0)
+
+    noise_level = 1
+    x_init = [np.random.uniform(-noise_level, noise_level, size=(4,)) for _ in range(n_obj_sample)]
+    for e in range(n_obj_sample):
+        x_init[e][0] = x_init[e][0] + 14.5467204
+        x_init[e][1] = x_init[e][1] + 16.3351668
+        x_init[e][2] = x_init[e][2] + 25.9473091
+        x_init[e][3] = x_init[e][3] + 23.5250934
+
+    # Evaluate solution for each experiment
+    solution_list = []
+    for index, element in enumerate(x_init):
+        solution = odeint(func=kinetic_kosir, y0=element, t=time_span)
+        solution_list.append(solution)
+
+    final_solution = np.vstack(solution_list)
+    time_span = np.tile(time_span, n_obj_sample).flatten()[:, np.newaxis]
+    x_init = np.repeat(x_init, 100, axis=0)
+    final_training_dataset = pd.DataFrame(np.concatenate((time_span, x_init, final_solution), axis=1))
+
+    t = torch.Tensor(final_training_dataset.iloc[:, 0].values).unsqueeze(1).requires_grad_(True)
+    y_initial = torch.Tensor(final_training_dataset.iloc[:, 1:5].values)
+    y_label = torch.Tensor(final_training_dataset.iloc[:, 5:].values)
+
+    file_path = 'chemistry_data_folder/train_noise_1.txt'
+    final_training_dataset.to_csv(file_path, sep = ',', index = False, header= False)
+
+    return
+
+#create_dataset(1000, test= True)
+

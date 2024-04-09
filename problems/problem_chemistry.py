@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from scipy.integrate import odeint
 from problems.problem_base_formal import BaseProblemFormal
+import pandas as pd
+import random
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+torch.set_default_device(DEVICE)
 
 """ Problem statement Chemistry equation"""
 
@@ -42,19 +46,17 @@ class Chemistry(BaseProblemFormal):
         self.regs = self.conf['regs']
 
         self.constraint_type = self.conf['constraint_type']
-
         self.n_constrs = self.conf['n_constrs']
 
-        # Generate sample
-        self.n_obj_sample = (self.conf['n_train_obj_samples_per_group']['pde'] +
-                             self.conf['n_train_obj_samples_per_group']['boundary'] +
-                             self.conf['n_train_obj_samples_per_group']['fitting'])
+        self.rates = torch.Tensor([1, 0.5, 1, 1]).to(DEVICE)
 
-        self.n_constrs = self.conf['n_constrs']
+        self.n_discretization = self.conf['t_discretization']
+        self.t_max = self.conf['t_max']
+        self.n_initial_conditions = self.conf['n_initial_conditions']
 
-        self.rates = torch.Tensor([1, 0.5, 1, 1])
-
-        self.t, self.initial_y, self.label_y, self.constr_row_select= self.generate_sample()
+        self.t, self.initial_y, self.label_y, self.constr_row_select= self.generate_training_data()
+        self.test_t, self.test_t_tensor, self.test_label_y, self.test_initial_y = self.generate_test_data()
+        
         self.mse_cost_function = torch.nn.MSELoss()  # Mean squared error
 
     def kinetic_kosir(self, y, t):
@@ -69,50 +71,82 @@ class Chemistry(BaseProblemFormal):
         ])
         return tensor
 
-    def create_dataset(self):
+    def create_dataset(self, number_of_initial_cond, n_discretization = 100, name = 'train'):
         ''' When called, this function creates new data to be stored in the .txt files
         It generates samples of the t ranging from 0 to 10 divide by the number of objective values constraints
         t until 10, noise_level is 1
         '''
-        time_range = 10
-        time_discretization = 10 / self.n_obj_sample
-        time_span = np.arange(0, time_range, time_discretization)
-        t = torch.Tensor(time_span).unsqueeze(1)
+        random.seed(1776526)
+        np.random.seed(1776526)
+        if name == 'test':
+          random.seed(1776)
+          np.random.seed(1776)
 
-        file_path = 'problems/srinivas_input_t.txt'
-        np.savetxt(file_path, t.numpy(), delimiter=',')
-        print(1)
+        time_range = self.t_max
+        time_discretization = time_range / n_discretization
+        time_span = np.arange(0, time_range, time_discretization)
+
+    # np.repeat(time_span, n_obj_sample, axis = 0)
 
         noise_level = 1
-        x_init = [np.random.uniform(-noise_level, noise_level, size=(4,)) for _ in range(self.n_obj_sample)]
-        for e in range(self.n_obj_sample):
+        x_init = [np.random.uniform(-noise_level, noise_level, size=(4,)) for _ in range(number_of_initial_cond)]
+        for e in range(number_of_initial_cond):
             x_init[e][0] = x_init[e][0] + 14.5467204
             x_init[e][1] = x_init[e][1] + 16.3351668
             x_init[e][2] = x_init[e][2] + 25.9473091
             x_init[e][3] = x_init[e][3] + 23.5250934
-        y_initial = torch.Tensor(np.array(x_init))
 
-        file_path = 'problems/srinivas_input_y_initial.txt'
-        np.savetxt(file_path, y_initial.numpy(), delimiter=',')
-        print(2)
+        def kinetic_kosir_gen(x, t) -> np.ndarray:
+    # A -> 2B; A <-> C; A <-> D
+            rates = [8.566 / 2, 1.191, 5.743, 10.219, 1.535]
+            return np.array([-(rates[0] + rates[1] + rates[3]) * x[0] + rates[2] * x[2] + rates[4] * x[3],
+                     2 * rates[0] * x[0],
+                     rates[1] * x[0] - rates[2] * x[2],
+                     rates[3] * x[0] - rates[4] * x[3]])
 
-        # Evaluate solution for each experiment
-        solution = [odeint(func=self.kinetic_kosir, y0=xi, t=time_span) for xi in x_init]
-        y_label = torch.Tensor(solution[0])
-        file_path = 'problems/srinivas_input_y_label.txt'
-        np.savetxt(file_path, y_label.numpy(), delimiter=',')
-        print(3)
+    # Evaluate solution for each experiment
+        solution_list = []
+        for index, element in enumerate(x_init):
+            solution = odeint(func=kinetic_kosir_gen, y0=element, t=time_span)
+            solution_list.append(solution)
+
+        final_solution = np.vstack(solution_list)
+        time_span = np.tile(time_span, number_of_initial_cond).flatten()[:, np.newaxis]
+        x_init = np.repeat(x_init, n_discretization, axis=0)
+        final_training_dataset = pd.DataFrame(np.concatenate((time_span, x_init, final_solution), axis=1))
+
+        file_path = f'/content/drive/MyDrive/SQPPIML/chemistry_data_folder/{name}_noise_1.txt'
+        final_training_dataset.to_csv(file_path, sep = ',', index = False, header= False)
         return
 
-    def generate_sample(self):
+    def generate_training_data(self):
         """ This function reads the .txt files and extract data to feed the objective function
-        Remember that y has dimension 4"""
-        t = tensor_from_file('chemistry_data_folder/chemistry_input_t.txt', self.n_obj_sample).requires_grad_(True)
-        y_initial = tensor_from_file('chemistry_data_folder/chemistry_input_y_initial.txt', self.n_obj_sample)
-        y_label = tensor_from_file('chemistry_data_folder/chemistry_input_y_label.txt', self.n_obj_sample)
-        constr_row_select = np.random.randint(0, self.n_obj_sample, size=self.n_constrs)
+        Remember that y has dimension 4""" 
+        self.create_dataset(number_of_initial_cond = self.n_initial_conditions, 
+                            n_discretization = self.n_discretization, 
+                            name='train')
+
+        final_training_dataset = pd.read_csv('/content/drive/MyDrive/SQPPIML/chemistry_data_folder/train_noise_1.txt', sep=',', header=None)
+        
+        t = torch.Tensor(final_training_dataset.iloc[:, 0].values).unsqueeze(1).to(DEVICE).requires_grad_(True)
+        y_initial = torch.Tensor(final_training_dataset.iloc[:, 1:5].values).to(DEVICE)
+        y_label = torch.Tensor(final_training_dataset.iloc[:, 5:].values).to(DEVICE)
+        constr_row_select = np.random.randint(0, self.n_discretization*self.n_initial_conditions, size=self.n_constrs)
 
         return t, y_initial, y_label, constr_row_select
+    
+    def generate_test_data(self):
+        self.create_dataset(number_of_initial_cond= self.conf['n_test_initial_conditions'],
+                            n_discretization = self.n_discretization, 
+                            name='test')
+
+        test_dataset = pd.read_csv('/content/drive/MyDrive/SQPPIML/chemistry_data_folder/test_noise_1.txt', sep=',', header=None)
+        t = test_dataset.iloc[:, 0].values
+        test_label_y =test_dataset.iloc[:, 5:].values
+
+        test_initial_y = torch.Tensor(test_dataset.iloc[:, 1:5].values).to(DEVICE)
+        test_t_tensor = torch.Tensor(t).unsqueeze(1).to(DEVICE)
+        return t, test_t_tensor, test_label_y, test_initial_y 
 
     def pde(self, output, t):
         dt = torch.empty(output.size(0), 0)
@@ -135,8 +169,13 @@ class Chemistry(BaseProblemFormal):
         pde_loss = self.mse_cost_function(pde_values, torch.zeros_like(pde_values))
 
         # data fitting function
-        fitting_loss = self.mse_cost_function(output, self.label_y)
+        # we select randomly for computing the fitting_loss
+        fitting_rows_indices =  np.random.choice(output.shape[0], 
+        size= int(output.shape[0]*self.conf['n_train_obj_samples_per_group']['fitting']), 
+        replace=False)
 
+        fitting_loss = self.mse_cost_function(output[fitting_rows_indices], self.label_y[fitting_rows_indices])
+        
         """ 
         ## 'other MSE' loss function
         rate_product_values = torch.matmul(dt, self.rates)
@@ -164,6 +203,7 @@ class Chemistry(BaseProblemFormal):
             output_constraint = self.net(torch.cat((initial_y_constraint_input, t_constraint_input), 1))
             #if self.constraint_type == 'other':
             _, constraint_dt = self.pde(output_constraint, t_constraint_input)
+
             c = torch.matmul(constraint_dt, self.rates)
 
             #if self.constraint_type == 'pde':
@@ -173,3 +213,29 @@ class Chemistry(BaseProblemFormal):
             #   c = output_constraint - self.label_y[self.constr_row_select]
 
             return c
+
+    def chemistry_plot(self, save_path):
+      prediction = self.net(torch.cat((self.test_initial_y, self.test_t_tensor),1)).cpu().detach().numpy()
+      # Create subplots
+      fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # 1 row, 2 columns
+
+      # Plot 1
+      for i in range(4):
+          axs[0].plot(self.test_t, self.test_label_y[:, i], label = f'y_true_{i}') 
+      axs[0].set_title('Test Label')  # Set subplot title
+      axs[0].set_xlabel('t')  # Set xlabel
+      axs[0].legend()  # Show legend
+
+      # Plot 2
+      for i in range(4):
+          axs[1].plot(self.test_t, prediction[:, i], label = f'y_prediction_{i}')  # Example scatter plot
+      axs[1].set_title('Prediction')  # Set subplot title
+      axs[1].set_xlabel('t')  # Set xlabel
+      axs[1].legend()  # Show legend
+
+      plt.tight_layout()  # Adjust layout
+      plt.savefig(save_path)
+      return
+      
+
+

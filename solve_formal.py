@@ -8,6 +8,7 @@ from problems.problem_chemistry import Chemistry
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
 torch.set_default_device(DEVICE)
+
 import sys
 torch.set_printoptions(precision=8)
 import time
@@ -26,7 +27,6 @@ def create_output_folders(output_folder, sub_folders, problem_name):
         create_dir(sub_sub_dir)
         folders[k] = sub_sub_dir
     return folders
-    
 
 def get_mdl_path(folders, epoch, suffix):
     path='%s/nn_%s_%s' %(folders['model'], suffix, epoch)
@@ -102,6 +102,8 @@ def plot_prediction(folders, epoch, problem, config):
         plt.close("all")
     elif problem.name == 'DarcyMatrix':
         problem.plot_prediction(file, sample_type='test')
+    elif problem.name == 'Chemistry':
+      problem.chemistry_plot(save_path = file)
     return file
 
 def plot_gif(folders, problem, config, files):
@@ -109,7 +111,7 @@ def plot_gif(folders, problem, config, files):
     if problem.name == 'SpringFormal':
         problem.save_gif_PIL(gif_path, files, fps=20, loop=0)
 
-def run(config):     
+def run(config):
     np.random.seed(22)
     torch.manual_seed(123)
 
@@ -129,8 +131,9 @@ def run(config):
         optimizer = torch.optim.SGD(problem.net.parameters(),lr=config['optimizer']['lr'])
     elif config['optimizer']['name'] == 'sqp':
         optimizer = StochasticSQP(problem.net.parameters(),
-                            lr = config['optimizer']['lr'],
-                            config = config['optimizer'],
+                            lr= config['optimizer']['lr'],
+                            mu = config['optimizer']['mu'],
+                            beta2=config['optimizer']['beta2'],
                             n_parameters = problem.n_parameters, 
                             n_constrs = problem.n_constrs,
                             merit_param_init = 1, 
@@ -247,12 +250,13 @@ def run(config):
         # Print Iteration Information   
         if np.mod(epoch-epoch_start,config['save_model_every']) == 0:
             printRow(log_f,type='value',headers=headers,values=values)
-
-        # Plot prediction
+        
+        #Plot prediction
         if np.mod(epoch-epoch_start,config['save_plot_every']) == 0:
             file = plot_prediction(folders, epoch+1, problem, config)
-            files.append(file)         
-        
+            files.append(file)
+         
+
     # Plot GIF
     plot_gif(folders, problem, config, files)
 
@@ -262,11 +266,30 @@ def run(config):
 
 if __name__ == '__main__':
 
-    problem_name = 'darcy_matrix'
-    with open('conf/conf_'+problem_name+'.yaml') as f:
+    problem_name = 'chemistry'
+    with open('/content/drive/MyDrive/SQPPIML/conf/conf_'+problem_name+'.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
+        run(config)
 
-    # train
-    run(config)
+    '''
+    n_constrs_list = [0, 1,3] 
+    learning_rate_list = [1.0e-2, 1.0e-3,  1.0e-4]
+    regs_list = [1.0e-1] #1.0e-2,
+    boundary_type_for_regs_list = ['pde','boundary','fitting']
+    for n_constrs in n_constrs_list:
+      for lr in learning_rate_list:
+          for reg in regs_list:
+              for boundary_type in boundary_type_for_regs_list:
+                  try:
+                    print('regs:', reg, 'b_type:', boundary_type, 'n_constrs:', n_constrs, 'lr', lr)
+                    config['n_constrs'] = n_constrs
+                    config['optimizer']['lr'] = lr
+                    config['problem']['regs'][boundary_type]= reg
+                    config['file_suffix'] = 'n_constrs_' + str(n_constrs) + '_lr_' + str(lr) + '_reg_' + str(reg) + '_boundary_type_' + str(boundary_type)
+                    run(config)
+                  except:
+                    config['problem']['regs'][boundary_type]= 1
+                    pass
+      '''
     
     
