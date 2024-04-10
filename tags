@@ -4,12 +4,15 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
+ABC	problems/problem_base_formal.py	/^from abc import ABC, abstractmethod$/;"	i
+ABCMeta	neuraloperator/neuralop/datasets/data_transforms.py	/^from abc import ABCMeta, abstractmethod$/;"	i
 AdaIN	neuraloperator/neuralop/layers/fno_block.py	/^from .normalization_layers import AdaIN$/;"	i
 AdaIN	neuraloperator/neuralop/layers/normalization_layers.py	/^class AdaIN(nn.Module):$/;"	c
 Any	neuraloperator/neuralop/mpu/mappings.py	/^from typing import Any$/;"	i
 ArgparseConfig	neuraloperator/scripts/hpo/tune_darcy.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 ArgparseConfig	neuraloperator/scripts/test_from_config.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 ArgparseConfig	neuraloperator/scripts/train_burgers.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
+ArgparseConfig	neuraloperator/scripts/train_car_cfd.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 ArgparseConfig	neuraloperator/scripts/train_darcy.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 ArgparseConfig	neuraloperator/scripts/train_navier_stokes.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 AttentionKernelIntegral	neuraloperator/neuralop/layers/attention_kernel_integral.py	/^class AttentionKernelIntegral(torch.nn.Module):$/;"	c
@@ -18,8 +21,13 @@ BUILDDIR	neuraloperator/doc/Makefile	/^BUILDDIR      = build$/;"	m
 BUILDDIR	neuraloperator/doc/make.bat	/^set BUILDDIR=build$/;"	v
 BaseModel	neuraloperator/neuralop/models/base_model.py	/^class BaseModel(torch.nn.Module):$/;"	c
 BaseModel	neuraloperator/neuralop/models/fno.py	/^from .base_model import BaseModel$/;"	i
+BaseModel	neuraloperator/neuralop/models/fnogno.py	/^from .base_model import BaseModel$/;"	i
 BaseModel	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop.models.base_model import BaseModel$/;"	i
-BaseProblem	problems/problem_base.py	/^class BaseProblem:$/;"	c
+BaseProblemFormal	problems/problem_base_formal.py	/^class BaseProblemFormal(ABC):$/;"	c
+BaseProblemFormal	problems/problem_burgers.py	/^from problems.problem_base_formal import BaseProblemFormal$/;"	i
+BaseProblemFormal	problems/problem_chemistry.py	/^from problems.problem_base_formal import BaseProblemFormal$/;"	i
+BaseProblemFormal	problems/problem_darcy_matrix.py	/^from .problem_base_formal import BaseProblemFormal$/;"	i
+BaseProblemFormal	problems/problem_spring_formal.py	/^from .problem_base_formal import BaseProblemFormal$/;"	i
 BaseSpectralConv	neuraloperator/neuralop/layers/base_spectral_conv.py	/^class BaseSpectralConv(nn.Module):$/;"	c
 BaseSpectralConv	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^from .base_spectral_conv import BaseSpectralConv$/;"	i
 BaseSpectralConv	neuraloperator/neuralop/layers/spectral_convolution.py	/^from .base_spectral_conv import BaseSpectralConv$/;"	i
@@ -27,43 +35,58 @@ BaseSpectralConv	neuraloperator/neuralop/layers/spherical_convolution.py	/^from 
 BasicLoggerCallback	neuraloperator/neuralop/training/__init__.py	/^from .callbacks import (Callback, BasicLoggerCallback,$/;"	i
 BasicLoggerCallback	neuraloperator/neuralop/training/callbacks.py	/^class BasicLoggerCallback(Callback):$/;"	c
 BasicLoggerCallback	neuraloperator/scripts/train_burgers.py	/^from neuralop.training import setup, BasicLoggerCallback$/;"	i
+BasicLoggerCallback	neuraloperator/scripts/train_car_cfd.py	/^from neuralop.training.callbacks import BasicLoggerCallback$/;"	i
 BasicLoggerCallback	neuraloperator/scripts/train_darcy.py	/^from neuralop.training.callbacks import BasicLoggerCallback$/;"	i
 BasicLoggerCallback	neuraloperator/scripts/train_navier_stokes.py	/^from neuralop.training import setup, BasicLoggerCallback$/;"	i
 Bunch	neuraloperator/neuralop/models/tests/test_fno.py	/^from configmypy import Bunch$/;"	i
+Burgers	problems/problem_burgers.py	/^class Burgers(BaseProblemFormal):$/;"	c
+Burgers	solve.py	/^from problems.problem_burgers import Burgers$/;"	i
 BurgersEqnLoss	neuraloperator/neuralop/__init__.py	/^from .losses import LpLoss, H1Loss, BurgersEqnLoss, ICLoss, WeightedSumLoss$/;"	i
 BurgersEqnLoss	neuraloperator/neuralop/losses/__init__.py	/^from .equation_losses import BurgersEqnLoss, ICLoss$/;"	i
 BurgersEqnLoss	neuraloperator/neuralop/losses/equation_losses.py	/^class BurgersEqnLoss(object):$/;"	c
 BurgersEqnLoss	neuraloperator/scripts/train_burgers.py	/^from neuralop import H1Loss, LpLoss, BurgersEqnLoss, ICLoss, WeightedSumLoss, Trainer, get_model$/;"	i
+CFDDataProcessor	neuraloperator/scripts/train_car_cfd.py	/^class CFDDataProcessor(DataProcessor):$/;"	c
 Callback	neuraloperator/neuralop/training/__init__.py	/^from .callbacks import (Callback, BasicLoggerCallback,$/;"	i
 Callback	neuraloperator/neuralop/training/callbacks.py	/^class Callback(object):$/;"	c
 CheckpointCallback	neuraloperator/examples/checkpoint_FNO_darcy.py	/^from neuralop.training import CheckpointCallback$/;"	i
-CheckpointCallback	neuraloperator/neuralop/__init__.py	/^from .training import Trainer, CheckpointCallback$/;"	i
+CheckpointCallback	neuraloperator/neuralop/__init__.py	/^from .training import Trainer, CheckpointCallback, IncrementalCallback$/;"	i
 CheckpointCallback	neuraloperator/neuralop/training/callbacks.py	/^class CheckpointCallback(Callback):$/;"	c
-CheckpointCallback	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop import Trainer, LpLoss, H1Loss, CheckpointCallback$/;"	i
+CheckpointCallback	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop import Trainer, LpLoss, H1Loss, CheckpointCallback, IncrementalCallback$/;"	i
+Chemistry	problems/problem_chemistry.py	/^class Chemistry(BaseProblemFormal):$/;"	c
+Chemistry	solve.py	/^from problems.problem_chemistry import Chemistry$/;"	i
 Composite	neuraloperator/neuralop/datasets/transforms.py	/^class Composite(Transform):$/;"	c
 ConfigPipeline	neuraloperator/neuralop/tests/test_model_from_config.py	/^from configmypy import ConfigPipeline, YamlConfig$/;"	i
 ConfigPipeline	neuraloperator/scripts/hpo/tune_darcy.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 ConfigPipeline	neuraloperator/scripts/test_from_config.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 ConfigPipeline	neuraloperator/scripts/train_burgers.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
+ConfigPipeline	neuraloperator/scripts/train_car_cfd.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 ConfigPipeline	neuraloperator/scripts/train_darcy.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 ConfigPipeline	neuraloperator/scripts/train_navier_stokes.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 DDP	neuraloperator/scripts/hpo/tune_darcy.py	/^from torch.nn.parallel import DistributedDataParallel as DDP$/;"	i
 DDP	neuraloperator/scripts/train_burgers.py	/^from torch.nn.parallel import DistributedDataParallel as DDP$/;"	i
 DDP	neuraloperator/scripts/train_darcy.py	/^from torch.nn.parallel import DistributedDataParallel as DDP$/;"	i
 DDP	neuraloperator/scripts/train_navier_stokes.py	/^from torch.nn.parallel import DistributedDataParallel as DDP$/;"	i
-Darcy	problems/problem_darcy.py	/^class Darcy:$/;"	c
-DarcyMatrix	problems/problem_darcy_matrix.py	/^class DarcyMatrix:$/;"	c
+DEVICE	solve.py	/^DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")$/;"	v
+DarcyMatrix	problems/problem_darcy_matrix.py	/^class DarcyMatrix(BaseProblemFormal):$/;"	c
+DarcyMatrix	solve.py	/^from problems.problem_darcy_matrix import DarcyMatrix$/;"	i
+DataLoader	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^from torch.utils.data import DataLoader$/;"	i
 DataLoader	neuraloperator/neuralop/datasets/spherical_swe.py	/^from torch.utils.data import DataLoader$/;"	i
 DataLoader	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from torch.utils.data import Dataset, DataLoader$/;"	i
+DataProcessor	neuraloperator/neuralop/datasets/data_transforms.py	/^class DataProcessor(torch.nn.Module, metaclass=ABCMeta):$/;"	c
+DataProcessor	neuraloperator/scripts/train_car_cfd.py	/^from neuralop.datasets.data_transforms import DataProcessor$/;"	i
+Dataset	neuraloperator/neuralop/datasets/dict_dataset.py	/^from torch.utils.data import Dataset$/;"	i
 Dataset	neuraloperator/neuralop/datasets/hdf5_dataset.py	/^from torch.utils.data import Dataset$/;"	i
 Dataset	neuraloperator/neuralop/datasets/tensor_dataset.py	/^from torch.utils.data.dataset import Dataset$/;"	i
 Dataset	neuraloperator/neuralop/datasets/transforms.py	/^from torch.utils.data import Dataset$/;"	i
 Dataset	neuraloperator/neuralop/datasets/zarr_dataset.py	/^from torch.utils.data import Dataset$/;"	i
 Dataset	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from torch.utils.data import Dataset, DataLoader$/;"	i
 DefaultDataProcessor	neuraloperator/neuralop/datasets/darcy.py	/^from .data_transforms import DefaultDataProcessor$/;"	i
-DefaultDataProcessor	neuraloperator/neuralop/datasets/data_transforms.py	/^class DefaultDataProcessor(torch.nn.Module):$/;"	c
+DefaultDataProcessor	neuraloperator/neuralop/datasets/data_transforms.py	/^class DefaultDataProcessor(DataProcessor):$/;"	c
 DefaultDataProcessor	neuraloperator/neuralop/datasets/navier_stokes.py	/^from .data_transforms import DefaultDataProcessor$/;"	i
-DefaultDataProcessor	neuraloperator/neuralop/datasets/tests/test_data_processor.py	/^from ..data_transforms import DefaultDataProcessor$/;"	i
+DefaultDataProcessor	neuraloperator/neuralop/datasets/tests/test_data_processor.py	/^from ..data_transforms import DefaultDataProcessor, IncrementalDataProcessor$/;"	i
+DictDataset	neuraloperator/neuralop/datasets/__init__.py	/^from .dict_dataset import DictDataset$/;"	i
+DictDataset	neuraloperator/neuralop/datasets/dict_dataset.py	/^class DictDataset(Dataset):$/;"	c
+DictDataset	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^from .dict_dataset import DictDataset$/;"	i
 DictTransform	neuraloperator/neuralop/datasets/output_encoder.py	/^class DictTransform(Transform):$/;"	c
 DomainPadding	neuraloperator/neuralop/layers/padding.py	/^class DomainPadding(nn.Module):$/;"	c
 DomainPadding	neuraloperator/neuralop/layers/tests/test_padding.py	/^from ..padding import DomainPadding$/;"	i
@@ -84,12 +107,13 @@ F	neuraloperator/neuralop/models/uno.py	/^import torch.nn.functional as F$/;"	i
 F	neuraloperator/neuralop/mpu/helpers.py	/^import torch.nn.functional as F$/;"	i
 F	neuraloperator/scripts/train_burgers.py	/^import torch.nn.functional as F$/;"	i
 FCLegendre	neuraloperator/neuralop/layers/fourier_continuation.py	/^class FCLegendre(nn.Module):$/;"	c
-FNO	FNO dataset.py	/^from neuralop.models import FNO$/;"	i
-FNO	FNO script.py	/^from neuralop.models import FNO$/;"	i
+FCN	nn_architecture.py	/^class FCN(nn.Module):$/;"	c
+FNO	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^from neuralop.models import FNO$/;"	i
 FNO	neuraloperator/neuralop/models/__init__.py	/^from .fno import FNO, FNO1d, FNO2d, FNO3d$/;"	i
 FNO	neuraloperator/neuralop/models/fno.py	/^class FNO(BaseModel, name='FNO'):$/;"	c
 FNO	neuraloperator/neuralop/models/fnogno.py	/^from .fno import FNO$/;"	i
 FNO	neuraloperator/neuralop/models/tests/test_fno.py	/^from neuralop.models import FNO$/;"	i
+FNO	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop.models import FNO$/;"	i
 FNO	nn_architecture.py	/^from neuralop.models import FNO$/;"	i
 FNO1d	neuraloperator/neuralop/models/__init__.py	/^from .fno import FNO, FNO1d, FNO2d, FNO3d$/;"	i
 FNO1d	neuraloperator/neuralop/models/fno.py	/^class FNO1d(FNO):$/;"	c
@@ -101,7 +125,8 @@ FNOBlocks	neuraloperator/neuralop/layers/fno_block.py	/^class FNOBlocks(nn.Modul
 FNOBlocks	neuraloperator/neuralop/layers/tests/test_fno_block.py	/^from ..fno_block import FNOBlocks$/;"	i
 FNOBlocks	neuraloperator/neuralop/models/fno.py	/^from ..layers.fno_block import FNOBlocks$/;"	i
 FNOBlocks	neuraloperator/neuralop/models/uno.py	/^from ..layers.fno_block import FNOBlocks$/;"	i
-FNOGNO	neuraloperator/neuralop/models/fnogno.py	/^class FNOGNO(nn.Module):$/;"	c
+FNOGNO	neuraloperator/neuralop/models/__init__.py	/^from .fnogno import FNOGNO$/;"	i
+FNOGNO	neuraloperator/neuralop/models/fnogno.py	/^class FNOGNO(BaseModel, name="FNOGNO"):$/;"	c
 FNOGNO	neuraloperator/neuralop/models/tests/test_fnogno.py	/^from ..fnogno import FNOGNO$/;"	i
 FNOLocal	nn_architecture.py	/^class FNOLocal(nn.Module):$/;"	c
 FactorizedTensor	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^from tltorch.factorized_tensors.core import FactorizedTensor$/;"	i
@@ -114,15 +139,15 @@ FieldwiseAggregatorLoss	neuraloperator/neuralop/losses/meta_losses.py	/^class Fi
 FixedRadiusSearch	neuraloperator/neuralop/layers/neighbor_search.py	/^            from open3d.ml.torch.layers import FixedRadiusSearch$/;"	i
 GeneralTensorDataset	neuraloperator/neuralop/datasets/pt_dataset.py	/^from .tensor_dataset import GeneralTensorDataset$/;"	i
 GeneralTensorDataset	neuraloperator/neuralop/datasets/tensor_dataset.py	/^class GeneralTensorDataset(Dataset):$/;"	c
-H1Loss	FNO script.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 H1Loss	neuraloperator/examples/checkpoint_FNO_darcy.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 H1Loss	neuraloperator/examples/plot_FNO_darcy.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 H1Loss	neuraloperator/examples/plot_SFNO_swe.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 H1Loss	neuraloperator/examples/plot_UNO_darcy.py	/^from neuralop import LpLoss, H1Loss$/;"	i
+H1Loss	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 H1Loss	neuraloperator/neuralop/__init__.py	/^from .losses import LpLoss, H1Loss, BurgersEqnLoss, ICLoss, WeightedSumLoss$/;"	i
 H1Loss	neuraloperator/neuralop/losses/__init__.py	/^from .data_losses import LpLoss, H1Loss$/;"	i
 H1Loss	neuraloperator/neuralop/losses/data_losses.py	/^class H1Loss(object):$/;"	c
-H1Loss	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop import Trainer, LpLoss, H1Loss, CheckpointCallback$/;"	i
+H1Loss	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop import Trainer, LpLoss, H1Loss, CheckpointCallback, IncrementalCallback$/;"	i
 H1Loss	neuraloperator/scripts/hpo/tune_darcy.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 H1Loss	neuraloperator/scripts/train_burgers.py	/^from neuralop import H1Loss, LpLoss, BurgersEqnLoss, ICLoss, WeightedSumLoss, Trainer, get_model$/;"	i
 H1Loss	neuraloperator/scripts/train_darcy.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
@@ -132,12 +157,22 @@ ICLoss	neuraloperator/neuralop/__init__.py	/^from .losses import LpLoss, H1Loss,
 ICLoss	neuraloperator/neuralop/losses/__init__.py	/^from .equation_losses import BurgersEqnLoss, ICLoss$/;"	i
 ICLoss	neuraloperator/neuralop/losses/equation_losses.py	/^class ICLoss(object):$/;"	c
 ICLoss	neuraloperator/scripts/train_burgers.py	/^from neuralop import H1Loss, LpLoss, BurgersEqnLoss, ICLoss, WeightedSumLoss, Trainer, get_model$/;"	i
+Image	problems/problem_burgers.py	/^from PIL import Image$/;"	i
+Image	problems/problem_chemistry.py	/^from PIL import Image$/;"	i
+Image	problems/problem_spring_formal.py	/^from PIL import Image$/;"	i
+IncrementalCallback	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^from neuralop.training.callbacks import IncrementalCallback$/;"	i
+IncrementalCallback	neuraloperator/neuralop/__init__.py	/^from .training import Trainer, CheckpointCallback, IncrementalCallback$/;"	i
+IncrementalCallback	neuraloperator/neuralop/training/callbacks.py	/^class IncrementalCallback(Callback):$/;"	c
+IncrementalCallback	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop import Trainer, LpLoss, H1Loss, CheckpointCallback, IncrementalCallback$/;"	i
+IncrementalDataProcessor	neuraloperator/neuralop/datasets/data_transforms.py	/^class IncrementalDataProcessor(torch.nn.Module):$/;"	c
+IncrementalDataProcessor	neuraloperator/neuralop/datasets/tests/test_data_processor.py	/^from ..data_transforms import DefaultDataProcessor, IncrementalDataProcessor$/;"	i
 IntegralTransform	neuraloperator/neuralop/layers/integral_transform.py	/^class IntegralTransform(nn.Module):$/;"	c
 IntegralTransform	neuraloperator/neuralop/models/fnogno.py	/^from ..layers.integral_transform import IntegralTransform$/;"	i
 InverseRealSHT	neuraloperator/neuralop/layers/spherical_convolution.py	/^from torch_harmonics import RealSHT, InverseRealSHT$/;"	i
-IregularLpqLoss	neuraloperator/neuralop/losses/data_losses.py	/^class IregularLpqLoss(torch.nn.Module):$/;"	c
 Iterable	neuraloperator/neuralop/datasets/output_encoder.py	/^from collections.abc import Iterable$/;"	i
 Legendre	neuraloperator/neuralop/layers/fourier_continuation.py	/^from numpy.polynomial.legendre import Legendre$/;"	i
+List	neuraloperator/neuralop/datasets/dict_dataset.py	/^from typing import List$/;"	i
+List	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^from typing import List, Union$/;"	i
 List	neuraloperator/neuralop/datasets/transforms.py	/^from typing import List$/;"	i
 List	neuraloperator/neuralop/layers/fno_block.py	/^from typing import List, Optional, Union$/;"	i
 List	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^from typing import List, Optional, Tuple, Union$/;"	i
@@ -151,23 +186,24 @@ Literal	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^    from
 Literal	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^    from typing_extensions import Literal$/;"	i
 Literal	neuraloperator/neuralop/layers/segment_csr.py	/^from typing import Literal$/;"	i
 Literal	neuraloperator/neuralop/training/callbacks.py	/^from typing import List, Union, Literal$/;"	i
-LpLoss	FNO script.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 LpLoss	neuraloperator/examples/checkpoint_FNO_darcy.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 LpLoss	neuraloperator/examples/plot_FNO_darcy.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 LpLoss	neuraloperator/examples/plot_SFNO_swe.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 LpLoss	neuraloperator/examples/plot_UNO_darcy.py	/^from neuralop import LpLoss, H1Loss$/;"	i
+LpLoss	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^from neuralop import LpLoss, H1Loss$/;"	i
 LpLoss	neuraloperator/neuralop/__init__.py	/^from .losses import LpLoss, H1Loss, BurgersEqnLoss, ICLoss, WeightedSumLoss$/;"	i
 LpLoss	neuraloperator/neuralop/losses/__init__.py	/^from .data_losses import LpLoss, H1Loss$/;"	i
 LpLoss	neuraloperator/neuralop/losses/data_losses.py	/^class LpLoss(object):$/;"	c
-LpLoss	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop import Trainer, LpLoss, H1Loss, CheckpointCallback$/;"	i
+LpLoss	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop import Trainer, LpLoss, H1Loss, CheckpointCallback, IncrementalCallback$/;"	i
 LpLoss	neuraloperator/neuralop/training/trainer.py	/^from neuralop.losses import LpLoss$/;"	i
 LpLoss	neuraloperator/scripts/hpo/tune_darcy.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 LpLoss	neuraloperator/scripts/train_burgers.py	/^from neuralop import H1Loss, LpLoss, BurgersEqnLoss, ICLoss, WeightedSumLoss, Trainer, get_model$/;"	i
+LpLoss	neuraloperator/scripts/train_car_cfd.py	/^from neuralop.losses.data_losses import LpLoss$/;"	i
 LpLoss	neuraloperator/scripts/train_darcy.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 LpLoss	neuraloperator/scripts/train_navier_stokes.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 MGPTensorDataset	neuraloperator/neuralop/datasets/transforms.py	/^class MGPTensorDataset(Dataset):$/;"	c
 MGPatchingCallback	neuraloperator/scripts/hpo/tune_darcy.py	/^from neuralop.training.callbacks import MGPatchingCallback, SimpleWandBLoggerCallback$/;"	i
-MGPatchingDataProcessor	neuraloperator/neuralop/datasets/data_transforms.py	/^class MGPatchingDataProcessor(torch.nn.Module):$/;"	c
+MGPatchingDataProcessor	neuraloperator/neuralop/datasets/data_transforms.py	/^class MGPatchingDataProcessor(DataProcessor):$/;"	c
 MGPatchingDataProcessor	neuraloperator/scripts/train_burgers.py	/^from neuralop.datasets.data_transforms import MGPatchingDataProcessor$/;"	i
 MGPatchingDataProcessor	neuraloperator/scripts/train_darcy.py	/^from neuralop.datasets.data_transforms import MGPatchingDataProcessor$/;"	i
 MGPatchingDataProcessor	neuraloperator/scripts/train_navier_stokes.py	/^from neuralop.datasets.data_transforms import MGPatchingDataProcessor$/;"	i
@@ -180,10 +216,12 @@ MLP	neuraloperator/neuralop/models/uno.py	/^from ..layers.mlp import MLP$/;"	i
 MLPLinear	neuraloperator/neuralop/layers/integral_transform.py	/^from .mlp import MLPLinear$/;"	i
 MLPLinear	neuraloperator/neuralop/layers/mlp.py	/^class MLPLinear(torch.nn.Module):$/;"	c
 MPI	neuraloperator/neuralop/mpu/comm.py	/^        from mpi4py import MPI$/;"	i
+MeshDataModule	neuraloperator/neuralop/datasets/__init__.py	/^    from .mesh_datamodule import MeshDataModule$/;"	i
+MeshDataModule	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^class MeshDataModule:$/;"	c
+MeshDataModule	neuraloperator/scripts/train_car_cfd.py	/^from neuralop.datasets import MeshDataModule$/;"	i
 MultigridPatching2D	neuraloperator/neuralop/datasets/data_transforms.py	/^from neuralop.training.patching import MultigridPatching2D$/;"	i
 MultigridPatching2D	neuraloperator/neuralop/datasets/transforms.py	/^from neuralop.training.patching import MultigridPatching2D$/;"	i
 MultigridPatching2D	neuraloperator/neuralop/training/patching.py	/^class MultigridPatching2D(nn.Module):$/;"	c
-MultipleFieldOutputEncoder	neuraloperator/neuralop/datasets/output_encoder.py	/^class MultipleFieldOutputEncoder(OutputEncoder):$/;"	c
 NeighborSearch	neuraloperator/neuralop/layers/neighbor_search.py	/^class NeighborSearch(nn.Module):$/;"	c
 NeighborSearch	neuraloperator/neuralop/models/fnogno.py	/^from ..layers.neighbor_search import NeighborSearch$/;"	i
 Normalizer	neuraloperator/neuralop/datasets/transforms.py	/^class Normalizer():$/;"	c
@@ -199,9 +237,9 @@ Optional	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^from ty
 Optional	neuraloperator/neuralop/layers/spectral_convolution.py	/^from typing import List, Optional, Tuple, Union$/;"	i
 Optional	neuraloperator/neuralop/layers/spherical_convolution.py	/^from typing import List, Optional, Union$/;"	i
 Optional	neuraloperator/neuralop/utils.py	/^from typing import List, Optional, Union$/;"	i
-OutputEncoder	neuraloperator/neuralop/datasets/output_encoder.py	/^class OutputEncoder(torch.nn.Module):$/;"	c
 Path	neuraloperator/neuralop/datasets/burgers.py	/^from pathlib import Path$/;"	i
 Path	neuraloperator/neuralop/datasets/darcy.py	/^from pathlib import Path$/;"	i
+Path	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^from pathlib import Path$/;"	i
 Path	neuraloperator/neuralop/datasets/navier_stokes.py	/^from pathlib import Path$/;"	i
 Path	neuraloperator/neuralop/models/base_model.py	/^from pathlib import Path$/;"	i
 Path	neuraloperator/neuralop/tests/test_model_from_config.py	/^from pathlib import Path$/;"	i
@@ -261,7 +299,8 @@ SphericalConv	neuraloperator/neuralop/layers/spherical_convolution.py	/^class Sp
 SphericalConv	neuraloperator/neuralop/layers/tests/test_spherical_convolution.py	/^from ..spherical_convolution import SphericalConv$/;"	i
 SphericalConv	neuraloperator/neuralop/models/fno.py	/^from ..layers.spherical_convolution import SphericalConv$/;"	i
 SphericalSWEDataset	neuraloperator/neuralop/datasets/spherical_swe.py	/^class SphericalSWEDataset(torch.utils.data.Dataset):$/;"	c
-Spring	problems/problem_spring.py	/^class Spring:$/;"	c
+SpringFormal	problems/problem_spring_formal.py	/^class SpringFormal(BaseProblemFormal):$/;"	c
+SpringFormal	solve.py	/^from problems.problem_spring_formal import SpringFormal$/;"	i
 StochasticSQP	stochasticsqp.py	/^class StochasticSQP(Optimizer):$/;"	c
 SubConv	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^class SubConv(nn.Module):$/;"	c
 SubConv	neuraloperator/neuralop/layers/spectral_convolution.py	/^class SubConv(nn.Module):$/;"	c
@@ -269,7 +308,6 @@ SubConv	neuraloperator/neuralop/layers/spherical_convolution.py	/^from .spectral
 SubModule	neuraloperator/neuralop/layers/fno_block.py	/^class SubModule(nn.Module):$/;"	c
 T	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^T = 100$/;"	v
 T	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^T = 500 # number of time steps$/;"	v
-TFNO	FNO script.py	/^from neuralop.models import TFNO$/;"	i
 TFNO	neuraloperator/examples/checkpoint_FNO_darcy.py	/^from neuralop.models import TFNO$/;"	i
 TFNO	neuraloperator/examples/plot_FNO_darcy.py	/^from neuralop.models import TFNO$/;"	i
 TFNO	neuraloperator/examples/plot_UNO_darcy.py	/^from neuralop.models import TFNO, UNO$/;"	i
@@ -290,17 +328,18 @@ TensorDataset	neuraloperator/neuralop/datasets/burgers.py	/^from .tensor_dataset
 TensorDataset	neuraloperator/neuralop/datasets/darcy.py	/^from .tensor_dataset import TensorDataset$/;"	i
 TensorDataset	neuraloperator/neuralop/datasets/navier_stokes.py	/^from .tensor_dataset import TensorDataset$/;"	i
 TensorDataset	neuraloperator/neuralop/datasets/tensor_dataset.py	/^class TensorDataset(Dataset):$/;"	c
-Trainer	FNO script.py	/^from neuralop import Trainer$/;"	i
 Trainer	neuraloperator/examples/checkpoint_FNO_darcy.py	/^from neuralop import Trainer$/;"	i
 Trainer	neuraloperator/examples/plot_FNO_darcy.py	/^from neuralop import Trainer$/;"	i
 Trainer	neuraloperator/examples/plot_SFNO_swe.py	/^from neuralop import Trainer$/;"	i
 Trainer	neuraloperator/examples/plot_UNO_darcy.py	/^from neuralop import Trainer$/;"	i
-Trainer	neuraloperator/neuralop/__init__.py	/^from .training import Trainer, CheckpointCallback$/;"	i
+Trainer	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^from neuralop import Trainer$/;"	i
+Trainer	neuraloperator/neuralop/__init__.py	/^from .training import Trainer, CheckpointCallback, IncrementalCallback$/;"	i
 Trainer	neuraloperator/neuralop/training/__init__.py	/^from .trainer import Trainer$/;"	i
-Trainer	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop import Trainer, LpLoss, H1Loss, CheckpointCallback$/;"	i
+Trainer	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop import Trainer, LpLoss, H1Loss, CheckpointCallback, IncrementalCallback$/;"	i
 Trainer	neuraloperator/neuralop/training/trainer.py	/^class Trainer:$/;"	c
 Trainer	neuraloperator/scripts/hpo/tune_darcy.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 Trainer	neuraloperator/scripts/train_burgers.py	/^from neuralop import H1Loss, LpLoss, BurgersEqnLoss, ICLoss, WeightedSumLoss, Trainer, get_model$/;"	i
+Trainer	neuraloperator/scripts/train_car_cfd.py	/^from neuralop.training.trainer import Trainer$/;"	i
 Trainer	neuraloperator/scripts/train_darcy.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 Trainer	neuraloperator/scripts/train_navier_stokes.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 Transform	neuraloperator/neuralop/datasets/output_encoder.py	/^from .transforms import Transform$/;"	i
@@ -312,6 +351,7 @@ UNO	neuraloperator/examples/plot_UNO_darcy.py	/^from neuralop.models import TFNO
 UNO	neuraloperator/neuralop/models/__init__.py	/^from .uno import UNO$/;"	i
 UNO	neuraloperator/neuralop/models/tests/test_uno.py	/^from ..uno import UNO$/;"	i
 UNO	neuraloperator/neuralop/models/uno.py	/^class UNO(nn.Module):$/;"	c
+Union	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^from typing import List, Union$/;"	i
 Union	neuraloperator/neuralop/layers/fno_block.py	/^from typing import List, Optional, Union$/;"	i
 Union	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^from typing import List, Optional, Tuple, Union$/;"	i
 Union	neuraloperator/neuralop/layers/padding.py	/^from typing import List, Union$/;"	i
@@ -321,6 +361,7 @@ Union	neuraloperator/neuralop/training/callbacks.py	/^from typing import List, U
 Union	neuraloperator/neuralop/training/training_state.py	/^from typing import Union$/;"	i
 Union	neuraloperator/neuralop/utils.py	/^from typing import List, Optional, Union$/;"	i
 UnitGaussianNormalizer	neuraloperator/neuralop/datasets/darcy.py	/^from .output_encoder import UnitGaussianNormalizer$/;"	i
+UnitGaussianNormalizer	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^from .output_encoder import UnitGaussianNormalizer$/;"	i
 UnitGaussianNormalizer	neuraloperator/neuralop/datasets/navier_stokes.py	/^from .output_encoder import UnitGaussianNormalizer$/;"	i
 UnitGaussianNormalizer	neuraloperator/neuralop/datasets/output_encoder.py	/^class UnitGaussianNormalizer(Transform):$/;"	c
 UnitGaussianNormalizer	neuraloperator/neuralop/datasets/pt_dataset.py	/^from ..utils import UnitGaussianNormalizer$/;"	i
@@ -328,11 +369,9 @@ UnitGaussianNormalizer	neuraloperator/neuralop/datasets/tests/test_data_processo
 UnitGaussianNormalizer	neuraloperator/neuralop/datasets/tests/test_output_encoder.py	/^from ..output_encoder import UnitGaussianNormalizer$/;"	i
 UnitGaussianNormalizer	neuraloperator/neuralop/utils.py	/^class UnitGaussianNormalizer:$/;"	c
 VERSION	neuraloperator/setup.py	/^VERSION = version(root_path)$/;"	v
-Variable	problems/problem_base.py	/^from torch.autograd import Variable$/;"	i
-Variable	problems/problem_darcy.py	/^from torch.autograd import Variable$/;"	i
-Variable	problems/problem_darcy_matrix.py	/^from torch.autograd import Variable$/;"	i
-Variable	problems/problem_spring.py	/^from torch.autograd import Variable$/;"	i
-WeightedL2DragLoss	neuraloperator/neuralop/losses/data_losses.py	/^class WeightedL2DragLoss(object):$/;"	c
+Variable	problems/problem_burgers.py	/^from torch.autograd import Variable$/;"	i
+Variable	problems/problem_chemistry.py	/^from torch.autograd import Variable$/;"	i
+Variable	problems/problem_spring_formal.py	/^from torch.autograd import Variable$/;"	i
 WeightedSumLoss	neuraloperator/neuralop/__init__.py	/^from .losses import LpLoss, H1Loss, BurgersEqnLoss, ICLoss, WeightedSumLoss$/;"	i
 WeightedSumLoss	neuraloperator/neuralop/losses/__init__.py	/^from .meta_losses import WeightedSumLoss/;"	i
 WeightedSumLoss	neuraloperator/neuralop/losses/meta_losses.py	/^class WeightedSumLoss(object):$/;"	c
@@ -341,6 +380,7 @@ YamlConfig	neuraloperator/neuralop/tests/test_model_from_config.py	/^from config
 YamlConfig	neuraloperator/scripts/hpo/tune_darcy.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 YamlConfig	neuraloperator/scripts/test_from_config.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 YamlConfig	neuraloperator/scripts/train_burgers.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
+YamlConfig	neuraloperator/scripts/train_car_cfd.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 YamlConfig	neuraloperator/scripts/train_darcy.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 YamlConfig	neuraloperator/scripts/train_navier_stokes.py	/^from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig$/;"	i
 ZarrDataset	neuraloperator/neuralop/datasets/zarr_dataset.py	/^class ZarrDataset(Dataset):$/;"	c
@@ -355,13 +395,13 @@ __call__	neuraloperator/neuralop/datasets/transforms.py	/^    def __call__(self,
 __call__	neuraloperator/neuralop/datasets/transforms.py	/^    def __call__(self, data, batched=True):$/;"	m	class:PositionalEmbedding2D	file:
 __call__	neuraloperator/neuralop/losses/data_losses.py	/^    def __call__(self, y_pred, y, **kwargs):$/;"	m	class:LpLoss	file:
 __call__	neuraloperator/neuralop/losses/data_losses.py	/^    def __call__(self, y_pred, y, h=None, **kwargs):$/;"	m	class:H1Loss	file:
-__call__	neuraloperator/neuralop/losses/data_losses.py	/^    def __call__(self, y_pred, y, vol_elm, inward_normals, flow_normals, flow_speed, reference_area, **kwargs):$/;"	m	class:WeightedL2DragLoss	file:
 __call__	neuraloperator/neuralop/losses/equation_losses.py	/^    def __call__(self, y_pred, **kwargs):$/;"	m	class:BurgersEqnLoss	file:
 __call__	neuraloperator/neuralop/losses/equation_losses.py	/^    def __call__(self, y_pred, x, **kwargs):$/;"	m	class:ICLoss	file:
 __call__	neuraloperator/neuralop/losses/meta_losses.py	/^    def __call__(self, *args, **kwargs):$/;"	m	class:WeightedSumLoss	file:
 __call__	neuraloperator/neuralop/losses/meta_losses.py	/^    def __call__(self, pred: torch.Tensor, truth: torch.Tensor, **kwargs):$/;"	m	class:FieldwiseAggregatorLoss	file:
 __enter__	neuraloperator/neuralop/mpu/comm.py	/^    def __enter__(self):$/;"	m	class:disable_logging	file:
 __exit__	neuraloperator/neuralop/mpu/comm.py	/^    def __exit__(self, type, value, traceback):$/;"	m	class:disable_logging	file:
+__getitem__	neuraloperator/neuralop/datasets/dict_dataset.py	/^    def __getitem__(self, index):$/;"	m	class:DictDataset	file:
 __getitem__	neuraloperator/neuralop/datasets/hdf5_dataset.py	/^    def __getitem__(self, idx):$/;"	m	class:H5pyDataset	file:
 __getitem__	neuraloperator/neuralop/datasets/spherical_swe.py	/^    def __getitem__(self, index):$/;"	m	class:SphericalSWEDataset	file:
 __getitem__	neuraloperator/neuralop/datasets/tensor_dataset.py	/^    def __getitem__(self, index):$/;"	m	class:GeneralTensorDataset	file:
@@ -374,11 +414,13 @@ __getitem__	neuraloperator/neuralop/layers/spectral_convolution.py	/^    def __g
 __getitem__	neuraloperator/neuralop/layers/spherical_convolution.py	/^    def __getitem__(self, indices):$/;"	m	class:SphericalConv	file:
 __getitem__	neuraloperator/neuralop/training/tests/test_callbacks.py	/^    def __getitem__(self, idx):$/;"	m	class:DummyDataset	file:
 __getitems__	neuraloperator/neuralop/datasets/zarr_dataset.py	/^    def __getitems__(self, idx):$/;"	m	class:ZarrDataset	file:
-__init__	neuraloperator/neuralop/datasets/data_transforms.py	/^    def __init__(self, $/;"	m	class:DefaultDataProcessor
-__init__	neuraloperator/neuralop/datasets/data_transforms.py	/^    def __init__(self, model: torch.nn.Module, levels: int, $/;"	m	class:MGPatchingDataProcessor
+__init__	neuraloperator/neuralop/datasets/data_transforms.py	/^    def __init__($/;"	m	class:DefaultDataProcessor
+__init__	neuraloperator/neuralop/datasets/data_transforms.py	/^    def __init__($/;"	m	class:MGPatchingDataProcessor
+__init__	neuraloperator/neuralop/datasets/data_transforms.py	/^    def __init__(self):$/;"	m	class:DataProcessor
+__init__	neuraloperator/neuralop/datasets/data_transforms.py	/^    def __init__(self, $/;"	m	class:IncrementalDataProcessor
+__init__	neuraloperator/neuralop/datasets/dict_dataset.py	/^    def __init__($/;"	m	class:DictDataset
 __init__	neuraloperator/neuralop/datasets/hdf5_dataset.py	/^    def __init__($/;"	m	class:H5pyDataset
-__init__	neuraloperator/neuralop/datasets/output_encoder.py	/^    def __init__(self):$/;"	m	class:OutputEncoder
-__init__	neuraloperator/neuralop/datasets/output_encoder.py	/^    def __init__(self, encoder_dict, input_mappings, return_mappings=None):$/;"	m	class:MultipleFieldOutputEncoder
+__init__	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^    def __init__($/;"	m	class:MeshDataModule
 __init__	neuraloperator/neuralop/datasets/output_encoder.py	/^    def __init__(self, mean=None, std=None, eps=1e-7, dim=None, mask=None):$/;"	m	class:UnitGaussianNormalizer
 __init__	neuraloperator/neuralop/datasets/output_encoder.py	/^    def __init__(self, transform_dict, input_mappings, return_mappings=None):$/;"	m	class:DictTransform
 __init__	neuraloperator/neuralop/datasets/spherical_swe.py	/^    def __init__(self, dt=3600, dims=(256, 512), initial_condition='random', num_examples=32,$/;"	m	class:SphericalSWEDataset
@@ -414,8 +456,6 @@ __init__	neuraloperator/neuralop/layers/spherical_convolution.py	/^    def __ini
 __init__	neuraloperator/neuralop/layers/spherical_convolution.py	/^    def __init__(self, dtype=torch.float32, device=None):$/;"	m	class:SHT
 __init__	neuraloperator/neuralop/losses/data_losses.py	/^    def __init__(self, d=1, L=2*math.pi, reduce_dims=0, reductions='sum', fix_x_bnd=False, fix_y_bnd=False, fix_z_bnd=False):$/;"	m	class:H1Loss
 __init__	neuraloperator/neuralop/losses/data_losses.py	/^    def __init__(self, d=1, p=2, L=2*math.pi, reduce_dims=0, reductions='sum'):$/;"	m	class:LpLoss
-__init__	neuraloperator/neuralop/losses/data_losses.py	/^    def __init__(self, mappings: dict, device: str = 'cuda'):$/;"	m	class:WeightedL2DragLoss
-__init__	neuraloperator/neuralop/losses/data_losses.py	/^    def __init__(self, p=2.0, q=2.0):$/;"	m	class:IregularLpqLoss
 __init__	neuraloperator/neuralop/losses/equation_losses.py	/^    def __init__(self, loss=F.mse_loss):$/;"	m	class:ICLoss
 __init__	neuraloperator/neuralop/losses/equation_losses.py	/^    def __init__(self, visc=0.01, method="fdm", loss=F.mse_loss, domain_length=1.0):$/;"	m	class:BurgersEqnLoss
 __init__	neuraloperator/neuralop/losses/meta_losses.py	/^    def __init__(self, losses, weights=None):$/;"	m	class:WeightedSumLoss
@@ -428,24 +468,29 @@ __init__	neuraloperator/neuralop/models/fnogno.py	/^    def __init__($/;"	m	clas
 __init__	neuraloperator/neuralop/models/uno.py	/^    def __init__($/;"	m	class:UNO
 __init__	neuraloperator/neuralop/mpu/comm.py	/^    def __init__(self, level=logging.ERROR):$/;"	m	class:disable_logging
 __init__	neuraloperator/neuralop/tests/test_utils.py	/^        def __init__(self, n_submodels=0, dtype=torch.float32):$/;"	m	class:test_count_model_params.DumyModel
+__init__	neuraloperator/neuralop/training/callbacks.py	/^    def __init__($/;"	m	class:CheckpointCallback
 __init__	neuraloperator/neuralop/training/callbacks.py	/^    def __init__(self):$/;"	m	class:Callback
-__init__	neuraloperator/neuralop/training/callbacks.py	/^    def __init__(self, $/;"	m	class:CheckpointCallback
 __init__	neuraloperator/neuralop/training/callbacks.py	/^    def __init__(self, callbacks: List[Callback]):$/;"	m	class:PipelineCallback
 __init__	neuraloperator/neuralop/training/callbacks.py	/^    def __init__(self, wandb_kwargs=None):$/;"	m	class:BasicLoggerCallback
+__init__	neuraloperator/neuralop/training/callbacks.py	/^    def __init__(self,$/;"	m	class:IncrementalCallback
 __init__	neuraloperator/neuralop/training/patching.py	/^    def __init__($/;"	m	class:MultigridPatching2D
 __init__	neuraloperator/neuralop/training/tests/test_callbacks.py	/^    def __init__(self, features, **kwargs):$/;"	m	class:DummyModel
 __init__	neuraloperator/neuralop/training/tests/test_callbacks.py	/^    def __init__(self, n_examples):$/;"	m	class:DummyDataset
-__init__	neuraloperator/neuralop/training/trainer.py	/^    def __init__(self, *, $/;"	m	class:Trainer
+__init__	neuraloperator/neuralop/training/trainer.py	/^    def __init__($/;"	m	class:Trainer
 __init__	neuraloperator/neuralop/utils.py	/^    def __init__(self, x, eps=0.00001, reduce_dim=[0], verbose=True):$/;"	m	class:UnitGaussianNormalizer
+__init__	neuraloperator/scripts/train_car_cfd.py	/^    def __init__(self, normalizer, device='cuda'):$/;"	m	class:CFDDataProcessor
+__init__	nn_architecture.py	/^    def __init__(self, N_INPUT, N_OUTPUT, N_HIDDEN, N_LAYERS):$/;"	m	class:FCN
 __init__	nn_architecture.py	/^    def __init__(self, n_discretize=16, hidden_channels=16):$/;"	m	class:FNOLocal
-__init__	nn_architecture.py	/^    def __init__(self, n_input, n_output, n_neurons=1024):$/;"	m	class:OneHiddenLayerFCNN
 __init__	nn_architecture.py	/^    def __init__(self, n_input, n_output, n_neurons=16):$/;"	m	class:TwoHiddenLayerFCNN
-__init__	problems/problem_base.py	/^    def __init__(self, device, n_obj_sample, n_constrs):$/;"	m	class:BaseProblem
-__init__	problems/problem_darcy.py	/^    def __init__(self, device, n_obj_sample=500, n_constrs=10):$/;"	m	class:Darcy
-__init__	problems/problem_darcy_matrix.py	/^    def __init__(self, device, n_obj_sample=500, n_constrs=10, n_test_sample=1):$/;"	m	class:DarcyMatrix
-__init__	problems/problem_spring.py	/^    def __init__(self, device, n_obj_sample = 500, n_constrs = 10):$/;"	m	class:Spring
+__init__	nn_architecture.py	/^    def __init__(self, n_input, n_output, n_neurons=64):$/;"	m	class:OneHiddenLayerFCNN
+__init__	problems/problem_base_formal.py	/^    def __init__(self):$/;"	m	class:BaseProblemFormal
+__init__	problems/problem_burgers.py	/^    def __init__(self, device, conf):$/;"	m	class:Burgers
+__init__	problems/problem_chemistry.py	/^    def __init__(self, device, conf):$/;"	m	class:Chemistry
+__init__	problems/problem_darcy_matrix.py	/^    def __init__(self, device, conf):$/;"	m	class:DarcyMatrix
+__init__	problems/problem_spring_formal.py	/^    def __init__(self, device, conf):$/;"	m	class:SpringFormal
 __init__	stochasticsqp.py	/^    def __init__(self, params, lr=required, $/;"	m	class:StochasticSQP
 __init_subclass__	neuraloperator/neuralop/models/base_model.py	/^    def __init_subclass__(cls, name=None, **kwargs):$/;"	m	class:BaseModel	file:
+__len__	neuraloperator/neuralop/datasets/dict_dataset.py	/^    def __len__(self):$/;"	m	class:DictDataset	file:
 __len__	neuraloperator/neuralop/datasets/hdf5_dataset.py	/^    def __len__(self):$/;"	m	class:H5pyDataset	file:
 __len__	neuraloperator/neuralop/datasets/spherical_swe.py	/^    def __len__(self):$/;"	m	class:SphericalSWEDataset	file:
 __len__	neuraloperator/neuralop/datasets/tensor_dataset.py	/^    def __len__(self):$/;"	m	class:GeneralTensorDataset	file:
@@ -499,28 +544,28 @@ a	Test file.py	/^a = torch.tensor([2., 3.], requires_grad=True).reshape(-1,1)$/;
 a1	Test file.py	/^a1 = variables[:,0].clone().detach().requires_grad_(True).reshape(-1,1)$/;"	v
 abs	neuraloperator/neuralop/losses/data_losses.py	/^    def abs(self, x, y, h=None):$/;"	m	class:H1Loss
 abs	neuraloperator/neuralop/losses/data_losses.py	/^    def abs(self, x, y, h=None):$/;"	m	class:LpLoss
-abs	neuraloperator/neuralop/losses/data_losses.py	/^    def abs(self, x, y, vol_elm):$/;"	m	class:IregularLpqLoss
+abstractmethod	neuraloperator/neuralop/datasets/data_transforms.py	/^from abc import ABCMeta, abstractmethod$/;"	i
 abstractmethod	neuraloperator/neuralop/datasets/output_encoder.py	/^from abc import abstractmethod$/;"	i
 abstractmethod	neuraloperator/neuralop/datasets/transforms.py	/^from abc import abstractmethod$/;"	i
-all_problems	solve.py	/^all_problems = import_all_classes_from_directory(directory_path)$/;"	v
+abstractmethod	problems/problem_base_formal.py	/^from abc import ABC, abstractmethod$/;"	i
 amp	neuraloperator/neuralop/training/trainer.py	/^from torch.cuda import amp$/;"	i
 amp_autocast	neuraloperator/scripts/train_burgers.py	/^    amp_autocast=config.opt.amp_autocast,$/;"	v
 amp_autocast	neuraloperator/scripts/train_darcy.py	/^    amp_autocast=config.opt.amp_autocast,$/;"	v
 amp_autocast	neuraloperator/scripts/train_navier_stokes.py	/^    amp_autocast=config.opt.amp_autocast,$/;"	v
 apply_1d_rotary_pos_emb	neuraloperator/neuralop/layers/embeddings.py	/^    def apply_1d_rotary_pos_emb(t, freqs):$/;"	m	class:RotaryEmbedding
 apply_2d_rotary_pos_emb	neuraloperator/neuralop/layers/embeddings.py	/^    def apply_2d_rotary_pos_emb(t, freqs_x, freqs_y):$/;"	m	class:RotaryEmbedding
+apply_frame	problems/problem_darcy_matrix.py	/^    def apply_frame(self, tensor, discretize):$/;"	m	class:DarcyMatrix
 apply_rotary_pos_emb	neuraloperator/neuralop/layers/embeddings.py	/^def apply_rotary_pos_emb(t, freqs):$/;"	f
+are_watertight	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^    def are_watertight(self, meshes):$/;"	m	class:MeshDataModule
 assert_close	neuraloperator/neuralop/datasets/tests/test_data_processor.py	/^from torch.testing import assert_close$/;"	i
 assert_close	neuraloperator/neuralop/datasets/tests/test_output_encoder.py	/^from torch.testing import assert_close$/;"	i
+attributes	neuraloperator/scripts/train_car_cfd.py	/^                             attributes=config.data.load_attributes,$/;"	v
 attrs	neuraloperator/neuralop/datasets/zarr_dataset.py	/^    def attrs(self, array_name, name):$/;"	m	class:ZarrDataset
 author	neuraloperator/doc/source/conf.py	/^author = 'Jean Kossaifi, Nikola Kovachki, Zongyi Li and Anima Anandkumar'$/;"	v
 autodoc_default_flags	neuraloperator/doc/source/conf.py	/^autodoc_default_flags = ['members']$/;"	v
 autodoc_member_order	neuraloperator/doc/source/conf.py	/^autodoc_member_order = 'bysource'$/;"	v
 autosummary_generate	neuraloperator/doc/source/conf.py	/^autosummary_generate = True$/;"	v
 available_models	neuraloperator/neuralop/models/base_model.py	/^def available_models():$/;"	f
-ax	FNO script.py	/^    ax = fig.add_subplot(3, 3, index*3 + 1)$/;"	v
-ax	FNO script.py	/^    ax = fig.add_subplot(3, 3, index*3 + 2)$/;"	v
-ax	FNO script.py	/^    ax = fig.add_subplot(3, 3, index*3 + 3)$/;"	v
 ax	neuraloperator/examples/plot_FNO_darcy.py	/^    ax = fig.add_subplot(3, 3, index*3 + 1)$/;"	v
 ax	neuraloperator/examples/plot_FNO_darcy.py	/^    ax = fig.add_subplot(3, 3, index*3 + 2)$/;"	v
 ax	neuraloperator/examples/plot_FNO_darcy.py	/^    ax = fig.add_subplot(3, 3, index*3 + 3)$/;"	v
@@ -534,6 +579,9 @@ ax	neuraloperator/examples/plot_darcy_flow.py	/^ax = fig.add_subplot(2, 2, 1)$/;
 ax	neuraloperator/examples/plot_darcy_flow.py	/^ax = fig.add_subplot(2, 2, 2)$/;"	v
 ax	neuraloperator/examples/plot_darcy_flow.py	/^ax = fig.add_subplot(2, 2, 3)$/;"	v
 ax	neuraloperator/examples/plot_darcy_flow.py	/^ax = fig.add_subplot(2, 2, 4)$/;"	v
+ax	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    ax = fig.add_subplot(3, 3, index * 3 + 1)$/;"	v
+ax	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    ax = fig.add_subplot(3, 3, index * 3 + 2)$/;"	v
+ax	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    ax = fig.add_subplot(3, 3, index * 3 + 3)$/;"	v
 b	Test file.py	/^b = torch.tensor([1., 5.], requires_grad=True).reshape(-1,1)$/;"	v
 b1	Test file.py	/^b1 = variables[:,1].clone().detach().requires_grad_(True).reshape(-1,1)$/;"	v
 backward	neuraloperator/neuralop/mpu/mappings.py	/^    def backward(ctx, grad_output):$/;"	m	class:_CopyToModelParallelRegion
@@ -541,6 +589,7 @@ backward	neuraloperator/neuralop/mpu/mappings.py	/^    def backward(ctx, grad_ou
 backward	neuraloperator/neuralop/mpu/mappings.py	/^    def backward(ctx, grad_output):$/;"	m	class:_ReduceFromModelParallelRegion
 backward	neuraloperator/neuralop/mpu/mappings.py	/^    def backward(ctx, grad_output):$/;"	m	class:_ScatterToModelParallelRegion
 batch	neuraloperator/examples/plot_darcy_flow.py	/^    batch = next(iter(test_loader))$/;"	v
+batch_size	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    batch_size=16,$/;"	v
 batch_size	neuraloperator/neuralop/datasets/darcy.py	/^            batch_size=test_batch_size,$/;"	v
 batch_size	neuraloperator/neuralop/datasets/darcy.py	/^        batch_size=batch_size,$/;"	v
 batch_size	neuraloperator/neuralop/datasets/darcy.py	/^        batch_size=test_batch_size,$/;"	v
@@ -548,9 +597,14 @@ batch_size	neuraloperator/scripts/hpo/tune_darcy.py	/^    batch_size=config.data
 batch_size	neuraloperator/scripts/test_from_config.py	/^batch_size = config.data.batch_size$/;"	v
 batch_size	neuraloperator/scripts/train_darcy.py	/^    batch_size=config.data.batch_size,$/;"	v
 batch_size	neuraloperator/scripts/train_navier_stokes.py	/^    batch_size=config.data.batch_size,$/;"	v
+batched	neuraloperator/neuralop/layers/segment_csr.py	/^            batched = False$/;"	v
+batched	neuraloperator/neuralop/layers/segment_csr.py	/^            batched = True$/;"	v
 buffer	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^buffer = 10 # just add a buffer to the plot$/;"	v
-buffer	stochasticsqp.py	/^    buffer=1e-5$/;"	v	class:StochasticSQP
+buffer	stochasticsqp.py	/^    buffer=0$/;"	v	class:StochasticSQP
+burg_system	dataset_creator.py	/^    def burg_system(u, t, k, mu, nu):$/;"	f	function:true_burgers_solution
 callbacks	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                  callbacks=[$/;"	v
+callbacks	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    callbacks=callbacks,$/;"	v
+callbacks	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^callbacks = [$/;"	v
 callbacks	neuraloperator/scripts/train_burgers.py	/^    callbacks=callbacks,$/;"	v
 callbacks	neuraloperator/scripts/train_burgers.py	/^callbacks = [$/;"	v
 callbacks	neuraloperator/scripts/train_darcy.py	/^    callbacks=[$/;"	v
@@ -562,13 +616,23 @@ central_diff_2d	neuraloperator/neuralop/losses/data_losses.py	/^def central_diff
 central_diff_2d	neuraloperator/neuralop/losses/equation_losses.py	/^from .data_losses import central_diff_2d$/;"	i
 central_diff_3d	neuraloperator/neuralop/losses/data_losses.py	/^def central_diff_3d(x, h, fix_x_bnd=False, fix_y_bnd=False, fix_z_bnd=False):$/;"	f
 channel_dim	neuraloperator/neuralop/datasets/darcy.py	/^        channel_dim=channel_dim,$/;"	v
+check_gradient	utils.py	/^def check_gradient(optimizer, problem):$/;"	f
+chemistry_plot	problems/problem_chemistry.py	/^    def chemistry_plot(self, save_path):$/;"	m	class:Chemistry
 comm	neuraloperator/neuralop/training/patching.py	/^import neuralop.mpu.comm as comm$/;"	i
 comm	neuraloperator/neuralop/training/torch_setup.py	/^import neuralop.mpu.comm as comm$/;"	i
 comm	neuraloperator/neuralop/training/trainer.py	/^import neuralop.mpu.comm as comm$/;"	i
+compute_distances	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^    def compute_distances(self, mesh, query_points, signed_distance):$/;"	m	class:MeshDataModule
+compute_explained_variance	neuraloperator/neuralop/training/callbacks.py	/^from neuralop.utils import compute_rank, compute_stable_rank, compute_explained_variance$/;"	i
+compute_explained_variance	neuraloperator/neuralop/utils.py	/^def compute_explained_variance(frequency_max, s):$/;"	f
 compute_extension_matrix	neuraloperator/neuralop/layers/fourier_continuation.py	/^    def compute_extension_matrix(self, n, d):$/;"	m	class:FCLegendre
+compute_rank	neuraloperator/neuralop/training/callbacks.py	/^from neuralop.utils import compute_rank, compute_stable_rank, compute_explained_variance$/;"	i
+compute_rank	neuraloperator/neuralop/utils.py	/^def compute_rank(tensor):$/;"	f
+compute_stable_rank	neuraloperator/neuralop/training/callbacks.py	/^from neuralop.utils import compute_rank, compute_stable_rank, compute_explained_variance$/;"	i
+compute_stable_rank	neuraloperator/neuralop/utils.py	/^def compute_stable_rank(tensor):$/;"	f
 compute_terms	neuraloperator/neuralop/losses/data_losses.py	/^    def compute_terms(self, x, y, h):$/;"	m	class:H1Loss
 compute_training_loss	neuraloperator/neuralop/training/callbacks.py	/^    def compute_training_loss(self, *args, **kwargs):$/;"	m	class:Callback
 compute_training_loss	neuraloperator/neuralop/training/callbacks.py	/^    def compute_training_loss(self, *args, **kwargs):$/;"	m	class:PipelineCallback
+compute_triangle_centroids	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^    def compute_triangle_centroids(self, vertices, triangles):$/;"	m	class:MeshDataModule
 compute_val_loss	neuraloperator/neuralop/training/callbacks.py	/^    def compute_val_loss(self, *args, **kwargs):$/;"	m	class:Callback
 compute_val_loss	neuraloperator/neuralop/training/callbacks.py	/^    def compute_val_loss(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 config	neuraloperator/scripts/hpo/tune_darcy.py	/^        config=config,$/;"	v
@@ -576,59 +640,65 @@ config	neuraloperator/scripts/hpo/tune_darcy.py	/^config = pipe.read_conf()$/;"	
 config	neuraloperator/scripts/test_from_config.py	/^config = pipe.read_conf()$/;"	v
 config	neuraloperator/scripts/train_burgers.py	/^        config=config,$/;"	v
 config	neuraloperator/scripts/train_burgers.py	/^config = pipe.read_conf()$/;"	v
+config	neuraloperator/scripts/train_car_cfd.py	/^config = pipe.read_conf()$/;"	v
 config	neuraloperator/scripts/train_darcy.py	/^        config=config,$/;"	v
 config	neuraloperator/scripts/train_darcy.py	/^config = pipe.read_conf()$/;"	v
 config	neuraloperator/scripts/train_navier_stokes.py	/^        config=config,$/;"	v
 config	neuraloperator/scripts/train_navier_stokes.py	/^config = pipe.read_conf()$/;"	v
 config	neuraloperator/setup.py	/^config = {$/;"	v
+config	solve.py	/^        config = yaml.load(f, Loader=yaml.FullLoader)$/;"	v
 config_name	neuraloperator/scripts/hpo/tune_darcy.py	/^config_name = "default"$/;"	v
 config_name	neuraloperator/scripts/hpo/tune_darcy.py	/^config_name = pipe.steps[-1].config_name$/;"	v
 config_name	neuraloperator/scripts/test_from_config.py	/^config_name = 'default'$/;"	v
 config_name	neuraloperator/scripts/test_from_config.py	/^config_name = pipe.steps[-1].config_name$/;"	v
 config_name	neuraloperator/scripts/train_burgers.py	/^config_name = "default"$/;"	v
 config_name	neuraloperator/scripts/train_burgers.py	/^config_name = pipe.steps[-1].config_name$/;"	v
+config_name	neuraloperator/scripts/train_car_cfd.py	/^config_name = 'car-pressure'$/;"	v
+config_name	neuraloperator/scripts/train_car_cfd.py	/^config_name = 'cfd'$/;"	v
 config_name	neuraloperator/scripts/train_darcy.py	/^config_name = "default"$/;"	v
 config_name	neuraloperator/scripts/train_darcy.py	/^config_name = pipe.steps[-1].config_name$/;"	v
 config_name	neuraloperator/scripts/train_navier_stokes.py	/^config_name = "default"$/;"	v
 config_name	neuraloperator/scripts/train_navier_stokes.py	/^config_name = pipe.steps[-1].config_name$/;"	v
-constraint_func_and_grad	problems/problem_darcy.py	/^    def constraint_func_and_grad(self, optimizer, no_grad = False):$/;"	m	class:Darcy
-constraint_func_and_grad	problems/problem_darcy_matrix.py	/^    def constraint_func_and_grad(self, optimizer, no_grad = False):$/;"	m	class:DarcyMatrix
-constraint_func_and_grad	problems/problem_spring.py	/^    def constraint_func_and_grad(self, optimizer, no_grad = False):$/;"	m	class:Spring
+constraint_func	problems/problem_base_formal.py	/^    def constraint_func(self):$/;"	m	class:BaseProblemFormal
+constraint_func	problems/problem_burgers.py	/^    def constraint_func(self):$/;"	m	class:Burgers
+constraint_func	problems/problem_chemistry.py	/^    def constraint_func(self):$/;"	m	class:Chemistry
+constraint_func	problems/problem_darcy_matrix.py	/^    def constraint_func(self):      $/;"	m	class:DarcyMatrix
+constraint_func	problems/problem_spring_formal.py	/^    def constraint_func(self):$/;"	m	class:SpringFormal
+constraint_func_and_grad	problems/problem_base_formal.py	/^    def constraint_func_and_grad(self, optimizer, no_grad = False):$/;"	m	class:BaseProblemFormal
 copy	stochasticsqp.py	/^import copy$/;"	i
 copy_to_model_parallel_region	neuraloperator/neuralop/mpu/mappings.py	/^def copy_to_model_parallel_region(input_):$/;"	f
 copyright	neuraloperator/doc/source/conf.py	/^copyright = f'{year}, Jean Kossaifi, Nikola Kovachki, Zongyi Li and Anima Anandkumar'$/;"	v
-count_model_params	FNO script.py	/^from neuralop.utils import count_model_params$/;"	i
 count_model_params	neuraloperator/examples/checkpoint_FNO_darcy.py	/^from neuralop.utils import count_model_params$/;"	i
 count_model_params	neuraloperator/examples/plot_FNO_darcy.py	/^from neuralop.utils import count_model_params$/;"	i
 count_model_params	neuraloperator/examples/plot_SFNO_swe.py	/^from neuralop.utils import count_model_params$/;"	i
 count_model_params	neuraloperator/examples/plot_UNO_darcy.py	/^from neuralop.utils import count_model_params$/;"	i
+count_model_params	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^from neuralop.utils import count_model_params$/;"	i
 count_model_params	neuraloperator/neuralop/tests/test_utils.py	/^from ..utils import count_model_params, count_tensor_params$/;"	i
 count_model_params	neuraloperator/neuralop/utils.py	/^def count_model_params(model):$/;"	f
 count_model_params	neuraloperator/scripts/train_burgers.py	/^from neuralop.utils import get_wandb_api_key, count_model_params$/;"	i
 count_model_params	neuraloperator/scripts/train_darcy.py	/^from neuralop.utils import get_wandb_api_key, count_model_params$/;"	i
 count_model_params	neuraloperator/scripts/train_navier_stokes.py	/^from neuralop.utils import get_wandb_api_key, count_model_params$/;"	i
-count_parameters	problems/problem_darcy.py	/^    def count_parameters(self, nn_net):$/;"	m	class:Darcy
-count_parameters	problems/problem_darcy_matrix.py	/^    def count_parameters(self, nn_net):$/;"	m	class:DarcyMatrix
-count_parameters	problems/problem_spring.py	/^    def count_parameters(self, nn_net):$/;"	m	class:Spring
+count_parameters	problems/problem_base_formal.py	/^    def count_parameters(self, nn_net):$/;"	m	class:BaseProblemFormal
 count_params	neuraloperator/scripts/hpo/tune_darcy.py	/^from neuralop.utils import get_wandb_api_key, count_params$/;"	i
 count_tensor_params	neuraloperator/neuralop/datasets/output_encoder.py	/^from ..utils import count_tensor_params$/;"	i
 count_tensor_params	neuraloperator/neuralop/tests/test_utils.py	/^from ..utils import count_model_params, count_tensor_params$/;"	i
 count_tensor_params	neuraloperator/neuralop/utils.py	/^def count_tensor_params(tensor, dims=None):$/;"	f
 cpu	neuraloperator/neuralop/datasets/output_encoder.py	/^    def cpu(self):$/;"	m	class:DictTransform
-cpu	neuraloperator/neuralop/datasets/output_encoder.py	/^    def cpu(self):$/;"	m	class:MultipleFieldOutputEncoder
-cpu	neuraloperator/neuralop/datasets/output_encoder.py	/^    def cpu(self):$/;"	m	class:OutputEncoder
 cpu	neuraloperator/neuralop/datasets/output_encoder.py	/^    def cpu(self):$/;"	m	class:UnitGaussianNormalizer
 cpu	neuraloperator/neuralop/datasets/transforms.py	/^    def cpu(self):$/;"	m	class:Transform
 cpu	neuraloperator/neuralop/utils.py	/^    def cpu(self):$/;"	m	class:UnitGaussianNormalizer
+create_burgers_dataset	dataset_creator.py	/^def create_burgers_dataset(n_points):$/;"	f
+create_dataset	dataset_creator.py	/^def create_dataset(n_obj_sample = 100, test = False):$/;"	f
+create_dataset	problems/problem_chemistry.py	/^    def create_dataset(self, number_of_initial_cond, n_discretization = 100, name = 'train'):$/;"	m	class:Chemistry
+create_dir	solve.py	/^from utils import create_dir$/;"	i
+create_dir	utils.py	/^def create_dir(dir):$/;"	f
+create_output_folders	solve.py	/^def create_output_folders(output_folder, sub_folders, problem_name):$/;"	f
 ctypes	neuraloperator/neuralop/training/torch_setup.py	/^        import ctypes$/;"	i
 cuda	neuraloperator/neuralop/datasets/output_encoder.py	/^    def cuda(self):$/;"	m	class:DictTransform
-cuda	neuraloperator/neuralop/datasets/output_encoder.py	/^    def cuda(self):$/;"	m	class:MultipleFieldOutputEncoder
-cuda	neuraloperator/neuralop/datasets/output_encoder.py	/^    def cuda(self):$/;"	m	class:OutputEncoder
 cuda	neuraloperator/neuralop/datasets/output_encoder.py	/^    def cuda(self):$/;"	m	class:UnitGaussianNormalizer
 cuda	neuraloperator/neuralop/datasets/transforms.py	/^    def cuda(self):$/;"	m	class:Transform
 cuda	neuraloperator/neuralop/utils.py	/^    def cuda(self):$/;"	m	class:UnitGaussianNormalizer
-data	FNO script.py	/^    data = data_processor.preprocess(data, batched=False)$/;"	v
-data	FNO script.py	/^    data = test_samples[index]$/;"	v
+d	problems/problem_spring_formal.py	/^    d = 2$/;"	v	class:SpringFormal
 data	neuraloperator/examples/plot_FNO_darcy.py	/^    data = data_processor.preprocess(data, batched=False)$/;"	v
 data	neuraloperator/examples/plot_FNO_darcy.py	/^    data = test_samples[index]$/;"	v
 data	neuraloperator/examples/plot_SFNO_swe.py	/^    data = test_samples[0]$/;"	v
@@ -637,37 +707,40 @@ data	neuraloperator/examples/plot_UNO_darcy.py	/^    data = test_samples[index]$
 data	neuraloperator/examples/plot_darcy_flow.py	/^data = data_processor.preprocess(data, batched=False)$/;"	v
 data	neuraloperator/examples/plot_darcy_flow.py	/^data = train_dataset[0]$/;"	v
 data	neuraloperator/examples/plot_darcy_flow.py	/^data = train_dataset[index]$/;"	v
+data	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    data = test_samples[index]$/;"	v
 data	neuraloperator/neuralop/datasets/darcy.py	/^        data = torch.load(Path(data_path).joinpath(f"darcy_test_{res}.pt").as_posix())$/;"	v
 data	neuraloperator/neuralop/datasets/darcy.py	/^    data = torch.load($/;"	v
 data	neuraloperator/neuralop/datasets/hdf5_dataset.py	/^    def data(self):$/;"	m	class:H5pyDataset
 data	neuraloperator/neuralop/datasets/zarr_dataset.py	/^    def data(self):$/;"	m	class:ZarrDataset
-data_processor	FNO dataset.py	/^data_processor = data_processor.to(device)$/;"	v
-data_processor	FNO script.py	/^                  data_processor=data_processor,$/;"	v
-data_processor	FNO script.py	/^data_processor = data_processor.to(device)$/;"	v
+data_module	neuraloperator/scripts/train_car_cfd.py	/^data_module = MeshDataModule(config.data.path, $/;"	v
 data_processor	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                  data_processor=data_processor,$/;"	v
 data_processor	neuraloperator/examples/plot_FNO_darcy.py	/^                  data_processor=data_processor,$/;"	v
 data_processor	neuraloperator/examples/plot_FNO_darcy.py	/^data_processor = data_processor.to(device)$/;"	v
 data_processor	neuraloperator/examples/plot_UNO_darcy.py	/^                  data_processor=data_processor,$/;"	v
+data_processor	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    data_processor=data_transform,$/;"	v
 data_processor	neuraloperator/neuralop/datasets/darcy.py	/^    data_processor = DefaultDataProcessor($/;"	v
 data_processor	neuraloperator/scripts/train_burgers.py	/^    data_processor=data_processor,$/;"	v
 data_processor	neuraloperator/scripts/train_burgers.py	/^data_processor = MGPatchingDataProcessor(model=model,$/;"	v
+data_processor	neuraloperator/scripts/train_car_cfd.py	/^data_processor = CFDDataProcessor(normalizer=output_encoder, device=device)$/;"	v
 data_processor	neuraloperator/scripts/train_darcy.py	/^    data_processor = MGPatchingDataProcessor(in_normalizer=data_processor.in_normalizer,$/;"	v
 data_processor	neuraloperator/scripts/train_darcy.py	/^    data_processor=data_processor,$/;"	v
 data_processor	neuraloperator/scripts/train_darcy.py	/^data_processor = data_processor.to(device)$/;"	v
 data_processor	neuraloperator/scripts/train_navier_stokes.py	/^    data_processor = MGPatchingDataProcessor(in_normalizer=data_processor.in_normalizer,$/;"	v
 data_processor	neuraloperator/scripts/train_navier_stokes.py	/^    data_processor=data_processor,$/;"	v
 data_processor	neuraloperator/scripts/train_navier_stokes.py	/^data_processor = data_processor.to(device)$/;"	v
+data_transform	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^data_transform = data_transform.to(device)$/;"	v
+data_transform	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^data_transform = data_transforms.IncrementalDataProcessor($/;"	v
+data_transforms	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^from neuralop.datasets import data_transforms$/;"	i
+dataset_indices	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    dataset_indices=[2, 3],$/;"	v
 dataset_name	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^dataset_name = "Darcy Flow"$/;"	v
 dataset_pred	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^dataset_pred = train_loader.dataset[:samples]['x'].squeeze() # squeeze the dataset to remove the batch dimension or other dimensions$/;"	v
+dataset_resolution	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    dataset_resolution=16,$/;"	v
 datasets	neuraloperator/neuralop/__init__.py	/^from . import datasets$/;"	i
 datetime	neuraloperator/doc/source/conf.py	/^from datetime import datetime$/;"	i
-decode	neuraloperator/neuralop/datasets/output_encoder.py	/^    def decode(self):$/;"	m	class:OutputEncoder
-decode	neuraloperator/neuralop/datasets/output_encoder.py	/^    def decode(self, x):$/;"	m	class:MultipleFieldOutputEncoder
 decode	neuraloperator/neuralop/utils.py	/^    def decode(self, x, sample_idx=None):$/;"	m	class:UnitGaussianNormalizer
+deepcopy	neuraloperator/scripts/train_car_cfd.py	/^from copy import deepcopy$/;"	i
+default_timer	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^from timeit import default_timer$/;"	i
 default_timer	neuraloperator/neuralop/training/trainer.py	/^from timeit import default_timer$/;"	i
-device	FNO dataset.py	/^device = 'cpu'$/;"	v
-device	FNO script.py	/^                  device=device,$/;"	v
-device	FNO script.py	/^device = 'cpu'$/;"	v
 device	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                  device=device,$/;"	v
 device	neuraloperator/examples/checkpoint_FNO_darcy.py	/^device = 'cpu'$/;"	v
 device	neuraloperator/examples/plot_FNO_darcy.py	/^                  device=device,$/;"	v
@@ -676,14 +749,14 @@ device	neuraloperator/examples/plot_SFNO_swe.py	/^                  device=devic
 device	neuraloperator/examples/plot_SFNO_swe.py	/^device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')$/;"	v
 device	neuraloperator/examples/plot_UNO_darcy.py	/^                  device=device,$/;"	v
 device	neuraloperator/examples/plot_UNO_darcy.py	/^device = 'cpu'$/;"	v
+device	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    device=device,$/;"	v
+device	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^device = torch.device("cuda" if torch.cuda.is_available() else "cpu")$/;"	v
 device	neuraloperator/scripts/test_from_config.py	/^    device = 'cpu'$/;"	v
 device	neuraloperator/scripts/test_from_config.py	/^    device = 'cuda'$/;"	v
 device	neuraloperator/scripts/train_burgers.py	/^                                       device=device,$/;"	v
 device	neuraloperator/scripts/train_burgers.py	/^    device=device,$/;"	v
 device	neuraloperator/scripts/train_darcy.py	/^    device=device,$/;"	v
 device	neuraloperator/scripts/train_navier_stokes.py	/^    device=device,$/;"	v
-device	solve.py	/^device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")$/;"	v
-directory_path	solve.py	/^directory_path = '.\/problems'$/;"	v
 disable_logging	neuraloperator/neuralop/mpu/comm.py	/^class disable_logging(object):$/;"	c
 dist	neuraloperator/neuralop/mpu/comm.py	/^import torch.distributed as dist$/;"	i
 dist	neuraloperator/neuralop/mpu/helpers.py	/^import torch.distributed as dist$/;"	i
@@ -696,8 +769,6 @@ einsum_complexhalf_two_input	neuraloperator/neuralop/layers/einsum_utils.py	/^de
 einsum_symbols	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^einsum_symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"$/;"	v
 einsum_symbols	neuraloperator/neuralop/layers/spectral_convolution.py	/^einsum_symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"$/;"	v
 einsum_symbols	neuraloperator/neuralop/layers/spherical_convolution.py	/^einsum_symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"$/;"	v
-encode	neuraloperator/neuralop/datasets/output_encoder.py	/^    def encode(self):$/;"	m	class:OutputEncoder
-encode	neuraloperator/neuralop/datasets/output_encoder.py	/^    def encode(self, x):$/;"	m	class:MultipleFieldOutputEncoder
 encode	neuraloperator/neuralop/utils.py	/^    def encode(self, x):$/;"	m	class:UnitGaussianNormalizer
 encode_input	neuraloperator/neuralop/datasets/darcy.py	/^        encode_input=encode_input,$/;"	v
 encode_input	neuraloperator/scripts/hpo/tune_darcy.py	/^    encode_input=config.data.encode_input,$/;"	v
@@ -712,13 +783,14 @@ encoding	neuraloperator/neuralop/datasets/darcy.py	/^        encoding=encoding,$
 end	neuraloperator/doc/make.bat	/^:end$/;"	l
 entity	neuraloperator/scripts/hpo/tune_darcy.py	/^        entity=config.wandb.entity,$/;"	v
 entity	neuraloperator/scripts/train_burgers.py	/^        entity=config.wandb.entity,$/;"	v
+entity	neuraloperator/scripts/train_car_cfd.py	/^                           entity=config.wandb.entity)$/;"	v
 entity	neuraloperator/scripts/train_darcy.py	/^        entity=config.wandb.entity,$/;"	v
 entity	neuraloperator/scripts/train_navier_stokes.py	/^        entity=config.wandb.entity,$/;"	v
+epoch_gap	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    epoch_gap=10,$/;"	v
+epoch_wise_res_increase	neuraloperator/neuralop/datasets/data_transforms.py	/^    def epoch_wise_res_increase(self, epoch):$/;"	m	class:IncrementalDataProcessor
 epsilon	stochasticsqp.py	/^    epsilon=1e-6$/;"	v	class:StochasticSQP
 equation_loss	neuraloperator/scripts/train_burgers.py	/^equation_loss = BurgersEqnLoss(method=config.opt.get('pino_method', None), $/;"	v
 eta	stochasticsqp.py	/^    eta=1e-4 # line search parameter$/;"	v	class:StochasticSQP
-eval_losses	FNO script.py	/^              eval_losses=eval_losses)$/;"	v
-eval_losses	FNO script.py	/^eval_losses={'h1': h1loss, 'l2': l2loss}$/;"	v
 eval_losses	neuraloperator/examples/checkpoint_FNO_darcy.py	/^eval_losses={'h1': h1loss, 'l2': l2loss}$/;"	v
 eval_losses	neuraloperator/examples/plot_FNO_darcy.py	/^              eval_losses=eval_losses)$/;"	v
 eval_losses	neuraloperator/examples/plot_FNO_darcy.py	/^eval_losses={'h1': h1loss, 'l2': l2loss}$/;"	v
@@ -726,13 +798,16 @@ eval_losses	neuraloperator/examples/plot_SFNO_swe.py	/^              eval_losses
 eval_losses	neuraloperator/examples/plot_SFNO_swe.py	/^eval_losses={'l2': l2loss} #'h1': h1loss, $/;"	v
 eval_losses	neuraloperator/examples/plot_UNO_darcy.py	/^              eval_losses=eval_losses)$/;"	v
 eval_losses	neuraloperator/examples/plot_UNO_darcy.py	/^eval_losses={'h1': h1loss, 'l2': l2loss}$/;"	v
+eval_losses	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    eval_losses=eval_losses,$/;"	v
+eval_losses	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^eval_losses = {"h1": h1loss, "l2": l2loss}$/;"	v
 eval_losses	neuraloperator/scripts/train_burgers.py	/^    eval_losses=eval_losses,$/;"	v
 eval_losses	neuraloperator/scripts/train_burgers.py	/^eval_losses = {"h1": h1loss, "l2": l2loss}$/;"	v
 eval_losses	neuraloperator/scripts/train_darcy.py	/^    eval_losses=eval_losses,$/;"	v
 eval_losses	neuraloperator/scripts/train_darcy.py	/^eval_losses = {"h1": h1loss, "l2": l2loss}$/;"	v
 eval_losses	neuraloperator/scripts/train_navier_stokes.py	/^    eval_losses=eval_losses,$/;"	v
 eval_losses	neuraloperator/scripts/train_navier_stokes.py	/^eval_losses = {"h1": h1loss, "l2": l2loss}$/;"	v
-evaluate	neuraloperator/neuralop/training/trainer.py	/^    def evaluate(self, loss_dict, data_loader,$/;"	m	class:Trainer
+evaluate	neuraloperator/neuralop/training/trainer.py	/^    def evaluate(self, loss_dict, data_loader, log_prefix=""):$/;"	m	class:Trainer
+evaluate	utils.py	/^def evaluate(problem,epoch):$/;"	f
 exclude_patterns	neuraloperator/doc/source/conf.py	/^exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']$/;"	v
 exclude_patterns	neuraloperator/doc/source/conf.py	/^exclude_patterns = []$/;"	v
 extend2d	neuraloperator/neuralop/layers/fourier_continuation.py	/^    def extend2d(self, x):$/;"	m	class:FCLegendre
@@ -740,23 +815,27 @@ extend_left_right	neuraloperator/neuralop/layers/fourier_continuation.py	/^    d
 extend_top_bottom	neuraloperator/neuralop/layers/fourier_continuation.py	/^    def extend_top_bottom(self, x):$/;"	m	class:FCLegendre
 extensions	neuraloperator/doc/source/conf.py	/^extensions = [$/;"	v
 f	Test file.py	/^f = torch.linalg.vector_norm(second_grad0, ord= 1)\/2$/;"	v
+f	problems/problem_darcy_matrix.py	/^    f = 1$/;"	v	class:DarcyMatrix
 factor	neuraloperator/scripts/train_burgers.py	/^        factor=config.opt.gamma,$/;"	v
 factor	neuraloperator/scripts/train_darcy.py	/^        factor=config.opt.gamma,$/;"	v
 factor	neuraloperator/scripts/train_navier_stokes.py	/^        factor=config.opt.gamma,$/;"	v
 fdm	neuraloperator/neuralop/losses/equation_losses.py	/^    def fdm(self, u):$/;"	m	class:BurgersEqnLoss
-fig	FNO script.py	/^fig = plt.figure(figsize=(7, 7))$/;"	v
 fig	neuraloperator/examples/plot_FNO_darcy.py	/^fig = plt.figure(figsize=(7, 7))$/;"	v
 fig	neuraloperator/examples/plot_SFNO_swe.py	/^fig = plt.figure(figsize=(7, 7))$/;"	v
 fig	neuraloperator/examples/plot_UNO_darcy.py	/^fig = plt.figure(figsize=(7, 7))$/;"	v
 fig	neuraloperator/examples/plot_darcy_flow.py	/^fig = plt.figure(figsize=(7, 7))$/;"	v
+fig	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^fig = plt.figure(figsize=(7, 7))$/;"	v
 final_grad	Test file.py	/^final_grad = torch.cat((grad_sum[0], grad_sum[1]), dim=1)$/;"	v
+find_header_row_number	run.py	/^def find_header_row_number(file, first_header):$/;"	f
 find_packages	neuraloperator/setup.py	/^    from distutils.core import setup, find_packages$/;"	i
 find_packages	neuraloperator/setup.py	/^    from setuptools import setup, find_packages$/;"	i
 fit	neuraloperator/neuralop/datasets/output_encoder.py	/^    def fit(self, data_batch):$/;"	m	class:UnitGaussianNormalizer
 floor	neuraloperator/neuralop/datasets/spherical_swe.py	/^from math import ceil, floor$/;"	i
 font	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^font = {'size'   : 28}$/;"	v
 forward	neuraloperator/neuralop/datasets/data_transforms.py	/^    def forward(self, **data_dict):$/;"	m	class:DefaultDataProcessor
+forward	neuraloperator/neuralop/datasets/data_transforms.py	/^    def forward(self, **data_dict):$/;"	m	class:IncrementalDataProcessor
 forward	neuraloperator/neuralop/datasets/data_transforms.py	/^    def forward(self, **data_dict):$/;"	m	class:MGPatchingDataProcessor
+forward	neuraloperator/neuralop/datasets/data_transforms.py	/^    def forward(self, x):$/;"	m	class:DataProcessor
 forward	neuraloperator/neuralop/datasets/output_encoder.py	/^    def forward(self, x):$/;"	m	class:UnitGaussianNormalizer
 forward	neuraloperator/neuralop/layers/attention_kernel_integral.py	/^    def forward(self,$/;"	m	class:AttentionKernelIntegral
 forward	neuraloperator/neuralop/layers/embeddings.py	/^    def forward(self, coordinates):$/;"	m	class:RotaryEmbedding
@@ -764,7 +843,7 @@ forward	neuraloperator/neuralop/layers/embeddings.py	/^    def forward(self, x):
 forward	neuraloperator/neuralop/layers/fno_block.py	/^    def forward(self, x):$/;"	m	class:SubModule
 forward	neuraloperator/neuralop/layers/fno_block.py	/^    def forward(self, x, index=0, output_shape=None):$/;"	m	class:FNOBlocks
 forward	neuraloperator/neuralop/layers/fourier_continuation.py	/^    def forward(self, x):$/;"	m	class:FCLegendre
-forward	neuraloperator/neuralop/layers/integral_transform.py	/^    def forward($/;"	m	class:IntegralTransform
+forward	neuraloperator/neuralop/layers/integral_transform.py	/^    def forward(self, y, neighbors, x=None, f_y=None, weights=None):$/;"	m	class:IntegralTransform
 forward	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^    def forward($/;"	m	class:SpectralConv
 forward	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^    def forward(self, x, **kwargs):$/;"	m	class:SubConv
 forward	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^    def forward(self, x, indices=0):$/;"	m	class:SpectralConv1d
@@ -782,7 +861,6 @@ forward	neuraloperator/neuralop/layers/spectral_convolution.py	/^    def forward
 forward	neuraloperator/neuralop/layers/spectral_convolution.py	/^    def forward(self, x, indices=0):$/;"	m	class:SpectralConv2d
 forward	neuraloperator/neuralop/layers/spectral_convolution.py	/^    def forward(self, x, indices=0):$/;"	m	class:SpectralConv3d
 forward	neuraloperator/neuralop/layers/spherical_convolution.py	/^    def forward(self, x, indices=0, output_shape=None):$/;"	m	class:SphericalConv
-forward	neuraloperator/neuralop/losses/data_losses.py	/^    def forward(self, y_pred, y, vol_elm, **kwargs):$/;"	m	class:IregularLpqLoss
 forward	neuraloperator/neuralop/models/fno.py	/^    def forward(self, x, output_shape=None, **kwargs):$/;"	m	class:FNO
 forward	neuraloperator/neuralop/models/fnogno.py	/^    def forward(self, in_p, out_p, f, ada_in=None, **kwargs):$/;"	m	class:FNOGNO
 forward	neuraloperator/neuralop/models/uno.py	/^    def forward(self, x, **kwargs):$/;"	m	class:UNO
@@ -791,19 +869,24 @@ forward	neuraloperator/neuralop/mpu/mappings.py	/^    def forward(ctx, input_):$
 forward	neuraloperator/neuralop/mpu/mappings.py	/^    def forward(ctx, input_, dim_):$/;"	m	class:_GatherFromModelParallelRegion
 forward	neuraloperator/neuralop/mpu/mappings.py	/^    def forward(ctx, input_, dim_):$/;"	m	class:_ScatterToModelParallelRegion
 forward	neuraloperator/neuralop/training/tests/test_callbacks.py	/^    def forward(self, x, **kwargs):$/;"	m	class:DummyModel
+forward	neuraloperator/scripts/train_car_cfd.py	/^    def forward(self, sample):$/;"	m	class:CFDDataProcessor
 forward	nn_architecture.py	/^    def forward(self, inputs):$/;"	m	class:FNOLocal
 forward	nn_architecture.py	/^    def forward(self, inputs):$/;"	m	class:OneHiddenLayerFCNN
 forward	nn_architecture.py	/^    def forward(self, inputs):$/;"	m	class:TwoHiddenLayerFCNN
+forward	nn_architecture.py	/^    def forward(self, x):$/;"	m	class:FCN
 forward_with_postactivation	neuraloperator/neuralop/layers/fno_block.py	/^    def forward_with_postactivation(self, x, index=0, output_shape=None):$/;"	m	class:FNOBlocks
 forward_with_preactivation	neuraloperator/neuralop/layers/fno_block.py	/^    def forward_with_preactivation(self, x, index=0, output_shape=None):$/;"	m	class:FNOBlocks
-friction_drag	neuraloperator/neuralop/losses/data_losses.py	/^def friction_drag(wall_shear_stress, vol_elm, $/;"	f
 from_checkpoint	neuraloperator/neuralop/models/base_model.py	/^    def from_checkpoint(cls, save_folder, save_name):$/;"	m	class:BaseModel
 from_dataset	neuraloperator/neuralop/datasets/output_encoder.py	/^    def from_dataset(cls, dataset, dim=None, keys=None, mask=None):$/;"	m	class:UnitGaussianNormalizer
+gamma	neuraloperator/scripts/train_car_cfd.py	/^                                                gamma=config.opt.gamma)$/;"	v
 gather_from_model_parallel_region	neuraloperator/neuralop/mpu/mappings.py	/^def gather_from_model_parallel_region(input_, dim):$/;"	f
-generate_sample	problems/problem_darcy.py	/^    def generate_sample(self):$/;"	m	class:Darcy
+generate_sample	problems/problem_base_formal.py	/^    def generate_sample(self):$/;"	m	class:BaseProblemFormal
+generate_sample	problems/problem_burgers.py	/^    def generate_sample(self):$/;"	m	class:Burgers
+generate_sample	problems/problem_chemistry.py	/^    def generate_sample(self,device):$/;"	m	class:Chemistry
 generate_sample	problems/problem_darcy_matrix.py	/^    def generate_sample(self, device):$/;"	m	class:DarcyMatrix
-generate_sample	problems/problem_spring.py	/^    def generate_sample(self):$/;"	m	class:Spring
+generate_sample	problems/problem_spring_formal.py	/^    def generate_sample(self):$/;"	m	class:SpringFormal
 get_block	neuraloperator/neuralop/layers/fno_block.py	/^    def get_block(self, indices):$/;"	m	class:FNOBlocks
+get_bounds_from_data	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^    def get_bounds_from_data(self, data, key):$/;"	m	class:MeshDataModule
 get_contract_fun	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^def get_contract_fun(weight, implementation="reconstructed", separable=False):$/;"	f
 get_contract_fun	neuraloperator/neuralop/layers/spectral_convolution.py	/^def get_contract_fun(weight, implementation="reconstructed", separable=False):$/;"	f
 get_contract_fun	neuraloperator/neuralop/layers/spherical_convolution.py	/^def get_contract_fun(weight, implementation="reconstructed", separable=False):$/;"	f
@@ -813,7 +896,10 @@ get_conv	neuraloperator/neuralop/layers/spherical_convolution.py	/^    def get_c
 get_data_parallel_group	neuraloperator/neuralop/mpu/comm.py	/^def get_data_parallel_group():$/;"	f
 get_data_parallel_rank	neuraloperator/neuralop/mpu/comm.py	/^def get_data_parallel_rank():$/;"	f
 get_data_parallel_size	neuraloperator/neuralop/mpu/comm.py	/^def get_data_parallel_size():$/;"	f
+get_gif_path	solve.py	/^def get_gif_path(folders, suffix):$/;"	f
+get_global_bounding_box	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^    def get_global_bounding_box(self, meshes):$/;"	m	class:MeshDataModule
 get_local_rank	neuraloperator/neuralop/mpu/comm.py	/^def get_local_rank():$/;"	f
+get_mdl_path	solve.py	/^def get_mdl_path(folders, epoch, suffix):$/;"	f
 get_memory_format	neuraloperator/neuralop/mpu/helpers.py	/^def get_memory_format(tensor):$/;"	f
 get_model	neuraloperator/neuralop/__init__.py	/^from .models import get_model$/;"	i
 get_model	neuraloperator/neuralop/models/__init__.py	/^from .base_model import get_model$/;"	i
@@ -822,20 +908,27 @@ get_model	neuraloperator/neuralop/tests/test_model_from_config.py	/^from neuralo
 get_model	neuraloperator/scripts/hpo/tune_darcy.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 get_model	neuraloperator/scripts/test_from_config.py	/^from neuralop import get_model$/;"	i
 get_model	neuraloperator/scripts/train_burgers.py	/^from neuralop import H1Loss, LpLoss, BurgersEqnLoss, ICLoss, WeightedSumLoss, Trainer, get_model$/;"	i
+get_model	neuraloperator/scripts/train_car_cfd.py	/^from neuralop import get_model$/;"	i
 get_model	neuraloperator/scripts/train_darcy.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 get_model	neuraloperator/scripts/train_navier_stokes.py	/^from neuralop import H1Loss, LpLoss, Trainer, get_model$/;"	i
 get_model_parallel_group	neuraloperator/neuralop/mpu/comm.py	/^def get_model_parallel_group():$/;"	f
 get_model_parallel_group	neuraloperator/neuralop/mpu/mappings.py	/^from .comm import get_model_parallel_group$/;"	i
 get_model_parallel_rank	neuraloperator/neuralop/mpu/comm.py	/^def get_model_parallel_rank():$/;"	f
 get_model_parallel_size	neuraloperator/neuralop/mpu/comm.py	/^def get_model_parallel_size():$/;"	f
+get_optim_path	solve.py	/^def get_optim_path(folders, epoch, suffix):$/;"	f
+get_plot_path	solve.py	/^def get_plot_path(folders, epoch, suffix):$/;"	f
 get_wandb_api_key	neuraloperator/neuralop/tests/test_utils.py	/^from ..utils import get_wandb_api_key, wandb_login$/;"	i
 get_wandb_api_key	neuraloperator/neuralop/utils.py	/^def get_wandb_api_key(api_key_file="..\/config\/wandb_api_key.txt"):$/;"	f
 get_wandb_api_key	neuraloperator/scripts/hpo/tune_darcy.py	/^from neuralop.utils import get_wandb_api_key, count_params$/;"	i
 get_wandb_api_key	neuraloperator/scripts/train_burgers.py	/^from neuralop.utils import get_wandb_api_key, count_model_params$/;"	i
+get_wandb_api_key	neuraloperator/scripts/train_car_cfd.py	/^from neuralop.utils import get_wandb_api_key$/;"	i
 get_wandb_api_key	neuraloperator/scripts/train_darcy.py	/^from neuralop.utils import get_wandb_api_key, count_model_params$/;"	i
 get_wandb_api_key	neuraloperator/scripts/train_navier_stokes.py	/^from neuralop.utils import get_wandb_api_key, count_model_params$/;"	i
 get_world_rank	neuraloperator/neuralop/mpu/comm.py	/^def get_world_rank():$/;"	f
 get_world_size	neuraloperator/neuralop/mpu/comm.py	/^def get_world_size():$/;"	f
+get_x	utils.py	/^def get_x(problem):$/;"	f
+grad	neuraloperator/neuralop/models/tests/test_fnogno.py	/^from torch.autograd import grad$/;"	i
+grad_explained	neuraloperator/neuralop/training/callbacks.py	/^    def grad_explained(self):$/;"	m	class:IncrementalCallback
 grad_sum	Test file.py	/^grad_sum = torch.autograd.grad(outputs=Q.sum(), inputs=(a,b), create_graph=True)$/;"	v
 grad_sum	Test file.py	/^grad_sum = torch.autograd.grad(outputs=Q.sum(), inputs=(a1,b1), create_graph=True)$/;"	v
 grid	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^grid = torch.cat((gridx, gridy), dim=-1)$/;"	v
@@ -847,18 +940,19 @@ gridy	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^gridy = gridy.reshap
 gridy	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^gridy = torch.tensor(np.linspace(-1, 1, size_y), dtype=torch.float)$/;"	v
 group	neuraloperator/scripts/hpo/tune_darcy.py	/^        group=config.wandb.group,$/;"	v
 group	neuraloperator/scripts/train_burgers.py	/^        group=config.wandb.group,$/;"	v
+group	neuraloperator/scripts/train_car_cfd.py	/^                           group=config.wandb.group,$/;"	v
 group	neuraloperator/scripts/train_darcy.py	/^        group=config.wandb.group,$/;"	v
 group	neuraloperator/scripts/train_navier_stokes.py	/^        group=config.wandb.group,$/;"	v
-h1loss	FNO script.py	/^h1loss = H1Loss(d=2)$/;"	v
 h1loss	neuraloperator/examples/checkpoint_FNO_darcy.py	/^h1loss = H1Loss(d=2)$/;"	v
 h1loss	neuraloperator/examples/plot_FNO_darcy.py	/^h1loss = H1Loss(d=2)$/;"	v
 h1loss	neuraloperator/examples/plot_UNO_darcy.py	/^h1loss = H1Loss(d=2)$/;"	v
+h1loss	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^h1loss = H1Loss(d=2)$/;"	v
 h1loss	neuraloperator/scripts/train_burgers.py	/^h1loss = H1Loss(d=2)$/;"	v
 h1loss	neuraloperator/scripts/train_darcy.py	/^h1loss = H1Loss(d=2)$/;"	v
 h1loss	neuraloperator/scripts/train_navier_stokes.py	/^h1loss = H1Loss(d=2)$/;"	v
 h5py	neuraloperator/neuralop/datasets/hdf5_dataset.py	/^import h5py$/;"	i
 help	neuraloperator/doc/make.bat	/^:help$/;"	l
-hidden_channels	problems/problem_darcy_matrix.py	/^    hidden_channels=4$/;"	v	class:DarcyMatrix
+hidden_channels	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    hidden_channels=32,$/;"	v
 html_logo	neuraloperator/doc/source/conf.py	/^html_logo = '_static\/logos\/neuraloperator_logo.png'$/;"	v
 html_permalinks_icon	neuraloperator/doc/source/conf.py	/^html_permalinks_icon = ""$/;"	v
 html_show_sphinx	neuraloperator/doc/source/conf.py	/^html_show_sphinx = False$/;"	v
@@ -868,22 +962,36 @@ html_theme_options	neuraloperator/doc/source/conf.py	/^html_theme_options = {$/;
 ic_loss	neuraloperator/scripts/train_burgers.py	/^ic_loss = ICLoss()$/;"	v
 idx	neuraloperator/neuralop/datasets/darcy.py	/^    idx = test_resolutions.index(train_resolution)$/;"	v
 imgmath_image_format	neuraloperator/doc/source/conf.py	/^imgmath_image_format = 'svg'$/;"	v
-import_all_classes_from_directory	solve.py	/^def import_all_classes_from_directory(directory):$/;"	f
 importlib	neuraloperator/neuralop/layers/segment_csr.py	/^import importlib$/;"	i
-importlib	solve.py	/^import importlib.util$/;"	i
+in_channels	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    in_channels=1,$/;"	v
 in_data	neuraloperator/scripts/test_from_config.py	/^in_data = torch.randn(batch_size, 3, size, size).to(device)$/;"	v
+in_normalizer	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    in_normalizer=None,$/;"	v
 in_normalizer	neuraloperator/neuralop/datasets/darcy.py	/^        in_normalizer=input_encoder,$/;"	v
 in_normalizer	neuraloperator/scripts/train_burgers.py	/^                                       in_normalizer=output_encoder,$/;"	v
 increase_l2_fetch_granularity	neuraloperator/neuralop/training/torch_setup.py	/^def increase_l2_fetch_granularity():$/;"	f
+incremental	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^incremental = True$/;"	v
+incremental_buffer	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^        incremental_buffer=5,$/;"	v
+incremental_grad	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^        incremental_grad=True,$/;"	v
+incremental_grad_eps	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^        incremental_grad_eps=0.9999,$/;"	v
+incremental_grad_max_iter	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^        incremental_grad_max_iter=2,$/;"	v
+incremental_loss_eps	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^        incremental_loss_eps = 0.001,$/;"	v
+incremental_loss_gap	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^        incremental_loss_gap=False,$/;"	v
+incremental_max_iter	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^        incremental_max_iter=1,$/;"	v
 incremental_n_modes	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^    def incremental_n_modes(self):$/;"	m	class:SpectralConv
 incremental_n_modes	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^    def incremental_n_modes(self, incremental_n_modes):$/;"	m	class:SpectralConv
 incremental_update_mean_std	neuraloperator/neuralop/datasets/output_encoder.py	/^    def incremental_update_mean_std(self, data_batch):$/;"	m	class:UnitGaussianNormalizer
 index	neuraloperator/examples/plot_darcy_flow.py	/^index = 0$/;"	v
 index	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^index = 1$/;"	v
+index_to_sub_from_table	neuraloperator/neuralop/datasets/data_transforms.py	/^    def index_to_sub_from_table(self, index):$/;"	m	class:IncrementalDataProcessor
+indices	neuraloperator/neuralop/layers/segment_csr.py	/^            indices = indptr$/;"	v
+indices	neuraloperator/neuralop/layers/segment_csr.py	/^            indices = indptr[0]  # full shape is needed for CUDA but not CPU-only$/;"	v
 indices	neuraloperator/neuralop/layers/tests/test_neighbor_search.py	/^indices = [0, 1, 5, 0, 1, 2, 6, 1, 2, 3, 7, 2, 3, 4, 8,$/;"	v
 init	neuraloperator/neuralop/mpu/comm.py	/^def init(config, verbose = False):$/;"	f
 init_weight	neuraloperator/neuralop/layers/attention_kernel_integral.py	/^    def init_weight(self, weight, init_fn):$/;"	m	class:AttentionKernelIntegral
+initial_condition	dataset_creator.py	/^def initial_condition(x):$/;"	f
+initial_condition	problems/problem_burgers.py	/^    def initial_condition(self, x):$/;"	m	class:Burgers
 initial_condition_loss	neuraloperator/neuralop/losses/equation_losses.py	/^    def initial_condition_loss(self, y_pred, x):$/;"	m	class:ICLoss
+initialize_param	stochasticsqp.py	/^    def initialize_param(self, initial_value = 1):$/;"	m	class:StochasticSQP
 initialize_qkv_weights	neuraloperator/neuralop/layers/attention_kernel_integral.py	/^    def initialize_qkv_weights(self):$/;"	m	class:AttentionKernelIntegral
 input_encoder	neuraloperator/neuralop/datasets/darcy.py	/^        input_encoder = None$/;"	v
 input_encoder	neuraloperator/neuralop/datasets/darcy.py	/^        input_encoder = UnitGaussianNormalizer(dim=reduce_dims)$/;"	v
@@ -899,12 +1007,15 @@ iterative_resample	neuraloperator/neuralop/layers/resample.py	/^def iterative_re
 itertools	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^import itertools$/;"	i
 itertools	neuraloperator/neuralop/layers/resample.py	/^import itertools$/;"	i
 k	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^k = np.arange(length + buffer) * 1.0$/;"	v
-l2loss	FNO script.py	/^l2loss = LpLoss(d=2, p=2)$/;"	v
+kinetic_kosir	dataset_creator.py	/^def kinetic_kosir(x, t) -> np.ndarray:$/;"	f
+kinetic_kosir_gen	problems/problem_chemistry.py	/^        def kinetic_kosir_gen(x, t) -> np.ndarray:$/;"	f	function:Chemistry.create_dataset
 l2loss	neuraloperator/examples/checkpoint_FNO_darcy.py	/^l2loss = LpLoss(d=2, p=2)$/;"	v
 l2loss	neuraloperator/examples/plot_FNO_darcy.py	/^l2loss = LpLoss(d=2, p=2)$/;"	v
 l2loss	neuraloperator/examples/plot_SFNO_swe.py	/^l2loss = LpLoss(d=2, p=2, reduce_dims=(0,1))$/;"	v
 l2loss	neuraloperator/examples/plot_UNO_darcy.py	/^l2loss = LpLoss(d=2, p=2)$/;"	v
+l2loss	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^l2loss = LpLoss(d=2, p=2)$/;"	v
 l2loss	neuraloperator/scripts/train_burgers.py	/^l2loss = LpLoss(d=2, p=2)$/;"	v
+l2loss	neuraloperator/scripts/train_car_cfd.py	/^l2loss = LpLoss(d=2,p=2)$/;"	v
 l2loss	neuraloperator/scripts/train_darcy.py	/^l2loss = LpLoss(d=2, p=2)$/;"	v
 l2loss	neuraloperator/scripts/train_navier_stokes.py	/^l2loss = LpLoss(d=2, p=2)$/;"	v
 latent_embedding	neuraloperator/neuralop/models/fnogno.py	/^    def latent_embedding(self, in_p, f, ada_in=None):$/;"	m	class:FNOGNO
@@ -919,15 +1030,15 @@ load_burgers_1dtime	neuraloperator/neuralop/datasets/__init__.py	/^from .burgers
 load_burgers_1dtime	neuraloperator/neuralop/datasets/burgers.py	/^def load_burgers_1dtime($/;"	f
 load_burgers_1dtime	neuraloperator/scripts/train_burgers.py	/^from neuralop.datasets import load_burgers_1dtime$/;"	i
 load_checkpoint	neuraloperator/neuralop/models/base_model.py	/^    def load_checkpoint(self, save_folder, save_name):$/;"	m	class:BaseModel
-load_darcy_flow_small	FNO dataset.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
-load_darcy_flow_small	FNO script.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_darcy_flow_small	neuraloperator/examples/checkpoint_FNO_darcy.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_darcy_flow_small	neuraloperator/examples/plot_FNO_darcy.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_darcy_flow_small	neuraloperator/examples/plot_UNO_darcy.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_darcy_flow_small	neuraloperator/examples/plot_darcy_flow.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_darcy_flow_small	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
+load_darcy_flow_small	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_darcy_flow_small	neuraloperator/neuralop/datasets/__init__.py	/^from .darcy import load_darcy_pt, load_darcy_flow_small$/;"	i
 load_darcy_flow_small	neuraloperator/neuralop/datasets/darcy.py	/^def load_darcy_flow_small($/;"	f
+load_darcy_flow_small	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_darcy_flow_small	neuraloperator/scripts/hpo/tune_darcy.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_darcy_flow_small	neuraloperator/scripts/train_darcy.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_darcy_flow_small	problems/problem_darcy_matrix.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
@@ -936,19 +1047,18 @@ load_darcy_pt	neuraloperator/neuralop/datasets/darcy.py	/^def load_darcy_pt($/;"
 load_navier_stokes_pt	neuraloperator/neuralop/datasets/__init__.py	/^from .navier_stokes import load_navier_stokes_pt $/;"	i
 load_navier_stokes_pt	neuraloperator/neuralop/datasets/navier_stokes.py	/^def load_navier_stokes_pt(data_path, train_resolution,$/;"	f
 load_navier_stokes_pt	neuraloperator/scripts/train_navier_stokes.py	/^from neuralop.datasets.navier_stokes import load_navier_stokes_pt$/;"	i
-load_net	problems/problem_darcy_matrix.py	/^    def load_net(self,path):$/;"	m	class:DarcyMatrix
+load_net	problems/problem_base_formal.py	/^    def load_net(self,path):$/;"	m	class:BaseProblemFormal
+load_pretrain_state	stochasticsqp.py	/^    def load_pretrain_state(self,optim_path):$/;"	m	class:StochasticSQP
 load_pt_traintestsplit	neuraloperator/neuralop/datasets/__init__.py	/^from .pt_dataset import load_pt_traintestsplit$/;"	i
 load_pt_traintestsplit	neuraloperator/neuralop/datasets/pt_dataset.py	/^def load_pt_traintestsplit(data_path, $/;"	f
 load_spherical_swe	neuraloperator/examples/plot_SFNO_swe.py	/^from neuralop.datasets import load_spherical_swe$/;"	i
 load_spherical_swe	neuraloperator/neuralop/datasets/__init__.py	/^from .spherical_swe import load_spherical_swe$/;"	i
 load_spherical_swe	neuraloperator/neuralop/datasets/spherical_swe.py	/^def load_spherical_swe(n_train, n_tests, batch_size, test_batch_sizes,$/;"	f
-load_training_state	neuraloperator/neuralop/training/__init__.py	/^from .training_state import load_training_state, save_training_state/;"	i
+load_training_state	neuraloperator/neuralop/training/__init__.py	/^from .training_state import load_training_state, save_training_state$/;"	i
 load_training_state	neuraloperator/neuralop/training/training_state.py	/^def load_training_state(save_dir: Union[str, Path], save_name: str,$/;"	f
-log_output	FNO script.py	/^                  log_output=True,$/;"	v
 log_output	neuraloperator/scripts/train_burgers.py	/^    log_output=config.wandb.log_output,$/;"	v
 log_output	neuraloperator/scripts/train_darcy.py	/^    log_output=config.wandb.log_output,$/;"	v
 log_output	neuraloperator/scripts/train_navier_stokes.py	/^    log_output=config.wandb.log_output,$/;"	v
-log_test_interval	FNO script.py	/^                  log_test_interval=3,$/;"	v
 log_test_interval	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                  log_test_interval=3,$/;"	v
 log_test_interval	neuraloperator/examples/plot_FNO_darcy.py	/^                  log_test_interval=3,$/;"	v
 log_test_interval	neuraloperator/examples/plot_SFNO_swe.py	/^                  log_test_interval=3,$/;"	v
@@ -959,22 +1069,22 @@ log_test_interval	neuraloperator/scripts/train_navier_stokes.py	/^    log_test_i
 logging	neuraloperator/neuralop/mpu/comm.py	/^import logging$/;"	i
 login	neuraloperator/neuralop/tests/test_utils.py	/^    def login(key):$/;"	f	function:test_ArgparseConfig
 loss	neuraloperator/scripts/test_from_config.py	/^loss = out.sum()$/;"	v
+loss_gap	neuraloperator/neuralop/training/callbacks.py	/^    def loss_gap(self, loss):$/;"	m	class:IncrementalCallback
 losses	neuraloperator/scripts/train_burgers.py	/^losses = []$/;"	v
-lr	FNO script.py	/^                                lr=8e-3,$/;"	v
 lr	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                                lr=8e-3, $/;"	v
 lr	neuraloperator/examples/plot_FNO_darcy.py	/^                                lr=8e-3, $/;"	v
 lr	neuraloperator/examples/plot_SFNO_swe.py	/^                                lr=8e-4, $/;"	v
 lr	neuraloperator/examples/plot_UNO_darcy.py	/^                                lr=8e-3, $/;"	v
 lr	neuraloperator/scripts/train_burgers.py	/^    lr=config.opt.learning_rate,$/;"	v
+lr	neuraloperator/scripts/train_car_cfd.py	/^                                lr=config.opt.learning_rate, $/;"	v
 lr	neuraloperator/scripts/train_darcy.py	/^    lr=config.opt.learning_rate,$/;"	v
 lr	neuraloperator/scripts/train_navier_stokes.py	/^    lr=config.opt.learning_rate,$/;"	v
-lr	solve.py	/^                          lr= 1,$/;"	v
+main	run.py	/^def main():$/;"	f
 make_patches	neuraloperator/neuralop/training/patching.py	/^def make_patches(x, n, p=0):$/;"	f
 math	neuraloperator/neuralop/layers/attention_kernel_integral.py	/^import math$/;"	i
 math	neuraloperator/neuralop/layers/embeddings.py	/^import math$/;"	i
 math	neuraloperator/neuralop/losses/data_losses.py	/^import math$/;"	i
 math	neuraloperator/neuralop/training/patching.py	/^import math$/;"	i
-matplotlib	FNO script.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	neuraloperator/examples/checkpoint_FNO_darcy.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	neuraloperator/examples/plot_FNO_darcy.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	neuraloperator/examples/plot_SFNO_swe.py	/^import matplotlib.pyplot as plt$/;"	i
@@ -982,12 +1092,18 @@ matplotlib	neuraloperator/examples/plot_UNO_darcy.py	/^import matplotlib.pyplot 
 matplotlib	neuraloperator/examples/plot_darcy_flow.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^import matplotlib$/;"	i
 matplotlib	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^import matplotlib.pyplot as plt$/;"	i
-merit_param_init	solve.py	/^                          merit_param_init = 1, $/;"	v
+matplotlib	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	problems/problem_burgers.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	problems/problem_chemistry.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	problems/problem_darcy_matrix.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	problems/problem_spring_formal.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	run.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	solve.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	utils.py	/^import matplotlib.pyplot as plt$/;"	i
+max_n_modes	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    max_n_modes=(16, 16),$/;"	v
 mode	neuraloperator/scripts/train_burgers.py	/^        mode="min",$/;"	v
 mode	neuraloperator/scripts/train_darcy.py	/^        mode="min",$/;"	v
 mode	neuraloperator/scripts/train_navier_stokes.py	/^        mode="min",$/;"	v
-model	FNO script.py	/^model = FNO(n_modes=(16, 16), hidden_channels=64,$/;"	v
-model	FNO script.py	/^model = model.to(device)$/;"	v
 model	neuraloperator/examples/checkpoint_FNO_darcy.py	/^model = TFNO(n_modes=(16, 16), hidden_channels=32, projection_channels=64, factorization='tucker', rank=0.42)$/;"	v
 model	neuraloperator/examples/checkpoint_FNO_darcy.py	/^model = model.to(device)$/;"	v
 model	neuraloperator/examples/plot_FNO_darcy.py	/^model = TFNO(n_modes=(16, 16), hidden_channels=32, projection_channels=64, factorization='tucker', rank=0.42)$/;"	v
@@ -996,12 +1112,17 @@ model	neuraloperator/examples/plot_SFNO_swe.py	/^model = SFNO(n_modes=(32, 32), 
 model	neuraloperator/examples/plot_SFNO_swe.py	/^model = model.to(device)$/;"	v
 model	neuraloperator/examples/plot_UNO_darcy.py	/^            horizontal_skips_map = None, n_layers = 5, domain_padding = 0.2)$/;"	v
 model	neuraloperator/examples/plot_UNO_darcy.py	/^model = model.to(device)$/;"	v
+model	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    model=model,$/;"	v
+model	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^model = FNO($/;"	v
+model	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^model = model.to(device)$/;"	v
 model	neuraloperator/scripts/test_from_config.py	/^model = get_model(config)$/;"	v
 model	neuraloperator/scripts/test_from_config.py	/^model = model.to(device)$/;"	v
 model	neuraloperator/scripts/train_burgers.py	/^    model = DDP($/;"	v
 model	neuraloperator/scripts/train_burgers.py	/^    model=model,$/;"	v
 model	neuraloperator/scripts/train_burgers.py	/^model = get_model(config)$/;"	v
 model	neuraloperator/scripts/train_burgers.py	/^model = model.to(device)$/;"	v
+model	neuraloperator/scripts/train_car_cfd.py	/^model = get_model(config)$/;"	v
+model	neuraloperator/scripts/train_car_cfd.py	/^model = model.to(device)$/;"	v
 model	neuraloperator/scripts/train_darcy.py	/^    model = DDP($/;"	v
 model	neuraloperator/scripts/train_darcy.py	/^    model=model,$/;"	v
 model	neuraloperator/scripts/train_darcy.py	/^model = get_model(config)$/;"	v
@@ -1014,12 +1135,12 @@ mpu	neuraloperator/neuralop/__init__.py	/^from . import mpu$/;"	i
 mpu	neuraloperator/neuralop/training/patching.py	/^import neuralop.mpu.comm as comm$/;"	i
 mpu	neuraloperator/neuralop/training/torch_setup.py	/^import neuralop.mpu.comm as comm$/;"	i
 mpu	neuraloperator/neuralop/training/trainer.py	/^import neuralop.mpu.comm as comm$/;"	i
-n_constrs	solve.py	/^                          n_constrs = problem.n_constrs,$/;"	v
-n_discretize	problems/problem_darcy_matrix.py	/^    n_discretize = 16$/;"	v	class:DarcyMatrix
 n_epochs	neuraloperator/examples/plot_UNO_darcy.py	/^                   n_epochs=20,$/;"	v
+n_epochs	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    n_epochs=20,$/;"	v
 n_epochs	neuraloperator/scripts/train_burgers.py	/^    n_epochs=config.opt.n_epochs,$/;"	v
 n_epochs	neuraloperator/scripts/train_darcy.py	/^    n_epochs=config.opt.n_epochs,$/;"	v
 n_epochs	neuraloperator/scripts/train_navier_stokes.py	/^    n_epochs=config.opt.n_epochs,$/;"	v
+n_modes	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    n_modes=starting_modes,$/;"	v
 n_modes	neuraloperator/neuralop/layers/fno_block.py	/^    def n_modes(self):$/;"	m	class:FNOBlocks
 n_modes	neuraloperator/neuralop/layers/fno_block.py	/^    def n_modes(self, n_modes):$/;"	m	class:FNOBlocks
 n_modes	neuraloperator/neuralop/layers/spectral_convolution.py	/^    def n_modes(self):$/;"	m	class:SpectralConv
@@ -1028,28 +1149,37 @@ n_modes	neuraloperator/neuralop/layers/spherical_convolution.py	/^    def n_mode
 n_modes	neuraloperator/neuralop/layers/spherical_convolution.py	/^    def n_modes(self, n_modes):$/;"	m	class:SphericalConv
 n_modes	neuraloperator/neuralop/models/fno.py	/^    def n_modes(self):$/;"	m	class:FNO
 n_modes	neuraloperator/neuralop/models/fno.py	/^    def n_modes(self, n_modes):$/;"	m	class:FNO
-n_parameters	solve.py	/^                          n_parameters = problem.n_parameters, $/;"	v
-n_params	FNO script.py	/^n_params = count_model_params(model)$/;"	v
+n_nbrs	neuraloperator/neuralop/layers/segment_csr.py	/^        n_nbrs = indices[1:] - indices[:-1]$/;"	v
 n_params	neuraloperator/examples/checkpoint_FNO_darcy.py	/^n_params = count_model_params(model)$/;"	v
 n_params	neuraloperator/examples/plot_FNO_darcy.py	/^n_params = count_model_params(model)$/;"	v
 n_params	neuraloperator/examples/plot_SFNO_swe.py	/^n_params = count_model_params(model)$/;"	v
 n_params	neuraloperator/examples/plot_UNO_darcy.py	/^n_params = count_model_params(model)$/;"	v
+n_params	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^n_params = count_model_params(model)$/;"	v
 n_params	neuraloperator/scripts/train_burgers.py	/^    n_params = count_model_params(model)$/;"	v
 n_params	neuraloperator/scripts/train_darcy.py	/^    n_params = count_model_params(model)$/;"	v
 n_params	neuraloperator/scripts/train_navier_stokes.py	/^    n_params = count_model_params(model)$/;"	v
 n_test	neuraloperator/neuralop/datasets/darcy.py	/^    n_test = n_tests.pop(idx)$/;"	v
+n_test	neuraloperator/scripts/train_car_cfd.py	/^                             n_test=config.data.n_test, $/;"	v
+n_tests	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    n_tests=[100, 50],$/;"	v
 n_tests	neuraloperator/neuralop/datasets/darcy.py	/^        n_tests=n_tests,$/;"	v
 n_tests	neuraloperator/scripts/hpo/tune_darcy.py	/^    n_tests=config.data.n_tests,$/;"	v
 n_tests	neuraloperator/scripts/train_darcy.py	/^    n_tests=config.data.n_tests,$/;"	v
 n_tests	neuraloperator/scripts/train_navier_stokes.py	/^    n_tests=config.data.n_tests,$/;"	v
+n_train	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    n_train=100,$/;"	v
 n_train	neuraloperator/neuralop/datasets/darcy.py	/^        n_train=n_train,$/;"	v
 n_train	neuraloperator/scripts/hpo/tune_darcy.py	/^    n_train=config.data.n_train,$/;"	v
+n_train	neuraloperator/scripts/train_car_cfd.py	/^                             n_train=config.data.n_train, $/;"	v
 n_train	neuraloperator/scripts/train_darcy.py	/^    n_train=config.data.n_train,$/;"	v
 n_train	neuraloperator/scripts/train_navier_stokes.py	/^    n_train=config.data.n_train,$/;"	v
 name	neuraloperator/scripts/hpo/tune_darcy.py	/^        name=wandb_name,$/;"	v
 name	neuraloperator/scripts/train_burgers.py	/^        name=wandb_name,$/;"	v
+name	neuraloperator/scripts/train_car_cfd.py	/^                           name=wandb_name, $/;"	v
 name	neuraloperator/scripts/train_darcy.py	/^        name=wandb_name,$/;"	v
 name	neuraloperator/scripts/train_navier_stokes.py	/^        name=wandb_name,$/;"	v
+name	problems/problem_burgers.py	/^    name = 'Burgers'$/;"	v	class:Burgers
+name	problems/problem_chemistry.py	/^    name = 'Chemistry'$/;"	v	class:Chemistry
+name	problems/problem_darcy_matrix.py	/^    name = 'DarcyMatrix'$/;"	v	class:DarcyMatrix
+name	problems/problem_spring_formal.py	/^    name = "SpringFormal"$/;"	v	class:SpringFormal
 napoleon_google_docstring	neuraloperator/doc/source/conf.py	/^napoleon_google_docstring = False$/;"	v
 napoleon_use_rtype	neuraloperator/doc/source/conf.py	/^napoleon_use_rtype = False$/;"	v
 neuralop	neuraloperator/doc/source/conf.py	/^import neuralop$/;"	i
@@ -1077,7 +1207,6 @@ nn	neuraloperator/neuralop/layers/spherical_convolution.py	/^from torch import n
 nn	neuraloperator/neuralop/losses/equation_losses.py	/^import torch.nn.functional as F$/;"	i
 nn	neuraloperator/neuralop/models/fno.py	/^import torch.nn as nn$/;"	i
 nn	neuraloperator/neuralop/models/fno.py	/^import torch.nn.functional as F$/;"	i
-nn	neuraloperator/neuralop/models/fnogno.py	/^from torch import nn$/;"	i
 nn	neuraloperator/neuralop/models/fnogno.py	/^import torch.nn.functional as F$/;"	i
 nn	neuraloperator/neuralop/models/uno.py	/^import torch.nn as nn$/;"	i
 nn	neuraloperator/neuralop/models/uno.py	/^import torch.nn.functional as F$/;"	i
@@ -1088,56 +1217,70 @@ nn	neuraloperator/neuralop/training/tests/test_callbacks.py	/^from torch import 
 nn	neuraloperator/neuralop/training/training_state.py	/^from torch import nn$/;"	i
 nn	neuraloperator/scripts/train_burgers.py	/^import torch.nn.functional as F$/;"	i
 nn	nn_architecture.py	/^import torch.nn as nn$/;"	i
-norm	neuraloperator/neuralop/losses/data_losses.py	/^    def norm(self, x, vol_elm):$/;"	m	class:IregularLpqLoss
 normalize_wrt_domain	neuraloperator/neuralop/layers/attention_kernel_integral.py	/^    def normalize_wrt_domain(self, u, norm_fn):$/;"	m	class:AttentionKernelIntegral
+np	dataset_creator.py	/^import numpy as np$/;"	i
 np	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^import numpy as np$/;"	i
 np	neuraloperator/neuralop/datasets/burgers.py	/^import numpy as np$/;"	i
+np	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^import numpy as np$/;"	i
 np	neuraloperator/neuralop/layers/fourier_continuation.py	/^import numpy as np$/;"	i
 np	neuraloperator/neuralop/layers/resample.py	/^import numpy as np$/;"	i
 np	neuraloperator/neuralop/layers/tests/test_neighbor_search.py	/^import numpy as np$/;"	i
-np	problems/problem_base.py	/^import numpy as np$/;"	i
-np	problems/problem_darcy.py	/^import numpy as np$/;"	i
+np	problems/problem_burgers.py	/^import numpy as np$/;"	i
+np	problems/problem_chemistry.py	/^import numpy as np$/;"	i
 np	problems/problem_darcy_matrix.py	/^import numpy as np$/;"	i
-np	problems/problem_spring.py	/^import numpy as np$/;"	i
+np	problems/problem_spring_formal.py	/^import numpy as np$/;"	i
 np	solve.py	/^import numpy as np$/;"	i
 np	stochasticsqp.py	/^import numpy as np$/;"	i
+np	utils.py	/^import numpy as np$/;"	i
 num_workers	neuraloperator/neuralop/datasets/darcy.py	/^            num_workers=0,$/;"	v
 num_workers	neuraloperator/neuralop/datasets/darcy.py	/^        num_workers=0,$/;"	v
 num_workers	neuraloperator/scripts/train_navier_stokes.py	/^    num_workers=config.data.num_workers,$/;"	v
 numpydoc_class_members_toctree	neuraloperator/doc/source/conf.py	/^numpydoc_class_members_toctree = False$/;"	v
 numpydoc_show_class_members	neuraloperator/doc/source/conf.py	/^numpydoc_show_class_members = True$/;"	v
 numpydoc_show_inherited_class_members	neuraloperator/doc/source/conf.py	/^numpydoc_show_inherited_class_members = False$/;"	v
+o3d	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^import open3d as o3d$/;"	i
 objective	neuraloperator/scripts/hpo/tune_darcy.py	/^def objective(trial):$/;"	f
-objective_func_and_grad	problems/problem_darcy.py	/^    def objective_func_and_grad(self, optimizer, no_grad = False):$/;"	m	class:Darcy
-objective_func_and_grad	problems/problem_darcy_matrix.py	/^    def objective_func_and_grad(self, optimizer, no_grad = False):$/;"	m	class:DarcyMatrix
-objective_func_and_grad	problems/problem_spring.py	/^    def objective_func_and_grad(self, optimizer, no_grad = False):$/;"	m	class:Spring
+objective_func	problems/problem_base_formal.py	/^    def objective_func(self):$/;"	m	class:BaseProblemFormal
+objective_func	problems/problem_burgers.py	/^    def objective_func(self, return_multiple_f = False):$/;"	m	class:Burgers
+objective_func	problems/problem_chemistry.py	/^    def objective_func(self):$/;"	m	class:Chemistry
+objective_func	problems/problem_darcy_matrix.py	/^    def objective_func(self):$/;"	m	class:DarcyMatrix
+objective_func	problems/problem_spring_formal.py	/^    def objective_func(self):$/;"	m	class:SpringFormal
+objective_func_and_grad	problems/problem_base_formal.py	/^    def objective_func_and_grad(self, optimizer, no_grad = False):$/;"	m	class:BaseProblemFormal
+odeint	dataset_creator.py	/^from scipy.integrate import odeint$/;"	i
+odeint	problems/problem_chemistry.py	/^from scipy.integrate import odeint$/;"	i
 on_batch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_batch_end(self, *args, **kwargs):$/;"	m	class:Callback
 on_batch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_batch_end(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_batch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_batch_start(self, *args, **kwargs):$/;"	m	class:Callback
 on_batch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_batch_start(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_batch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_batch_start(self, idx, **kwargs):$/;"	m	class:BasicLoggerCallback
+on_batch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_batch_start(self, idx, **kwargs):$/;"	m	class:IncrementalCallback
 on_before_forward	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_forward(self, *args, **kwargs):$/;"	m	class:Callback
 on_before_forward	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_forward(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_before_loss	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_loss(self, *args, **kwargs):$/;"	m	class:Callback
 on_before_loss	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_loss(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_before_loss	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_loss(self, out, **kwargs):$/;"	m	class:BasicLoggerCallback
+on_before_loss	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_loss(self, out, **kwargs):$/;"	m	class:IncrementalCallback
 on_before_train	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_train(self, *args, **kwargs):$/;"	m	class:Callback
 on_before_train	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_train(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_before_val	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_val(self, *args, **kwargs):$/;"	m	class:Callback
 on_before_val	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_val(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_before_val	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_val(self, epoch, train_err, time, avg_loss, avg_lasso_loss, **kwargs):$/;"	m	class:BasicLoggerCallback
+on_before_val	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_val(self, epoch, train_err, time, avg_loss, avg_lasso_loss, **kwargs):$/;"	m	class:IncrementalCallback
 on_before_val_loss	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_val_loss(self, **kwargs):$/;"	m	class:Callback
 on_before_val_loss	neuraloperator/neuralop/training/callbacks.py	/^    def on_before_val_loss(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_epoch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_epoch_end(self, *args, **kwargs):$/;"	m	class:Callback
 on_epoch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_epoch_end(self, *args, **kwargs):$/;"	m	class:CheckpointCallback
 on_epoch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_epoch_end(self, *args, **kwargs):$/;"	m	class:PipelineCallback
+on_epoch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_epoch_end(self, epoch, **kwargs):$/;"	m	class:IncrementalCallback
 on_epoch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_epoch_start(self, *args, **kwargs):$/;"	m	class:Callback
 on_epoch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_epoch_start(self, *args, **kwargs):$/;"	m	class:CheckpointCallback
 on_epoch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_epoch_start(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_epoch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_epoch_start(self, epoch):$/;"	m	class:BasicLoggerCallback
+on_epoch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_epoch_start(self, epoch):$/;"	m	class:IncrementalCallback
 on_init_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_init_end(self, *args, **kwargs):$/;"	m	class:BasicLoggerCallback
 on_init_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_init_end(self, *args, **kwargs):$/;"	m	class:Callback
 on_init_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_init_end(self, *args, **kwargs):$/;"	m	class:CheckpointCallback
+on_init_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_init_end(self, *args, **kwargs):$/;"	m	class:IncrementalCallback
 on_init_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_init_end(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_init_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_init_start(self, **kwargs):$/;"	m	class:Callback
 on_init_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_init_start(self, *args, **kwargs):$/;"	m	class:PipelineCallback
@@ -1146,26 +1289,28 @@ on_load_to_device	neuraloperator/neuralop/training/callbacks.py	/^    def on_loa
 on_train_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_train_end(self, *args, **kwargs):$/;"	m	class:Callback
 on_train_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_train_end(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_train_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_train_start(self, **kwargs):$/;"	m	class:BasicLoggerCallback
+on_train_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_train_start(self, **kwargs):$/;"	m	class:IncrementalCallback
 on_train_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_train_start(self, *args, **kwargs):$/;"	m	class:Callback
 on_train_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_train_start(self, *args, **kwargs):$/;"	m	class:CheckpointCallback
 on_train_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_train_start(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_val_batch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_batch_end(self, *args, **kwargs):$/;"	m	class:Callback
 on_val_batch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_batch_end(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_val_batch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_batch_start(self, *args, **kwargs):$/;"	m	class:Callback
+on_val_batch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_batch_start(self, *args, **kwargs):$/;"	m	class:IncrementalCallback
 on_val_batch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_batch_start(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_val_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_end(self, *args, **kwargs):$/;"	m	class:BasicLoggerCallback
 on_val_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_end(self, *args, **kwargs):$/;"	m	class:Callback
+on_val_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_end(self, *args, **kwargs):$/;"	m	class:IncrementalCallback
 on_val_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_end(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_val_epoch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_epoch_end(self, *args, **kwargs):$/;"	m	class:Callback
 on_val_epoch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_epoch_end(self, *args, **kwargs):$/;"	m	class:CheckpointCallback
 on_val_epoch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_epoch_end(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 on_val_epoch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_epoch_end(self, errors, **kwargs):$/;"	m	class:BasicLoggerCallback
+on_val_epoch_end	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_epoch_end(self, errors, **kwargs):$/;"	m	class:IncrementalCallback
 on_val_epoch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_epoch_start(self, *args, **kwargs):$/;"	m	class:Callback
 on_val_epoch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_epoch_start(self, *args, **kwargs):$/;"	m	class:CheckpointCallback
 on_val_epoch_start	neuraloperator/neuralop/training/callbacks.py	/^    def on_val_epoch_start(self, *args, **kwargs):$/;"	m	class:PipelineCallback
 opt_einsum	neuraloperator/neuralop/layers/einsum_utils.py	/^import opt_einsum$/;"	i
-optimizer	FNO script.py	/^              optimizer=optimizer,$/;"	v
-optimizer	FNO script.py	/^optimizer = torch.optim.Adam(model.parameters(),$/;"	v
 optimizer	neuraloperator/examples/checkpoint_FNO_darcy.py	/^              optimizer=optimizer,$/;"	v
 optimizer	neuraloperator/examples/checkpoint_FNO_darcy.py	/^optimizer = torch.optim.Adam(model.parameters(), $/;"	v
 optimizer	neuraloperator/examples/plot_FNO_darcy.py	/^              optimizer=optimizer,$/;"	v
@@ -1174,30 +1319,41 @@ optimizer	neuraloperator/examples/plot_SFNO_swe.py	/^              optimizer=opt
 optimizer	neuraloperator/examples/plot_SFNO_swe.py	/^optimizer = torch.optim.Adam(model.parameters(), $/;"	v
 optimizer	neuraloperator/examples/plot_UNO_darcy.py	/^              optimizer=optimizer,$/;"	v
 optimizer	neuraloperator/examples/plot_UNO_darcy.py	/^optimizer = torch.optim.Adam(model.parameters(), $/;"	v
+optimizer	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^optimizer = torch.optim.Adam(model.parameters(), lr=8e-3, weight_decay=1e-4)$/;"	v
 optimizer	neuraloperator/scripts/train_burgers.py	/^optimizer = torch.optim.Adam($/;"	v
+optimizer	neuraloperator/scripts/train_car_cfd.py	/^optimizer = torch.optim.Adam(model.parameters(), $/;"	v
 optimizer	neuraloperator/scripts/train_darcy.py	/^    optimizer=optimizer,$/;"	v
 optimizer	neuraloperator/scripts/train_darcy.py	/^optimizer = torch.optim.Adam($/;"	v
 optimizer	neuraloperator/scripts/train_navier_stokes.py	/^optimizer = torch.optim.Adam($/;"	v
-optimizer	solve.py	/^    optimizer = StochasticSQP(problem.net.parameters(),$/;"	v
 optuna	neuraloperator/scripts/hpo/tune_darcy.py	/^import optuna$/;"	i
-os	FNO script.py	/^import os$/;"	i
 os	neuraloperator/neuralop/mpu/comm.py	/^import os$/;"	i
 os	neuraloperator/neuralop/tests/test_utils.py	/^import os$/;"	i
 os	neuraloperator/neuralop/training/callbacks.py	/^import os$/;"	i
 os	neuraloperator/neuralop/training/tests/test_callbacks.py	/^import os$/;"	i
 os	neuraloperator/neuralop/utils.py	/^    import os$/;"	i
+os	problems/problem_chemistry.py	/^import os$/;"	i
 os	solve.py	/^import os$/;"	i
-out	FNO script.py	/^    out = model(x.unsqueeze(0))$/;"	v
+os	utils.py	/^import os$/;"	i
+oscillator	problems/problem_spring_formal.py	/^def oscillator(d, w0, x):$/;"	f
 out	neuraloperator/examples/plot_FNO_darcy.py	/^    out = model(x.unsqueeze(0))$/;"	v
 out	neuraloperator/examples/plot_SFNO_swe.py	/^    out = model(x_in).squeeze()[0, ...].detach().cpu().numpy()$/;"	v
 out	neuraloperator/examples/plot_UNO_darcy.py	/^    out = model(x.unsqueeze(0).to(device)).cpu()$/;"	v
+out	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    out = model(x.unsqueeze(0))$/;"	v
+out	neuraloperator/neuralop/layers/segment_csr.py	/^        out = torch.zeros(output_shape, device=src.device)$/;"	v
 out	neuraloperator/scripts/test_from_config.py	/^out = model(in_data)$/;"	v
+out_channels	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    out_channels=1,$/;"	v
+out_idx	neuraloperator/neuralop/layers/segment_csr.py	/^                out_idx = (slice(None), slice(i, i + 1))  # grab all batch elements$/;"	v
+out_idx	neuraloperator/neuralop/layers/segment_csr.py	/^                out_idx = i  # no batching dim$/;"	v
+out_normalizer	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    out_normalizer=None,$/;"	v
 out_normalizer	neuraloperator/neuralop/datasets/darcy.py	/^        out_normalizer=output_encoder,$/;"	v
 out_normalizer	neuraloperator/scripts/train_burgers.py	/^                                       out_normalizer=output_encoder)$/;"	v
 out_normalizer	neuraloperator/scripts/train_darcy.py	/^                                             out_normalizer=data_processor.out_normalizer,$/;"	v
 out_normalizer	neuraloperator/scripts/train_navier_stokes.py	/^                                             out_normalizer=data_processor.out_normalizer,$/;"	v
 output_encoder	neuraloperator/neuralop/datasets/darcy.py	/^        output_encoder = None$/;"	v
 output_encoder	neuraloperator/neuralop/datasets/darcy.py	/^        output_encoder = UnitGaussianNormalizer(dim=reduce_dims)$/;"	v
+output_encoder	neuraloperator/scripts/train_car_cfd.py	/^output_encoder = deepcopy(data_module.normalizers['press']).to(device)$/;"	v
+output_folder	run.py	/^output_folder = '..\/results0409'$/;"	v
+output_shape	neuraloperator/neuralop/layers/segment_csr.py	/^        output_shape = list(src.shape)$/;"	v
 pad	neuraloperator/neuralop/layers/padding.py	/^    def pad(self, x, verbose=False):$/;"	m	class:DomainPadding
 pad	neuraloperator/scripts/train_burgers.py	/^        pad=config.data.get("pad", 0), temporal_subsample=config.data.get("temporal_subsample", 1),$/;"	v
 pad_helper	neuraloperator/neuralop/mpu/helpers.py	/^def pad_helper(tensor, dim, new_size, mode="zero"):$/;"	f
@@ -1213,7 +1369,14 @@ pathlib	neuraloperator/neuralop/training/trainer.py	/^import pathlib$/;"	i
 patience	neuraloperator/scripts/train_burgers.py	/^        patience=config.opt.scheduler_patience,$/;"	v
 patience	neuraloperator/scripts/train_darcy.py	/^        patience=config.opt.scheduler_patience,$/;"	v
 patience	neuraloperator/scripts/train_navier_stokes.py	/^        patience=config.opt.scheduler_patience,$/;"	v
-pde_model	FNO dataset.py	/^def pde_model(train_sample):$/;"	f
+pd	dataset_creator.py	/^import pandas as pd$/;"	i
+pd	problems/problem_burgers.py	/^import pandas as pd$/;"	i
+pd	problems/problem_chemistry.py	/^import pandas as pd$/;"	i
+pd	run.py	/^import pandas as pd$/;"	i
+pde	problems/problem_burgers.py	/^    def pde(self, input_dataset):$/;"	m	class:Burgers
+pde	problems/problem_chemistry.py	/^    def pde(self, output, t):$/;"	m	class:Chemistry
+pde	problems/problem_darcy_matrix.py	/^    def pde(self, nu, x1, x2, out):$/;"	m	class:DarcyMatrix
+pde	problems/problem_spring_formal.py	/^    def pde(self, u_pde_pred, t_pde):$/;"	m	class:SpringFormal
 persistent_workers	neuraloperator/neuralop/datasets/darcy.py	/^            persistent_workers=False,$/;"	v
 persistent_workers	neuraloperator/neuralop/datasets/darcy.py	/^        persistent_workers=False,$/;"	v
 persistent_workers	neuraloperator/scripts/train_navier_stokes.py	/^    persistent_workers=config.data.persistent_workers,$/;"	v
@@ -1223,20 +1386,36 @@ pin_memory	neuraloperator/scripts/train_navier_stokes.py	/^    pin_memory=config
 pipe	neuraloperator/scripts/hpo/tune_darcy.py	/^pipe = ConfigPipeline($/;"	v
 pipe	neuraloperator/scripts/test_from_config.py	/^pipe = ConfigPipeline([YamlConfig('.\/test_config.yaml', config_name='default', config_folder='..\/config'),$/;"	v
 pipe	neuraloperator/scripts/train_burgers.py	/^pipe = ConfigPipeline($/;"	v
+pipe	neuraloperator/scripts/train_car_cfd.py	/^pipe = ConfigPipeline([YamlConfig('.\/car_cfd_config.yaml', config_name=config_name, config_folder='..\/config'),$/;"	v
 pipe	neuraloperator/scripts/train_darcy.py	/^pipe = ConfigPipeline($/;"	v
 pipe	neuraloperator/scripts/train_navier_stokes.py	/^pipe = ConfigPipeline($/;"	v
-plt	FNO script.py	/^import matplotlib.pyplot as plt$/;"	i
+plot	run.py	/^plot = True$/;"	v
+plot	utils.py	/^def plot(u_true, u_pred, t, save_file_name):$/;"	f
+plot_f	run.py	/^def plot_f(problem):$/;"	f
+plot_gif	solve.py	/^def plot_gif(folders, problem, config, files):$/;"	f
+plot_prediction	problems/problem_darcy_matrix.py	/^    def plot_prediction(self, save_path, sample_type='test'):$/;"	m	class:DarcyMatrix
+plot_prediction	solve.py	/^def plot_prediction(folders, epoch, problem, config):$/;"	f
+plot_result	problems/problem_spring_formal.py	/^    def plot_result(self,epoch, t,u_true, u_pred, t_fitting,u_fitting,t_pde=None, save_file=None):$/;"	m	class:SpringFormal
 plt	neuraloperator/examples/checkpoint_FNO_darcy.py	/^import matplotlib.pyplot as plt$/;"	i
 plt	neuraloperator/examples/plot_FNO_darcy.py	/^import matplotlib.pyplot as plt$/;"	i
 plt	neuraloperator/examples/plot_SFNO_swe.py	/^import matplotlib.pyplot as plt$/;"	i
 plt	neuraloperator/examples/plot_UNO_darcy.py	/^import matplotlib.pyplot as plt$/;"	i
 plt	neuraloperator/examples/plot_darcy_flow.py	/^import matplotlib.pyplot as plt$/;"	i
 plt	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	problems/problem_burgers.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	problems/problem_chemistry.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	problems/problem_darcy_matrix.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	problems/problem_spring_formal.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	run.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	solve.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	utils.py	/^import matplotlib.pyplot as plt$/;"	i
+point_dim	neuraloperator/neuralop/layers/segment_csr.py	/^            point_dim = 0$/;"	v
+point_dim	neuraloperator/neuralop/layers/segment_csr.py	/^            point_dim = 1$/;"	v
 pos_encoding	neuraloperator/neuralop/datasets/darcy.py	/^        pos_encoding = None$/;"	v
 pos_encoding	neuraloperator/neuralop/datasets/darcy.py	/^        pos_encoding = PositionalEmbedding2D(grid_boundaries=grid_boundaries)$/;"	v
-positional_encoding	FNO dataset.py	/^        positional_encoding=True$/;"	v
-positional_encoding	FNO script.py	/^        positional_encoding=True$/;"	v
 positional_encoding	neuraloperator/examples/plot_FNO_darcy.py	/^        positional_encoding=True$/;"	v
+positional_encoding	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    positional_encoding=None,$/;"	v
 positional_encoding	neuraloperator/neuralop/datasets/darcy.py	/^        positional_encoding=pos_encoding$/;"	v
 positional_encoding	neuraloperator/neuralop/datasets/darcy.py	/^        positional_encoding=positional_encoding,$/;"	v
 positional_encoding	neuraloperator/scripts/hpo/tune_darcy.py	/^    positional_encoding=config.data.positional_encoding,$/;"	v
@@ -1246,19 +1425,27 @@ positional_encoding	neuraloperator/scripts/train_navier_stokes.py	/^            
 positional_encoding	neuraloperator/scripts/train_navier_stokes.py	/^    positional_encoding=config.data.positional_encoding,$/;"	v
 postprocess	neuraloperator/neuralop/datasets/data_transforms.py	/^    def postprocess(self, out, data_dict):$/;"	m	class:MGPatchingDataProcessor
 postprocess	neuraloperator/neuralop/datasets/data_transforms.py	/^    def postprocess(self, output, data_dict):$/;"	m	class:DefaultDataProcessor
+postprocess	neuraloperator/neuralop/datasets/data_transforms.py	/^    def postprocess(self, output, data_dict):$/;"	m	class:IncrementalDataProcessor
+postprocess	neuraloperator/neuralop/datasets/data_transforms.py	/^    def postprocess(self, x):$/;"	m	class:DataProcessor
+postprocess	neuraloperator/scripts/train_car_cfd.py	/^    def postprocess(self, out, sample):$/;"	m	class:CFDDataProcessor
 preprocess	neuraloperator/neuralop/datasets/data_transforms.py	/^    def preprocess(self, data_dict, batched=True):$/;"	m	class:DefaultDataProcessor
+preprocess	neuraloperator/neuralop/datasets/data_transforms.py	/^    def preprocess(self, data_dict, batched=True):$/;"	m	class:IncrementalDataProcessor
 preprocess	neuraloperator/neuralop/datasets/data_transforms.py	/^    def preprocess(self, data_dict, batched=True):$/;"	m	class:MGPatchingDataProcessor
-pressure_drag	neuraloperator/neuralop/losses/data_losses.py	/^def pressure_drag(pressure, vol_elm, inward_surface_normal, $/;"	f
+preprocess	neuraloperator/neuralop/datasets/data_transforms.py	/^    def preprocess(self, x):$/;"	m	class:DataProcessor
+preprocess	neuraloperator/scripts/train_car_cfd.py	/^    def preprocess(self, sample):$/;"	m	class:CFDDataProcessor
+printRow	solve.py	/^def printRow(log_f, type='header', headers=[],values={}):$/;"	f
+printerBeginningSummary	solve.py	/^def printerBeginningSummary(config, log_f):$/;"	f
+printerBeginningSummary	stochasticsqp.py	/^    def printerBeginningSummary(self):$/;"	m	class:StochasticSQP
 printerHeader	stochasticsqp.py	/^    def printerHeader(self):$/;"	m	class:StochasticSQP
 printerIteration	stochasticsqp.py	/^    def printerIteration(self,every=1):$/;"	m	class:StochasticSQP
-problem	solve.py	/^                          problem = problem$/;"	v
-problem	solve.py	/^    problem = all_problems[problem_name](device, n_obj_sample = 100, n_constrs = 0)    $/;"	v
-problem_name	solve.py	/^    problem_name = "DarcyMatrix" #"Spring" #sys.argv[1]$/;"	v
+problem_name	solve.py	/^    problem_name = 'chemistry'$/;"	v
+problems	run.py	/^problems = ['spring', 'darcy_matrix', 'chemistry']$/;"	v
 prod	neuraloperator/neuralop/models/tests/test_fno.py	/^from math import prod$/;"	i
 prod	neuraloperator/neuralop/utils.py	/^from math import prod$/;"	i
 project	neuraloperator/doc/source/conf.py	/^project = 'neuraloperator'$/;"	v
 project	neuraloperator/scripts/hpo/tune_darcy.py	/^        project=config.wandb.project,$/;"	v
 project	neuraloperator/scripts/train_burgers.py	/^        project=config.wandb.project,$/;"	v
+project	neuraloperator/scripts/train_car_cfd.py	/^                           project=config.wandb.project,$/;"	v
 project	neuraloperator/scripts/train_darcy.py	/^        project=config.wandb.project,$/;"	v
 project	neuraloperator/scripts/train_navier_stokes.py	/^        project=config.wandb.project,$/;"	v
 pytest	neuraloperator/neuralop/layers/tests/test_attention_layer.py	/^import pytest$/;"	i
@@ -1272,9 +1459,12 @@ pytest	neuraloperator/neuralop/models/tests/test_fno.py	/^import pytest$/;"	i
 pytest	neuraloperator/neuralop/models/tests/test_fnogno.py	/^import pytest$/;"	i
 pytest	neuraloperator/neuralop/models/tests/test_uno.py	/^import pytest$/;"	i
 pytest	neuraloperator/neuralop/tests/test_utils.py	/^import pytest$/;"	i
-random	problems/problem_darcy.py	/^import random$/;"	i
+query_res	neuraloperator/scripts/train_car_cfd.py	/^                             query_res=[config.data.sdf_query_resolution]*3, $/;"	v
+random	dataset_creator.py	/^import random$/;"	i
+random	problems/problem_burgers.py	/^import random$/;"	i
+random	problems/problem_chemistry.py	/^import random$/;"	i
 random	problems/problem_darcy_matrix.py	/^import random$/;"	i
-ratio_param_init	solve.py	/^                          ratio_param_init = 1,$/;"	v
+range_normalize	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^    def range_normalize(self, data, min_b, max_b, new_min, new_max):$/;"	m	class:MeshDataModule
 re	neuraloperator/setup.py	/^import re$/;"	i
 readme	neuraloperator/setup.py	/^def readme(root_path):$/;"	f
 reduce_all	neuraloperator/neuralop/losses/data_losses.py	/^    def reduce_all(self, x):$/;"	m	class:H1Loss
@@ -1284,17 +1474,17 @@ reduce_dims	neuraloperator/neuralop/datasets/darcy.py	/^            reduce_dims 
 reduce_dims	neuraloperator/neuralop/datasets/darcy.py	/^            reduce_dims = list(range(y_train.ndim))$/;"	v
 reduce_from_model_parallel_region	neuraloperator/neuralop/mpu/mappings.py	/^def reduce_from_model_parallel_region(input_):$/;"	f
 regular_grid	neuraloperator/neuralop/datasets/transforms.py	/^def regular_grid(spatial_dims, grid_boundaries=[[0, 1], [0, 1]]):$/;"	f
-regularizer	FNO script.py	/^              regularizer=False,$/;"	v
+regularize_input_res	neuraloperator/neuralop/datasets/data_transforms.py	/^    def regularize_input_res(self, x, y):$/;"	m	class:IncrementalDataProcessor
 regularizer	neuraloperator/examples/checkpoint_FNO_darcy.py	/^              regularizer=False, $/;"	v
 regularizer	neuraloperator/examples/plot_FNO_darcy.py	/^              regularizer=False, $/;"	v
 regularizer	neuraloperator/examples/plot_SFNO_swe.py	/^              regularizer=False, $/;"	v
 regularizer	neuraloperator/examples/plot_UNO_darcy.py	/^              regularizer=False, $/;"	v
+regularizer	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    regularizer=False,$/;"	v
 regularizer	neuraloperator/scripts/train_burgers.py	/^    regularizer=False,$/;"	v
 regularizer	neuraloperator/scripts/train_darcy.py	/^    regularizer=False,$/;"	v
 regularizer	neuraloperator/scripts/train_navier_stokes.py	/^    regularizer=False,$/;"	v
 rel	neuraloperator/neuralop/losses/data_losses.py	/^    def rel(self, x, y):$/;"	m	class:LpLoss
 rel	neuraloperator/neuralop/losses/data_losses.py	/^    def rel(self, x, y, h=None):$/;"	m	class:H1Loss
-rel	neuraloperator/neuralop/losses/data_losses.py	/^    def rel(self, x, y, vol_elm):$/;"	m	class:IregularLpqLoss
 release	neuraloperator/doc/source/conf.py	/^release = neuralop.__version__$/;"	v
 required	stochasticsqp.py	/^from torch.optim.optimizer import Optimizer, required$/;"	i
 resample	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^from .resample import resample$/;"	i
@@ -1306,21 +1496,23 @@ resnet18	Test file.py	/^from torchvision.models import resnet18, ResNet18_Weight
 resume_from_dir	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                                            resume_from_dir='.\/checkpoints\/ep_10')$/;"	v
 root_path	neuraloperator/setup.py	/^root_path = Path(__file__).parent$/;"	v
 rotate_half	neuraloperator/neuralop/layers/embeddings.py	/^def rotate_half(x):$/;"	f
-run	solve.py	/^def run(optimizer, problem, max_iter = 10000, save_every=10):$/;"	f
+run	run.py	/^from solve import run $/;"	i
+run	solve.py	/^def run(config):     $/;"	f
 s	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^s = 16 # resolution of the dataset$/;"	v
 samples	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^samples = 50$/;"	v
 save_checkpoint	neuraloperator/neuralop/models/base_model.py	/^    def save_checkpoint(self, save_folder, save_name):$/;"	m	class:BaseModel
+save_gif_PIL	problems/problem_spring_formal.py	/^    def save_gif_PIL(self, outfile, files, fps=5, loop=0):$/;"	m	class:SpringFormal
 save_interval	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                                       save_interval=10,$/;"	v
-save_net	problems/problem_darcy_matrix.py	/^    def save_net(self,path):$/;"	m	class:DarcyMatrix
+save_model	solve.py	/^def save_model(folders, epoch, problem, optimizer, config):$/;"	f
+save_net	problems/problem_base_formal.py	/^    def save_net(self,path):$/;"	m	class:BaseProblemFormal
 save_optimizer	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                                            save_optimizer=True,$/;"	v
+save_pretrain_state	stochasticsqp.py	/^    def save_pretrain_state(self,optim_path):$/;"	m	class:StochasticSQP
 save_scheduler	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                                            save_scheduler=True)$/;"	v
-save_training_state	neuraloperator/neuralop/training/__init__.py	/^from .training_state import load_training_state, save_training_state/;"	i
+save_training_state	neuraloperator/neuralop/training/__init__.py	/^from .training_state import load_training_state, save_training_state$/;"	i
 save_training_state	neuraloperator/neuralop/training/callbacks.py	/^from .training_state import save_training_state$/;"	i
 save_training_state	neuraloperator/neuralop/training/training_state.py	/^def save_training_state(save_dir: Union[str, Path], save_name: str,$/;"	f
 scatter_segment_csr	neuraloperator/neuralop/layers/segment_csr.py	/^        import torch_scatter.segment_csr as scatter_segment_csr$/;"	i
 scatter_to_model_parallel_region	neuraloperator/neuralop/mpu/mappings.py	/^def scatter_to_model_parallel_region(input_, dim):$/;"	f
-scheduler	FNO script.py	/^              scheduler=scheduler,$/;"	v
-scheduler	FNO script.py	/^scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=30)$/;"	v
 scheduler	neuraloperator/examples/checkpoint_FNO_darcy.py	/^              scheduler=scheduler, $/;"	v
 scheduler	neuraloperator/examples/checkpoint_FNO_darcy.py	/^scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=30)$/;"	v
 scheduler	neuraloperator/examples/plot_FNO_darcy.py	/^              scheduler=scheduler, $/;"	v
@@ -1329,9 +1521,13 @@ scheduler	neuraloperator/examples/plot_SFNO_swe.py	/^              scheduler=sch
 scheduler	neuraloperator/examples/plot_SFNO_swe.py	/^scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=30)$/;"	v
 scheduler	neuraloperator/examples/plot_UNO_darcy.py	/^              scheduler=scheduler, $/;"	v
 scheduler	neuraloperator/examples/plot_UNO_darcy.py	/^scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=30)$/;"	v
+scheduler	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=30)$/;"	v
 scheduler	neuraloperator/scripts/train_burgers.py	/^    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR($/;"	v
 scheduler	neuraloperator/scripts/train_burgers.py	/^    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau($/;"	v
 scheduler	neuraloperator/scripts/train_burgers.py	/^    scheduler = torch.optim.lr_scheduler.StepLR($/;"	v
+scheduler	neuraloperator/scripts/train_car_cfd.py	/^    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config.opt.scheduler_T_max)$/;"	v
+scheduler	neuraloperator/scripts/train_car_cfd.py	/^    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=config.opt.gamma, patience=config.opt.scheduler_patience, mode='min')$/;"	v
+scheduler	neuraloperator/scripts/train_car_cfd.py	/^    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, $/;"	v
 scheduler	neuraloperator/scripts/train_darcy.py	/^    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR($/;"	v
 scheduler	neuraloperator/scripts/train_darcy.py	/^    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau($/;"	v
 scheduler	neuraloperator/scripts/train_darcy.py	/^    scheduler = torch.optim.lr_scheduler.StepLR($/;"	v
@@ -1344,8 +1540,9 @@ second_grad	Test file.py	/^second_grad = torch.autograd.grad(outputs=grad_sum[1]
 second_grad0	Test file.py	/^second_grad0 = torch.autograd.grad(outputs=grad_sum[0].sum(), inputs= a, create_graph=True)[0]$/;"	v
 second_grad0	Test file.py	/^second_grad0 = torch.autograd.grad(outputs=grad_sum[0].sum(), inputs= a1, create_graph=True)[0]$/;"	v
 segment_csr	neuraloperator/neuralop/layers/integral_transform.py	/^from .segment_csr import segment_csr$/;"	i
-segment_csr	neuraloperator/neuralop/layers/segment_csr.py	/^def segment_csr(src: torch.Tensor, indptr: torch.Tensor, reduce: Literal['mean', 'sum'], use_scatter=True):$/;"	f
+segment_csr	neuraloperator/neuralop/layers/segment_csr.py	/^def segment_csr($/;"	f
 set_ada_in_embeddings	neuraloperator/neuralop/layers/fno_block.py	/^    def set_ada_in_embeddings(self, *embeddings):$/;"	m	class:FNOBlocks
+set_boundary_and_interior_pixel_idx	problems/problem_darcy_matrix.py	/^    def set_boundary_and_interior_pixel_idx(self):$/;"	m	class:DarcyMatrix
 set_constraint_pixel_idx	problems/problem_darcy_matrix.py	/^    def set_constraint_pixel_idx(self):$/;"	m	class:DarcyMatrix
 set_embedding	neuraloperator/neuralop/layers/normalization_layers.py	/^    def set_embedding(self, x):$/;"	m	class:AdaIN
 set_initial_condition	neuraloperator/neuralop/datasets/spherical_swe.py	/^    def set_initial_condition(self, ictype='random'):$/;"	m	class:SphericalSWEDataset
@@ -1355,6 +1552,7 @@ setup	neuraloperator/neuralop/training/__init__.py	/^from .torch_setup import se
 setup	neuraloperator/neuralop/training/torch_setup.py	/^def setup(config):$/;"	f
 setup	neuraloperator/scripts/hpo/tune_darcy.py	/^from neuralop.training import setup$/;"	i
 setup	neuraloperator/scripts/train_burgers.py	/^from neuralop.training import setup, BasicLoggerCallback$/;"	i
+setup	neuraloperator/scripts/train_car_cfd.py	/^from neuralop.training import setup$/;"	i
 setup	neuraloperator/scripts/train_darcy.py	/^from neuralop.training import setup$/;"	i
 setup	neuraloperator/scripts/train_navier_stokes.py	/^from neuralop.training import setup, BasicLoggerCallback$/;"	i
 setup	neuraloperator/setup.py	/^    from distutils.core import setup, find_packages$/;"	i
@@ -1381,24 +1579,31 @@ sphinx_gallery_conf	neuraloperator/doc/source/conf.py	/^sphinx_gallery_conf = {$
 split_tensor_along_dim	neuraloperator/neuralop/mpu/helpers.py	/^def split_tensor_along_dim(tensor, dim, num_chunks):$/;"	f
 split_tensor_along_dim	neuraloperator/neuralop/mpu/mappings.py	/^from .helpers import split_tensor_along_dim$/;"	i
 splits	neuraloperator/neuralop/layers/tests/test_neighbor_search.py	/^splits = [0, 3, 7, 11, 15, 18, 22, 27, 32, 37, 41, 45, 50,$/;"	v
+src_idx	neuraloperator/neuralop/layers/segment_csr.py	/^                    src_idx = (slice(None), slice(start + j, start + j + 1))$/;"	v
+starting_modes	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    starting_modes = (16, 16)$/;"	v
+starting_modes	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    starting_modes = (2, 2)$/;"	v
+step	neuraloperator/neuralop/datasets/data_transforms.py	/^    def step(self, loss=None, epoch=None, x=None, y=None):$/;"	m	class:IncrementalDataProcessor
+step	neuraloperator/neuralop/training/callbacks.py	/^    def step(self, loss=None):$/;"	m	class:IncrementalCallback
 step	stochasticsqp.py	/^    def step(self, closure=None):$/;"	m	class:StochasticSQP
-step_opt	solve.py	/^                          step_opt= 2,$/;"	v
+step_size	neuraloperator/scripts/train_car_cfd.py	/^                                                step_size=config.opt.step_size,$/;"	v
 stitching	neuraloperator/scripts/train_burgers.py	/^                                       stitching=config.patching.stitching,$/;"	v
 stitching	neuraloperator/scripts/train_darcy.py	/^                                             stitching=config.patching.stitching,$/;"	v
 stitching	neuraloperator/scripts/train_navier_stokes.py	/^                                             stitching=config.patching.stitching,$/;"	v
 study	neuraloperator/scripts/hpo/tune_darcy.py	/^study = optuna.create_study()$/;"	v
+subsampling_rates	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    subsampling_rates=[2, 1],$/;"	v
 symbolic	neuraloperator/neuralop/mpu/mappings.py	/^    def symbolic(graph, input_):$/;"	m	class:_CopyToModelParallelRegion
 symbolic	neuraloperator/neuralop/mpu/mappings.py	/^    def symbolic(graph, input_):$/;"	m	class:_ReduceFromModelParallelRegion
 symbolic	neuraloperator/neuralop/mpu/mappings.py	/^    def symbolic(graph, input_, dim_):$/;"	m	class:_GatherFromModelParallelRegion
 symbolic	neuraloperator/neuralop/mpu/mappings.py	/^    def symbolic(graph, input_, dim_):$/;"	m	class:_ScatterToModelParallelRegion
-sys	FNO script.py	/^import sys$/;"	i
 sys	neuraloperator/examples/checkpoint_FNO_darcy.py	/^import sys$/;"	i
 sys	neuraloperator/examples/plot_FNO_darcy.py	/^import sys$/;"	i
 sys	neuraloperator/examples/plot_SFNO_swe.py	/^import sys$/;"	i
 sys	neuraloperator/examples/plot_UNO_darcy.py	/^import sys$/;"	i
+sys	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^import sys$/;"	i
 sys	neuraloperator/neuralop/training/callbacks.py	/^import sys$/;"	i
 sys	neuraloperator/scripts/hpo/tune_darcy.py	/^import sys$/;"	i
 sys	neuraloperator/scripts/train_burgers.py	/^import sys$/;"	i
+sys	neuraloperator/scripts/train_car_cfd.py	/^import sys$/;"	i
 sys	neuraloperator/scripts/train_darcy.py	/^import sys$/;"	i
 sys	neuraloperator/scripts/train_navier_stokes.py	/^import sys$/;"	i
 sys	solve.py	/^import sys$/;"	i
@@ -1429,80 +1634,87 @@ test_SphericalConv	neuraloperator/neuralop/layers/tests/test_spherical_convoluti
 test_UNO	neuraloperator/neuralop/models/tests/test_uno.py	/^def test_UNO(input_shape):$/;"	f
 test_UnitGaussianNormalizer	neuraloperator/neuralop/datasets/tests/test_output_encoder.py	/^def test_UnitGaussianNormalizer():$/;"	f
 test_batch_size	neuraloperator/neuralop/datasets/darcy.py	/^    test_batch_size = test_batch_sizes.pop(idx)$/;"	v
-test_batch_sizes	FNO dataset.py	/^        test_batch_sizes=[32, 32],$/;"	v
-test_batch_sizes	FNO script.py	/^        test_batch_sizes=[32, 32],$/;"	v
 test_batch_sizes	neuraloperator/examples/checkpoint_FNO_darcy.py	/^        test_batch_sizes=[32, 32],$/;"	v
 test_batch_sizes	neuraloperator/examples/plot_FNO_darcy.py	/^        test_batch_sizes=[32, 32],$/;"	v
 test_batch_sizes	neuraloperator/examples/plot_UNO_darcy.py	/^        test_batch_sizes=[32, 32],$/;"	v
+test_batch_sizes	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    test_batch_sizes=[32, 32],$/;"	v
 test_batch_sizes	neuraloperator/neuralop/datasets/darcy.py	/^        test_batch_sizes=test_batch_sizes,$/;"	v
 test_batch_sizes	neuraloperator/scripts/hpo/tune_darcy.py	/^    test_batch_sizes=config.data.test_batch_sizes,$/;"	v
 test_batch_sizes	neuraloperator/scripts/train_darcy.py	/^    test_batch_sizes=config.data.test_batch_sizes,$/;"	v
 test_batch_sizes	neuraloperator/scripts/train_navier_stokes.py	/^    test_batch_sizes=config.data.test_batch_sizes,$/;"	v
 test_count_model_params	neuraloperator/neuralop/tests/test_utils.py	/^def test_count_model_params():$/;"	f
 test_count_tensor_params	neuraloperator/neuralop/tests/test_utils.py	/^def test_count_tensor_params():$/;"	f
+test_dataloader	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^    def test_dataloader(self, **kwargs):$/;"	m	class:MeshDataModule
 test_db	neuraloperator/neuralop/datasets/darcy.py	/^        test_db = TensorDataset($/;"	v
 test_db	neuraloperator/neuralop/datasets/darcy.py	/^    test_db = TensorDataset($/;"	v
 test_fallback_nb_search	neuraloperator/neuralop/layers/tests/test_neighbor_search.py	/^def test_fallback_nb_search():$/;"	f
 test_fno_superresolution	neuraloperator/neuralop/models/tests/test_fno.py	/^def test_fno_superresolution(output_scaling_factor):$/;"	f
-test_fnogno	neuraloperator/neuralop/models/tests/test_fnogno.py	/^def test_fnogno(gno_transform_type, fno_n_modes):$/;"	f
+test_fnogno	neuraloperator/neuralop/models/tests/test_fnogno.py	/^def test_fnogno(gno_transform_type, fno_n_modes, gno_batched):$/;"	f
 test_from_config	neuraloperator/neuralop/tests/test_model_from_config.py	/^def test_from_config():$/;"	f
 test_get_wandb_api_key	neuraloperator/neuralop/tests/test_utils.py	/^def test_get_wandb_api_key():$/;"	f
+test_incremental	neuraloperator/neuralop/training/tests/test_callbacks.py	/^def test_incremental():$/;"	f
+test_incremental_resolution	neuraloperator/neuralop/datasets/tests/test_data_processor.py	/^def test_incremental_resolution():$/;"	f
 test_load_from_checkpoint	neuraloperator/neuralop/training/tests/test_callbacks.py	/^def test_load_from_checkpoint():$/;"	f
 test_loader	neuraloperator/neuralop/datasets/darcy.py	/^        test_loader = torch.utils.data.DataLoader($/;"	v
 test_loader	neuraloperator/neuralop/datasets/darcy.py	/^    test_loader = torch.utils.data.DataLoader($/;"	v
-test_loaders	FNO script.py	/^              test_loaders=test_loaders,$/;"	v
+test_loader	neuraloperator/scripts/train_car_cfd.py	/^test_loader = data_module.test_dataloader(batch_size=1, shuffle=False)$/;"	v
 test_loaders	neuraloperator/examples/checkpoint_FNO_darcy.py	/^              test_loaders={},$/;"	v
 test_loaders	neuraloperator/examples/plot_FNO_darcy.py	/^              test_loaders=test_loaders,$/;"	v
 test_loaders	neuraloperator/examples/plot_SFNO_swe.py	/^              test_loaders=test_loaders,$/;"	v
 test_loaders	neuraloperator/examples/plot_UNO_darcy.py	/^              test_loaders=test_loaders,$/;"	v
 test_loaders	neuraloperator/neuralop/datasets/darcy.py	/^    test_loaders = {train_resolution: test_loader}$/;"	v
 test_loaders	neuraloperator/scripts/train_darcy.py	/^    test_loaders=test_loaders,$/;"	v
+test_loss_fn	neuraloperator/scripts/train_car_cfd.py	/^    test_loss_fn = l2loss$/;"	v
 test_model_checkpoint_and_resume	neuraloperator/neuralop/training/tests/test_callbacks.py	/^def test_model_checkpoint_and_resume():$/;"	f
 test_model_checkpoint_saves	neuraloperator/neuralop/training/tests/test_callbacks.py	/^def test_model_checkpoint_saves():$/;"	f
 test_resample	neuraloperator/neuralop/layers/tests/test_resample.py	/^def test_resample():$/;"	f
 test_resolutions	neuraloperator/examples/plot_SFNO_swe.py	/^                                                test_resolutions=[(32, 64), (64, 128)], n_tests=[50, 50], test_batch_sizes=[10, 10],)$/;"	v
+test_resolutions	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    test_resolutions=[16, 32],$/;"	v
 test_resolutions	neuraloperator/neuralop/datasets/darcy.py	/^        test_resolutions=test_resolutions,$/;"	v
 test_resolutions	neuraloperator/scripts/hpo/tune_darcy.py	/^    test_resolutions=config.data.test_resolutions,$/;"	v
 test_resolutions	neuraloperator/scripts/train_darcy.py	/^    test_resolutions=config.data.test_resolutions,$/;"	v
 test_resolutions	neuraloperator/scripts/train_navier_stokes.py	/^    test_resolutions=config.data.test_resolutions,$/;"	v
-test_samples	FNO script.py	/^test_samples = test_loaders[16].dataset$/;"	v
 test_samples	neuraloperator/examples/plot_FNO_darcy.py	/^test_samples = test_loaders[32].dataset$/;"	v
 test_samples	neuraloperator/examples/plot_SFNO_swe.py	/^    test_samples = test_loaders[resolution].dataset$/;"	v
 test_samples	neuraloperator/examples/plot_UNO_darcy.py	/^test_samples = test_loaders[32].dataset$/;"	v
+test_samples	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^test_samples = test_loaders[32].dataset$/;"	v
 test_sht	neuraloperator/neuralop/layers/tests/test_spherical_convolution.py	/^def test_sht(grid):$/;"	f
 test_tfno	neuraloperator/neuralop/models/tests/test_fno.py	/^def test_tfno($/;"	f
 time	neuraloperator/neuralop/models/tests/test_uno.py	/^import time$/;"	i
 time	neuraloperator/neuralop/tests/test_model_from_config.py	/^import time$/;"	i
 time	neuraloperator/scripts/test_from_config.py	/^import time$/;"	i
+time	solve.py	/^import time$/;"	i
 tl	neuraloperator/neuralop/layers/einsum_utils.py	/^import tensorly as tl$/;"	i
 tl	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^import tensorly as tl$/;"	i
 tl	neuraloperator/neuralop/layers/spectral_convolution.py	/^import tensorly as tl$/;"	i
 tl	neuraloperator/neuralop/layers/spherical_convolution.py	/^import tensorly as tl$/;"	i
+to	neuraloperator/neuralop/datasets/data_transforms.py	/^    def to(self, device):$/;"	m	class:DataProcessor
 to	neuraloperator/neuralop/datasets/data_transforms.py	/^    def to(self, device):$/;"	m	class:DefaultDataProcessor
+to	neuraloperator/neuralop/datasets/data_transforms.py	/^    def to(self, device):$/;"	m	class:IncrementalDataProcessor
 to	neuraloperator/neuralop/datasets/data_transforms.py	/^    def to(self, device):$/;"	m	class:MGPatchingDataProcessor
 to	neuraloperator/neuralop/datasets/output_encoder.py	/^    def to(self, device):$/;"	m	class:DictTransform
-to	neuraloperator/neuralop/datasets/output_encoder.py	/^    def to(self, device):$/;"	m	class:MultipleFieldOutputEncoder
-to	neuraloperator/neuralop/datasets/output_encoder.py	/^    def to(self, device):$/;"	m	class:OutputEncoder
 to	neuraloperator/neuralop/datasets/output_encoder.py	/^    def to(self, device):$/;"	m	class:UnitGaussianNormalizer
 to	neuraloperator/neuralop/datasets/transforms.py	/^    def to(self, _):$/;"	m	class:MGPatchingTransform
 to	neuraloperator/neuralop/datasets/transforms.py	/^    def to(self, device):$/;"	m	class:Composite
 to	neuraloperator/neuralop/datasets/transforms.py	/^    def to(self, device):$/;"	m	class:Transform
 to	neuraloperator/neuralop/utils.py	/^    def to(self, device):$/;"	m	class:UnitGaussianNormalizer
+to	neuraloperator/scripts/train_car_cfd.py	/^    def to(self, device):$/;"	m	class:CFDDataProcessor
 to_log	neuraloperator/scripts/train_burgers.py	/^        to_log = {"n_params": n_params}$/;"	v
 to_log	neuraloperator/scripts/train_darcy.py	/^        to_log = {"n_params": n_params}$/;"	v
 to_log	neuraloperator/scripts/train_navier_stokes.py	/^        to_log = {"n_params": n_params}$/;"	v
-torch	FNO dataset.py	/^import torch$/;"	i
-torch	FNO script.py	/^import torch$/;"	i
 torch	Test file.py	/^import torch$/;"	i
+torch	dataset_creator.py	/^import torch$/;"	i
 torch	neuraloperator/examples/checkpoint_FNO_darcy.py	/^import torch$/;"	i
 torch	neuraloperator/examples/plot_FNO_darcy.py	/^import torch$/;"	i
 torch	neuraloperator/examples/plot_SFNO_swe.py	/^import torch$/;"	i
 torch	neuraloperator/examples/plot_UNO_darcy.py	/^import torch$/;"	i
 torch	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^import torch$/;"	i
+torch	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^import torch$/;"	i
 torch	neuraloperator/neuralop/datasets/burgers.py	/^import torch$/;"	i
 torch	neuraloperator/neuralop/datasets/darcy.py	/^import torch$/;"	i
 torch	neuraloperator/neuralop/datasets/data_transforms.py	/^import torch$/;"	i
 torch	neuraloperator/neuralop/datasets/hdf5_dataset.py	/^import torch$/;"	i
+torch	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^import torch$/;"	i
 torch	neuraloperator/neuralop/datasets/navier_stokes.py	/^import torch$/;"	i
 torch	neuraloperator/neuralop/datasets/output_encoder.py	/^import torch$/;"	i
 torch	neuraloperator/neuralop/datasets/pt_dataset.py	/^import torch$/;"	i
@@ -1577,51 +1789,56 @@ torch	neuraloperator/scripts/hpo/tune_darcy.py	/^import torch$/;"	i
 torch	neuraloperator/scripts/test_from_config.py	/^import torch$/;"	i
 torch	neuraloperator/scripts/train_burgers.py	/^import torch$/;"	i
 torch	neuraloperator/scripts/train_burgers.py	/^import torch.nn.functional as F$/;"	i
+torch	neuraloperator/scripts/train_car_cfd.py	/^import torch$/;"	i
 torch	neuraloperator/scripts/train_darcy.py	/^import torch$/;"	i
 torch	neuraloperator/scripts/train_navier_stokes.py	/^import torch$/;"	i
 torch	nn_architecture.py	/^import torch$/;"	i
 torch	nn_architecture.py	/^import torch.nn as nn$/;"	i
-torch	problems/problem_base.py	/^import torch$/;"	i
-torch	problems/problem_darcy.py	/^import torch$/;"	i
+torch	problems/problem_base_formal.py	/^import torch$/;"	i
+torch	problems/problem_burgers.py	/^import torch$/;"	i
+torch	problems/problem_chemistry.py	/^import torch$/;"	i
 torch	problems/problem_darcy_matrix.py	/^import torch$/;"	i
-torch	problems/problem_spring.py	/^import torch$/;"	i
+torch	problems/problem_spring_formal.py	/^import torch$/;"	i
 torch	solve.py	/^import torch$/;"	i
 torch	stochasticsqp.py	/^import torch$/;"	i
+torch	utils.py	/^import torch$/;"	i
 torch_scatter	neuraloperator/neuralop/layers/segment_csr.py	/^        import torch_scatter.segment_csr as scatter_segment_csr$/;"	i
-total_drag	neuraloperator/neuralop/losses/data_losses.py	/^def total_drag(pressure, wall_shear_stress, vol_elm, $/;"	f
-train	neuraloperator/neuralop/training/trainer.py	/^    def train(self, train_loader, test_loaders,$/;"	m	class:Trainer
-train_dataset	FNO dataset.py	/^train_dataset = train_loader.dataset$/;"	v
+train	neuraloperator/neuralop/training/trainer.py	/^    def train($/;"	m	class:Trainer
+train	run.py	/^train = False$/;"	v
+train_dataloader	neuraloperator/neuralop/datasets/mesh_datamodule.py	/^    def train_dataloader(self, **kwargs):$/;"	m	class:MeshDataModule
 train_dataset	neuraloperator/examples/plot_darcy_flow.py	/^train_dataset = train_loader.dataset$/;"	v
 train_db	neuraloperator/neuralop/datasets/darcy.py	/^    train_db = TensorDataset($/;"	v
 train_loader	neuraloperator/neuralop/datasets/darcy.py	/^    train_loader = torch.utils.data.DataLoader($/;"	v
+train_loader	neuraloperator/scripts/train_car_cfd.py	/^train_loader = data_module.train_dataloader(batch_size=1, shuffle=True)$/;"	v
 train_loader	neuraloperator/scripts/train_darcy.py	/^    train_loader=train_loader,$/;"	v
-train_loss	FNO script.py	/^train_loss = h1loss$/;"	v
 train_loss	neuraloperator/examples/checkpoint_FNO_darcy.py	/^train_loss = h1loss$/;"	v
 train_loss	neuraloperator/examples/plot_FNO_darcy.py	/^train_loss = h1loss$/;"	v
 train_loss	neuraloperator/examples/plot_SFNO_swe.py	/^train_loss = l2loss$/;"	v
 train_loss	neuraloperator/examples/plot_UNO_darcy.py	/^train_loss = h1loss$/;"	v
+train_loss	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^train_loss = h1loss$/;"	v
 train_loss	neuraloperator/scripts/train_burgers.py	/^train_loss = WeightedSumLoss(losses=losses, weights=weights)$/;"	v
 train_loss	neuraloperator/scripts/train_darcy.py	/^    train_loss = h1loss$/;"	v
 train_loss	neuraloperator/scripts/train_darcy.py	/^    train_loss = l2loss$/;"	v
 train_loss	neuraloperator/scripts/train_navier_stokes.py	/^    train_loss = h1loss$/;"	v
 train_loss	neuraloperator/scripts/train_navier_stokes.py	/^    train_loss = l2loss$/;"	v
+train_loss_fn	neuraloperator/scripts/train_car_cfd.py	/^    train_loss_fn = l2loss$/;"	v
 train_resolution	neuraloperator/neuralop/datasets/darcy.py	/^        train_resolution=16,$/;"	v
 train_resolution	neuraloperator/scripts/train_navier_stokes.py	/^    train_resolution=config.data.train_resolution,$/;"	v
-train_sample	FNO dataset.py	/^train_sample = train_dataset[0]  ##single sample$/;"	v
-trainer	FNO script.py	/^trainer = Trainer(model=model, n_epochs=2,$/;"	v
 trainer	neuraloperator/examples/checkpoint_FNO_darcy.py	/^trainer = Trainer(model=model, n_epochs=20,$/;"	v
 trainer	neuraloperator/examples/plot_FNO_darcy.py	/^trainer = Trainer(model=model, n_epochs=20,$/;"	v
 trainer	neuraloperator/examples/plot_SFNO_swe.py	/^trainer = Trainer(model=model, n_epochs=20,$/;"	v
 trainer	neuraloperator/examples/plot_UNO_darcy.py	/^trainer = Trainer(model=model,$/;"	v
+trainer	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^trainer = Trainer($/;"	v
 trainer	neuraloperator/scripts/train_burgers.py	/^trainer = Trainer($/;"	v
+trainer	neuraloperator/scripts/train_car_cfd.py	/^trainer = Trainer(model=model, $/;"	v
 trainer	neuraloperator/scripts/train_darcy.py	/^trainer = Trainer($/;"	v
 trainer	neuraloperator/scripts/train_navier_stokes.py	/^trainer = Trainer($/;"	v
-training_loss	FNO script.py	/^              training_loss=train_loss,$/;"	v
 training_loss	neuraloperator/examples/checkpoint_FNO_darcy.py	/^              training_loss=train_loss)$/;"	v
 training_loss	neuraloperator/examples/checkpoint_FNO_darcy.py	/^              training_loss=train_loss)/;"	v
 training_loss	neuraloperator/examples/plot_FNO_darcy.py	/^              training_loss=train_loss,$/;"	v
 training_loss	neuraloperator/examples/plot_SFNO_swe.py	/^              training_loss=train_loss,$/;"	v
 training_loss	neuraloperator/examples/plot_UNO_darcy.py	/^              training_loss=train_loss,$/;"	v
+training_loss	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    training_loss=train_loss,$/;"	v
 training_loss	neuraloperator/scripts/train_burgers.py	/^    training_loss = [training_loss]$/;"	v
 training_loss	neuraloperator/scripts/train_burgers.py	/^    training_loss=train_loss,$/;"	v
 training_loss	neuraloperator/scripts/train_burgers.py	/^training_loss = config.opt.training_loss$/;"	v
@@ -1638,6 +1855,7 @@ transform	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^    de
 transform	neuraloperator/neuralop/layers/spectral_convolution.py	/^    def transform(self, x, **kwargs):$/;"	m	class:SubConv
 transform	neuraloperator/neuralop/layers/spectral_convolution.py	/^    def transform(self, x, layer_index=0, output_shape=None):$/;"	m	class:SpectralConv
 transform	neuraloperator/neuralop/layers/spherical_convolution.py	/^    def transform(self, x, layer_index=0, output_shape=None):$/;"	m	class:SphericalConv
+true_burgers_solution	dataset_creator.py	/^def true_burgers_solution(X, T):$/;"	f
 truncate_helper	neuraloperator/neuralop/mpu/helpers.py	/^def truncate_helper(tensor, dim, new_size):$/;"	f
 truth_sp	neuraloperator/examples/plot_darcy_flow_spectrum.py	/^truth_sp = spectrum_2d(dataset_pred.reshape(samples * batchsize, s, s), s)$/;"	v
 types	neuraloperator/neuralop/mpu/mappings.py	/^import types$/;"	i
@@ -1646,7 +1864,6 @@ uniform_h	neuraloperator/neuralop/losses/data_losses.py	/^    def uniform_h(self
 unpad	neuraloperator/neuralop/layers/padding.py	/^    def unpad(self, x):$/;"	m	class:DomainPadding
 unpatch	neuraloperator/neuralop/training/patching.py	/^    def unpatch(self, x, y, evaluation=False):$/;"	m	class:MultigridPatching2D
 update_mean_std	neuraloperator/neuralop/datasets/output_encoder.py	/^    def update_mean_std(self, data_batch):$/;"	m	class:UnitGaussianNormalizer
-use_distributed	FNO script.py	/^                  use_distributed=False,$/;"	v
 use_distributed	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                  use_distributed=False,$/;"	v
 use_distributed	neuraloperator/examples/plot_FNO_darcy.py	/^                  use_distributed=False,$/;"	v
 use_distributed	neuraloperator/examples/plot_SFNO_swe.py	/^                  use_distributed=False,$/;"	v
@@ -1658,7 +1875,6 @@ use_opt_einsum	neuraloperator/neuralop/layers/einsum_utils.py	/^from tensorly.pl
 use_opt_einsum	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^from tensorly.plugins import use_opt_einsum$/;"	i
 use_opt_einsum	neuraloperator/neuralop/layers/spectral_convolution.py	/^from tensorly.plugins import use_opt_einsum$/;"	i
 use_opt_einsum	neuraloperator/neuralop/layers/spherical_convolution.py	/^from tensorly.plugins import use_opt_einsum$/;"	i
-util	solve.py	/^import importlib.util$/;"	i
 validate_scaling_factor	neuraloperator/neuralop/layers/fno_block.py	/^from ..utils import validate_scaling_factor$/;"	i
 validate_scaling_factor	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^from ..utils import validate_scaling_factor$/;"	i
 validate_scaling_factor	neuraloperator/neuralop/layers/padding.py	/^from neuralop.utils import validate_scaling_factor$/;"	i
@@ -1666,29 +1882,32 @@ validate_scaling_factor	neuraloperator/neuralop/layers/spectral_convolution.py	/
 validate_scaling_factor	neuraloperator/neuralop/layers/spherical_convolution.py	/^from neuralop.utils import validate_scaling_factor$/;"	i
 validate_scaling_factor	neuraloperator/neuralop/utils.py	/^def validate_scaling_factor($/;"	f
 variables	Test file.py	/^variables = torch.cat((a,b), dim=1)$/;"	v
-verbose	FNO script.py	/^                  verbose=True)$/;"	v
 verbose	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                  verbose=True)$/;"	v
 verbose	neuraloperator/examples/plot_FNO_darcy.py	/^                  verbose=True)$/;"	v
 verbose	neuraloperator/examples/plot_SFNO_swe.py	/^                  verbose=True)$/;"	v
 verbose	neuraloperator/examples/plot_UNO_darcy.py	/^                  verbose=True)$/;"	v
+verbose	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    verbose=True,$/;"	v
 verbose	neuraloperator/scripts/train_burgers.py	/^    verbose=config.verbose,$/;"	v
 verbose	neuraloperator/scripts/train_darcy.py	/^    verbose=config.verbose and is_logger,$/;"	v
 verbose	neuraloperator/scripts/train_navier_stokes.py	/^    verbose=config.verbose,$/;"	v
 version	neuraloperator/setup.py	/^def version(root_path):$/;"	f
+w0	problems/problem_spring_formal.py	/^    w0 = 20$/;"	v	class:SpringFormal
 wandb	neuraloperator/neuralop/tests/test_utils.py	/^import wandb$/;"	i
 wandb	neuraloperator/neuralop/training/callbacks.py	/^import wandb$/;"	i
 wandb	neuraloperator/neuralop/utils.py	/^import wandb$/;"	i
 wandb	neuraloperator/scripts/hpo/tune_darcy.py	/^import wandb$/;"	i
 wandb	neuraloperator/scripts/train_burgers.py	/^import wandb$/;"	i
+wandb	neuraloperator/scripts/train_car_cfd.py	/^import wandb$/;"	i
 wandb	neuraloperator/scripts/train_darcy.py	/^import wandb$/;"	i
 wandb	neuraloperator/scripts/train_navier_stokes.py	/^import wandb$/;"	i
 wandb_args	neuraloperator/scripts/train_darcy.py	/^    wandb_args =  dict($/;"	v
 wandb_args	neuraloperator/scripts/train_darcy.py	/^wandb_args = None$/;"	v
 wandb_init_args	neuraloperator/scripts/train_burgers.py	/^    wandb_init_args = None$/;"	v
 wandb_init_args	neuraloperator/scripts/train_burgers.py	/^    wandb_init_args = dict($/;"	v
+wandb_init_args	neuraloperator/scripts/train_car_cfd.py	/^    wandb_init_args = dict(config=config, $/;"	v
+wandb_init_args	neuraloperator/scripts/train_car_cfd.py	/^wandb_init_args = {}$/;"	v
 wandb_init_args	neuraloperator/scripts/train_navier_stokes.py	/^    wandb_init_args = dict($/;"	v
 wandb_init_args	neuraloperator/scripts/train_navier_stokes.py	/^wandb_init_args = None$/;"	v
-wandb_log	FNO script.py	/^                  wandb_log=False,$/;"	v
 wandb_log	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                  wandb_log=False,$/;"	v
 wandb_log	neuraloperator/examples/plot_FNO_darcy.py	/^                  wandb_log=False,$/;"	v
 wandb_log	neuraloperator/examples/plot_SFNO_swe.py	/^                  wandb_log=False,$/;"	v
@@ -1703,6 +1922,8 @@ wandb_name	neuraloperator/scripts/hpo/tune_darcy.py	/^        wandb_name = "_".j
 wandb_name	neuraloperator/scripts/hpo/tune_darcy.py	/^        wandb_name = config.wandb.name$/;"	v
 wandb_name	neuraloperator/scripts/train_burgers.py	/^        wandb_name = "_".join($/;"	v
 wandb_name	neuraloperator/scripts/train_burgers.py	/^        wandb_name = config.wandb.name$/;"	v
+wandb_name	neuraloperator/scripts/train_car_cfd.py	/^        wandb_name = '_'.join($/;"	v
+wandb_name	neuraloperator/scripts/train_car_cfd.py	/^        wandb_name = config.wandb.name$/;"	v
 wandb_name	neuraloperator/scripts/train_darcy.py	/^        wandb_name = "_".join($/;"	v
 wandb_name	neuraloperator/scripts/train_darcy.py	/^        wandb_name = config.wandb.name$/;"	v
 wandb_name	neuraloperator/scripts/train_navier_stokes.py	/^        wandb_name = "_".join($/;"	v
@@ -1711,38 +1932,45 @@ warnings	neuraloperator/neuralop/models/base_model.py	/^import warnings$/;"	i
 warnings	neuraloperator/neuralop/utils.py	/^import warnings$/;"	i
 weight	neuraloperator/neuralop/layers/legacy_spectral_convolution.py	/^    def weight(self):$/;"	m	class:SubConv
 weight	neuraloperator/neuralop/layers/spectral_convolution.py	/^    def weight(self):$/;"	m	class:SubConv
-weight_decay	FNO script.py	/^                                weight_decay=1e-4)$/;"	v
 weight_decay	neuraloperator/examples/checkpoint_FNO_darcy.py	/^                                weight_decay=1e-4)$/;"	v
 weight_decay	neuraloperator/examples/plot_FNO_darcy.py	/^                                weight_decay=1e-4)$/;"	v
 weight_decay	neuraloperator/examples/plot_SFNO_swe.py	/^                                weight_decay=0.0)$/;"	v
 weight_decay	neuraloperator/examples/plot_UNO_darcy.py	/^                                weight_decay=1e-4)$/;"	v
 weight_decay	neuraloperator/scripts/train_burgers.py	/^    weight_decay=config.opt.weight_decay,$/;"	v
+weight_decay	neuraloperator/scripts/train_car_cfd.py	/^                                weight_decay=config.opt.weight_decay)$/;"	v
 weight_decay	neuraloperator/scripts/train_darcy.py	/^    weight_decay=config.opt.weight_decay,$/;"	v
 weight_decay	neuraloperator/scripts/train_navier_stokes.py	/^    weight_decay=config.opt.weight_decay,$/;"	v
 weights	neuraloperator/scripts/train_burgers.py	/^weights = []$/;"	v
+wrap	neuraloperator/neuralop/datasets/data_transforms.py	/^    def wrap(self, model):$/;"	m	class:DataProcessor
 wrap	neuraloperator/neuralop/datasets/data_transforms.py	/^    def wrap(self, model):$/;"	m	class:DefaultDataProcessor
+wrap	neuraloperator/neuralop/datasets/data_transforms.py	/^    def wrap(self, model):$/;"	m	class:IncrementalDataProcessor
 wrap	neuraloperator/neuralop/datasets/data_transforms.py	/^    def wrap(self, model):$/;"	m	class:MGPatchingDataProcessor
-x	FNO script.py	/^    x = data['x']$/;"	v
+wrap	neuraloperator/scripts/train_car_cfd.py	/^    def wrap(self, model):$/;"	m	class:CFDDataProcessor
 x	neuraloperator/examples/plot_FNO_darcy.py	/^    x = data['x']$/;"	v
 x	neuraloperator/examples/plot_SFNO_swe.py	/^    x = data['x']$/;"	v
 x	neuraloperator/examples/plot_SFNO_swe.py	/^    x = x[0, ...].detach().numpy()$/;"	v
 x	neuraloperator/examples/plot_UNO_darcy.py	/^    x = data['x']$/;"	v
 x	neuraloperator/examples/plot_darcy_flow.py	/^    x = batch['x']$/;"	v
 x	neuraloperator/examples/plot_darcy_flow.py	/^x = data['x']$/;"	v
+x	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    x = data["x"].to(device)$/;"	v
+x	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    x = x.cpu().squeeze().detach().numpy()$/;"	v
 x_in	neuraloperator/examples/plot_SFNO_swe.py	/^    x_in = x.unsqueeze(0).to(device)$/;"	v
 x_test	neuraloperator/neuralop/datasets/darcy.py	/^        x_test = ($/;"	v
 x_test	neuraloperator/neuralop/datasets/darcy.py	/^    x_test = data["x"][:n_test, :, :].unsqueeze(channel_dim).type(torch.float32).clone()$/;"	v
 x_train	neuraloperator/neuralop/datasets/darcy.py	/^    x_train = ($/;"	v
 xavier_uniform_	neuraloperator/neuralop/layers/attention_kernel_integral.py	/^from torch.nn.init import xavier_uniform_, zeros_$/;"	i
-y	FNO script.py	/^    y = data['y']$/;"	v
 y	neuraloperator/examples/plot_FNO_darcy.py	/^    y = data['y']$/;"	v
 y	neuraloperator/examples/plot_SFNO_swe.py	/^    y = data['y'][0, ...].numpy()$/;"	v
 y	neuraloperator/examples/plot_UNO_darcy.py	/^    y = data['y']$/;"	v
 y	neuraloperator/examples/plot_darcy_flow.py	/^    y = batch['y']$/;"	v
 y	neuraloperator/examples/plot_darcy_flow.py	/^y = data['y']$/;"	v
+y	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    y = data["y"].to(device)$/;"	v
+y	neuraloperator/examples/plot_incremental_FNO_darcy.py	/^    y = y.cpu().squeeze().detach().numpy()$/;"	v
 y_test	neuraloperator/neuralop/datasets/darcy.py	/^        y_test = data["y"][:n_test, :, :].unsqueeze(channel_dim).clone()$/;"	v
 y_test	neuraloperator/neuralop/datasets/darcy.py	/^    y_test = data["y"][:n_test, :, :].unsqueeze(channel_dim).clone()$/;"	v
 y_train	neuraloperator/neuralop/datasets/darcy.py	/^    y_train = data["y"][0:n_train, :, :].unsqueeze(channel_dim).clone()$/;"	v
+yaml	run.py	/^import yaml$/;"	i
+yaml	solve.py	/^import yaml$/;"	i
 year	neuraloperator/doc/source/conf.py	/^year = datetime.now().year$/;"	v
 zarr	neuraloperator/neuralop/datasets/zarr_dataset.py	/^import zarr$/;"	i
 zeros_	neuraloperator/neuralop/layers/attention_kernel_integral.py	/^from torch.nn.init import xavier_uniform_, zeros_$/;"	i

@@ -5,10 +5,10 @@ sub_folders:                    # Subfolder names for model, plot, and log
   log   : log
   
 file_suffix: test               # str, all the leaf output file name will contain this suffix
-maxiter: 50000                  # Total number of epochs
-save_model_every: 100           # Save models and logs per [such] iterations
+maxiter: 30000                  # Total number of epochs
+save_model_every: 1000           # Save models and logs per [such] iterations
 save_plot_every: 1000           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
-stdout : 0                      # 0: print to screen, 1: print to log file
+stdout : 1                      # 0: print to screen, 1: print to log file
 
 problem:                        # Parameters for problem
   name  : SpringFormal
@@ -47,5 +47,7 @@ optimizer:
   lr    : 1.0e-3
   mu    : 1.0e-7
   beta2 : 0.999
+  alpha_type: 'c_adam'         # 'ada', 'adam', 'c_ada', 'c_adam' 
+  beta1 : 0.9
   pretrain: null              # null; or dict with keys: epoch_start and file_suffix
       

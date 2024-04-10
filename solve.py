@@ -1,187 +1,202 @@
 import torch
 from stochasticsqp import *
-from problems.problem_darcy_matrix_old import DarcyMatrixOld
 from problems.problem_darcy_matrix import DarcyMatrix
-from problems.problem_spring import Spring
-from problems.problem_spring_new import SpringNew
+from problems.problem_spring_formal import SpringFormal
+from problems.problem_burgers import Burgers
 from problems.problem_chemistry import Chemistry
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
-torch.set_default_device(device)
-torch.manual_seed(22)
-np.random.seed(22)
-torch.manual_seed(123)
+torch.set_default_device(DEVICE)
 import sys
 torch.set_printoptions(precision=8)
-import matplotlib.pyplot as plt
 import time
 import os
+import yaml
+from utils import create_dir
+import matplotlib.pyplot as plt
 
-MDL_DIR = './mdl'
-PLOTS_DIR = './plots'
-LOG_DIR = './log'
+def create_output_folders(output_folder, sub_folders, problem_name):
+    create_dir(output_folder)
+    folders = {}
+    for k,v in sub_folders.items():
+        sub_dir = output_folder + '/' + v 
+        create_dir(sub_dir)
+        sub_sub_dir = output_folder + '/' + v + '/' + problem_name
+        create_dir(sub_sub_dir)
+        folders[k] = sub_sub_dir
+    return folders
+    
 
-def create_dir(dir):
-    if not os.path.isdir(dir):
-        os.mkdir(dir) 
-
-def get_mdl_path(epoch, suffix):
-    path='%s/nn_%s_%s' %(MDL_DIR,epoch, suffix)
+def get_mdl_path(folders, epoch, suffix):
+    path='%s/nn_%s_%s' %(folders['model'], suffix, epoch)
     return path
 
-def get_optim_path(epoch, suffix):
-    optim_path = '%s/optim_%s_%s.pt' %(MDL_DIR,epoch, suffix)
+def get_optim_path(folders, epoch, suffix):
+    optim_path = '%s/optim_%s_%s.pt' %(folders['model'],suffix, epoch)
     return optim_path
 
-def get_full_file_suffix(optimizer_name, problem_name, n_constrs, constraint_type, lr, mu, beta2, file_suffix):
-    suffix='%s_%s_%s_%s_%s_%s_%s' %(optimizer_name, problem_name, n_constrs, constraint_type,
-                                    lr, mu, beta2)
-    if file_suffix is not None:
-        suffix = '%s_%s' %(suffix, file_suffix)
-    return suffix
+def get_plot_path(folders, epoch, suffix):
+    path = '%s/plot_%s_%.8i.png' %(folders['plot'], suffix, epoch) 
+    return path
 
-def get_x(problem):
-    res = []
-    for name, param in problem.net.named_parameters():
-        res.append(param.view(-1))
-    res = torch.cat(res)
-    return res
-
-def plot(u_true, u_pred, t, save_file_name):
-    # Data for plotting
- 
-    fig, (ax0, ax1) = plt.subplots(2, 1, layout='constrained')
-    ax0.plot(t, u_true)
-    ax0.set_ylabel('u_true')
-    ax1.plot(t, u_pred)
-    ax1.set_ylabel('u_pred')
-    fig.savefig(save_file_name)
-
-
-def check_gradient(optimizer, problem):
+def get_gif_path(folders, suffix):
+    path = '%s/animation_%s.gif' %(folders['plot'],suffix)
+    return path
     
-    f, g_ori = problem.objective_func_and_grad(optimizer)
-    
-    max_abs_diff = 0
-    for name, param in problem.net.named_parameters():
-        g_param = param.grad.view(-1)
-        for i in range(len(param.view(-1))):
-            
-            #print('Before-------')
-            #for name_cur, param_cur in problem.net.named_parameters():
-            #    print(param_cur.data)
-            
-            param.view(-1).data[i] += 1e-4
-            
-            #print('After-------')
-            #for name_cur, param_cur in problem.net.named_parameters():
-            #    print(param_cur.data)
+def printRow(log_f, type='header', headers=[],values={}):
+    for i, ele in enumerate(headers):
+        if ele == 'epoch':
+            if type == 'header':
+                p_format = '{:>7s}'
+            elif type == 'value':
+                p_format = '{:7d}'
+        elif ele == 'elapse':
+            if type == 'header':
+                p_format = '{:>12s}'
+            elif type == 'value':
+                p_format = '{:12d}'
+        else:
+            if type == 'header':
+                p_format = '{:>12s}'
+            elif type == 'value':
+                p_format = '{:12.4e}'
                 
-            f_i,g = problem.objective_func_and_grad(optimizer)
-            d_i = (f_i - f)/1e-4
-            g_i = g_param.data[i]
-            abs_diff = abs(d_i - g_i)
-            max_abs_diff = max(max_abs_diff, abs_diff)
-            re_diff =  abs(d_i - g_i) / max(abs(d_i), abs(g_i))
-            msg = ''
-            if re_diff > 1e-3:
-                msg = 'large error'
-            print(d_i, g_i, abs_diff, re_diff, msg)
-            param.view(-1).data[i] -= 1e-4
-    print(max_abs_diff)
+        if type == 'header':
+            value = headers[i]
+        elif type == 'value':
+            value = values[headers[i]]
+            
+        # Print
+        if i == len(headers) - 1:
+            print(p_format.format(value), sep=' ', file=log_f)
+        else:
+            print(p_format.format(value), sep=' ', end = '', file=log_f)
 
+def printerBeginningSummary(config, log_f):
+    print('-'*60, file=log_f)
+    print(yaml.dump(config), file=log_f)
+    headers = ['epoch', 'f', 'f_pde', 'f_boundary', 'f_fitting',
+                '||c||inf', '||c||1' ,'elapse']
+    if config['optimizer']['name'] == 'sqp':
+        headers = headers + ['H_max', 'H_min', 'merit_f', 'alpha', 'tau']
+    print('-'*60, file=log_f)
+    printRow(log_f, type='header', headers=headers)
+    return headers
 
-def run(optimizer_name, problem_name,  n_constrs, constraint_type,
-        lr=1e-3, mu = 1e-7, beta2 = 0.999, 
-        max_iter = 100000, 
-        save_model_every=100, save_plot_every=100, 
-        pretrain={},
-        file_suffix=None,
-        stdout = 0):     
+def save_model(folders, epoch, problem, optimizer, config):
+    # path for saving trained NN
+    mdl_path=get_mdl_path(folders, epoch, config['file_suffix'])
+    problem.save_net(mdl_path)
+    # path for saving optimizer state
+    if config['optimizer']['name'] == 'sqp':
+        optim_path = get_optim_path(folders,epoch, config['file_suffix'])
+        optimizer.save_pretrain_state(optim_path)
 
-    # Create directories if they do not exist
-    create_dir(MDL_DIR)
-    create_dir(PLOTS_DIR)
-    create_dir(LOG_DIR)
+def plot_prediction(folders, epoch, problem, config):
+    file = get_plot_path(folders, epoch, config['file_suffix'])
+    if problem.name == 'SpringFormal':
+        u_pred = problem.net(problem.t_test).detach()
+        problem.plot_result(epoch,problem.t_test,problem.u_test, u_pred, problem.t_fitting, problem.u_fitting,problem.t_pde.detach(), save_file=None)
+        plt.savefig(file, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
+        plt.close("all")
+    elif problem.name == 'DarcyMatrix':
+        problem.plot_prediction(file, sample_type='test')
+    elif problem.name == 'Chemistry':
+        problem.chemistry_plot(save_path = file)
+    return file
+
+def plot_gif(folders, problem, config, files):
+    gif_path = get_gif_path(folders, config['file_suffix'])
+    if problem.name == 'SpringFormal':
+        problem.save_gif_PIL(gif_path, files, fps=20, loop=0)
+
+def run(config):     
+    np.random.seed(22)
+    torch.manual_seed(123)
+
+    # Create output folders
+    folders = create_output_folders(config['output_folder'],config['sub_folders'],config['problem']['name'])
 
     # Load problem instance
-    problem = eval(problem_name)(device, n_obj_sample = 1, n_constrs = n_constrs, constraint_type=constraint_type, reg=1e-4)
+    problem = eval(config['problem']['name'])(DEVICE,config['problem'])
     
+    # Add problem number of parameters to config
+    config['problem']['n_parameters'] = problem.n_parameters
+
     # Load optimizer
-    if optimizer_name == 'adam':
-        optimizer = torch.optim.Adam(problem.net.parameters(),lr=lr)
-    elif optimizer_name == 'sgd':
-        optimizer = torch.optim.SGD(problem.net.parameters(),lr=lr)
-    elif optimizer_name == 'sqp':
+    if config['optimizer']['name'] == 'adam':
+        optimizer = torch.optim.Adam(problem.net.parameters(),lr=config['optimizer']['lr'])
+    elif config['optimizer']['name'] == 'sgd':
+        optimizer = torch.optim.SGD(problem.net.parameters(),lr=config['optimizer']['lr'])
+    elif config['optimizer']['name'] == 'sqp':
         optimizer = StochasticSQP(problem.net.parameters(),
-                            lr= lr,
-                            mu = mu,
-                            beta2=beta2,
+                            lr = config['optimizer']['lr'],
+                            config = config['optimizer'],
                             n_parameters = problem.n_parameters, 
                             n_constrs = problem.n_constrs,
                             merit_param_init = 1, 
                             ratio_param_init = 1,
                             step_opt= 2,
                             problem = problem,)
-        
-    suffix = get_full_file_suffix(optimizer_name, problem_name, n_constrs, constraint_type, lr, mu, beta2, file_suffix)
     
-    # Log file IO
-    if stdout == 1:
-        log_file_name = '%s/%s.txt' %(LOG_DIR,suffix)
+    # Open log file IO
+    if config['stdout'] == 1:
+        log_file_name = '%s/%s.txt' %(folders['log'],config['file_suffix'])
         log_f = open(log_file_name,'w')
-    elif stdout == 0:
+    elif config['stdout'] == 0:
         log_f = None
-        
+
+
     # reload the model and optimizer. Now only apply to sqp optimizer
-    if pretrain != {} and optimizer_name == 'sqp':
-        epoch_start = pretrain['epoch_start']
-        pretrain_suffix = get_full_file_suffix(optimizer_name, problem_name, pretrain['n_constrs'], 
-                                               pretrain['constraint_type'],pretrain['lr'],
-                                               pretrain['mu'],pretrain['beta2'],pretrain['file_suffix'])
-        mdl_path=get_mdl_path(epoch_start, pretrain_suffix)
+    if (config['optimizer']['pretrain'] is not None) and (config['optimizer']['name'] == 'sqp'):
+        epoch_start = config['optimizer']['pretrain']['epoch_start']
+        pretrain_suffix = config['optimizer']['pretrain']['file_suffix']
+        mdl_path=get_mdl_path(folders, epoch_start, pretrain_suffix)
         problem.load_net(mdl_path)
-        optim_path = get_optim_path(epoch_start, pretrain_suffix)
+        optim_path = get_optim_path(folders, epoch_start, pretrain_suffix)
         optimizer.load_pretrain_state(optim_path)
     else:
         epoch_start=0
+
         
-    #optimizer.printerHeader()
-    print('%11s: %10s' %('Problem',problem.name), file=log_f)
-    print('%11s: %10s' %('Optimizer',optimizer_name), file=log_f)
-    print('%11s: %10s' %('Pretrained?', len(pretrain) > 0 ) , file=log_f)
-    print('%11s: %10s' %('Epoch start', epoch_start), file=log_f)
-    print('%11s: %10s\n%11s: %10s\n%11s: %10s' %('lr',lr, 'mu',mu, 'beta2',beta2), file=log_f)
-    print('-'*40, file=log_f)
-    print('%5s %11s %11s %11s %11s %11s' %('epoch', 'f', 'f_interior', 'f_boundary', 'alpha_max', 'alpha_min'), file=log_f)
+    #printer header
+    headers = printerBeginningSummary(config, log_f)
+    values = {k:-1 for k in headers}
 
     #optimizer.initialize_param(0.1)
-
     #check_gradient(optimizer, problem)
     #x0 = get_x(problem)
     
     files = []
-
-    """ 
-    # plot the initial predition
-    u_pred = problem.net(problem.t_all).detach()
-    problem.plot_result(epoch_start,problem.t_all,problem.u_all, u_pred, problem.t_fitting, problem.u_fitting,problem.t_pde.detach(), save_file=None)
-    file = '%s/nn_%.8i_%s.png' %(PLOTS_DIR,epoch_start, suffix) 
-    plt.savefig(file, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
-    files.append(file)
-    """
     
+    # plot the initial predition
+    file = plot_prediction(folders, epoch_start, problem, config)
+    files.append(file)
+    
+    # Set starting time
     t_start = time.time()
 
-    for epoch in range(epoch_start, epoch_start+max_iter+1):
+    # Main Loop
+    for epoch in range(epoch_start, epoch_start+config['maxiter']+1):
+        
         # Compute f, g, c, J
-        f,f_interior,f_boundary, g = problem.objective_func_and_grad(optimizer,return_multiple_f = True)
+        fs, g = problem.objective_func_and_grad(optimizer)
         c, J = problem.constraint_func_and_grad(optimizer)
         
+        # Add printer values
+        values['epoch'] = epoch
+        values['f'] = fs['f'].data
+        values['f_pde'] = fs['pde'].data
+        values['f_boundary'] = fs['boundary'].data
+        values['f_fitting'] = fs['fitting'].data
+        if config['problem']['n_constrs'] > 0:
+            values['||c||inf'] = torch.norm(c,p=float('inf'))
+        else:
+            values['||c||inf'] = torch.tensor(0.)
+        values['||c||1'] = torch.norm(c,p=1)
+        
         # Update f, g, c, J to optimizer
-        optimizer.state['f'] = f
-        optimizer.state['f_interior'] = f_interior
-        optimizer.state['f_boundary'] = f_boundary
+        optimizer.state['f'] = fs['f'].data
         optimizer.state['g'] = g
         optimizer.state['c'] = c
         optimizer.state['J'] = J
@@ -197,16 +212,13 @@ def run(optimizer_name, problem_name,  n_constrs, constraint_type,
         #     with open('g_test_%s.txt' %(optimizer_name),'w') as f_g_test: 
         #         for i in diff:
         #             f_g_test.write(str(i.detach().numpy())+'\n')
-                
-        # Print out for SQP Optimizer
-        #optimizer.printerIteration(every=100)
 
         # get max and min step size
-        if optimizer_name == 'adam':
-            alpha_adam_init = optimizer.param_groups[0]['lr']
+        if config['optimizer']['name'] == 'adam':
+            values['alpha'] = optimizer.param_groups[0]['lr']
             beta1_adam,beta2_adam = optimizer.param_groups[0]['betas']
             eps_adam = optimizer.param_groups[0]['eps']
-            alphak = alpha_adam_init * np.sqrt(1-beta2_adam**(epoch+1)) / (1-beta1_adam**(epoch+1)) 
+            H = np.sqrt(1-beta2_adam**(epoch+1)) / (1-beta1_adam**(epoch+1)) 
             vt = torch.tensor([])
             mt = torch.tensor([])
             for group in optimizer.param_groups:
@@ -214,87 +226,48 @@ def run(optimizer_name, problem_name,  n_constrs, constraint_type,
                     state = optimizer.state[p]
                     vt = torch.concat((vt,state['exp_avg_sq'].view(-1)))
                     mt = torch.concat((mt,state['exp_avg'].view(-1)))
-            alpha_adam = alphak / (torch.sqrt(vt) + eps_adam)
-            alpha_max = torch.max(alpha_adam)
-            alpha_min = torch.min(alpha_adam)
+            H = H / (torch.sqrt(vt) + eps_adam)
+            values['H_max'] = torch.max(H)
+            values['H_min'] = torch.min(H)
             # x0 - x1 should be equal to alpha_max * mt. They have small difference now. 
-        elif optimizer_name == 'sqp':
-            alpha_sqp = optimizer.state['alpha_sqp'] / optimizer.state['H_diag']
-            alpha_max = torch.max(alpha_sqp)
-            alpha_min = torch.min(alpha_sqp)
+        elif config['optimizer']['name'] == 'sqp':
+            values['alpha'] = optimizer.state['alpha_sqp']
+            values['merit_f'] = optimizer.state['cur_merit_f']
+            values['tau'] = optimizer.state['merit_param']
+            values['H_max'] = torch.max(optimizer.state['H_diag'])
+            values['H_min'] = torch.min(optimizer.state['H_diag'])
+            
+        # Add time elapse
+        t_end = time.time() - t_start
+        values['elapse'] = int(t_end)
 
         # Save model and optimizer parameters
-        if np.mod(epoch+1-epoch_start,save_model_every) == 0:
-            # path for saving trained NN
-            mdl_path=get_mdl_path(epoch+1, suffix)
-            problem.save_net(mdl_path)
-            
-            # path for saving optimizer state
-            if optimizer_name == 'sqp':
-                optim_path = get_optim_path(epoch+1, suffix)
-                optimizer.save_pretrain_state(optim_path)
-                
-        if np.mod(epoch-epoch_start,save_model_every) == 0:
-            # Printout
-            print('%5s %11.4e %11.4e %11.4e %11.4e %11.4e ' %(epoch, f, f_interior, f_boundary, alpha_max, alpha_min),file=log_f)
+        if np.mod(epoch+1-epoch_start,config['save_model_every']) == 0:
+            save_model(folders, epoch+1, problem, optimizer, config)
 
-    """ 
-        # plot the result as training progresses
-        if np.mod(epoch-epoch_start,save_plot_every) == 0:
-            u_pred = problem.net(problem.t_all).detach()
-            problem.plot_result(epoch+1,problem.t_all,problem.u_all, u_pred, problem.t_fitting, problem.u_fitting,problem.t_pde.detach(), save_file=None)
-            file = '%s/nn_%.8i_%s.png' %(PLOTS_DIR,epoch+1, suffix) 
-            plt.savefig(file, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
-            files.append(file)
-            plt.close("all")
-    t_end = time.time() - t_start
-    print('Running time: %s' %(t_end), file=log_f)
-    problem.save_gif_PIL("%s/pinn_%s_%s.gif" %(PLOTS_DIR,max_iter,suffix), files, fps=20, loop=0)
-    """
-def evaluate(problem,epoch):
-    #u_true = problem.get_u_true(
-    u_pred = problem.net(problem.domain_interior_tensor)
-    u_pred = u_pred.reshape(-1)
-    u_pred = u_pred.detach().numpy()
-    err = np.linalg.norm(u_true - u_pred,2)
-    t_np = problem.domain_interior_tensor[:,1].detach().numpy()
-    if epoch == 200:
-        plot(u_true, u_pred, t_np, '%s_%s.png' %(problem.name, epoch))
-    print(err)
-    
+        # Print Iteration Information   
+        if np.mod(epoch-epoch_start,config['save_model_every']) == 0:
+            printRow(log_f,type='value',headers=headers,values=values)
+
+        # Plot prediction
+        if np.mod(epoch-epoch_start,config['save_plot_every']) == 0:
+            file = plot_prediction(folders, epoch+1, problem, config)
+            files.append(file)         
+        
+    # Plot GIF
+    plot_gif(folders, problem, config, files)
+
+    # Close file IO
+    if config['stdout'] == 1:
+        log_f.close()
 
 if __name__ == '__main__':
 
-    problem_name = "DarcyMatrix"
-    optimizer_name = 'sqp'          # adam or sgd or sqp 
-    n_constrs = 1
-    constraint_type='pde'
-    lr    = 1e-3
-    mu    = 1e-7
-    beta2 = 0.999
-    file_suffix="type1"             # None or a str, like "type1", etc.
-    stdout = 1                      # 0: print to screen, 1: print to a .log/ directory
-    maxiter=100000
-    save_model_every=1
-    save_plot_every=1000             # maxiter / save_plot_every better not exceed 500
-    
-    pretrain = {                        
-        'epoch_start':10000,          
-        'n_constrs'  :0,
-        'constraint_type':'pde',
-        'lr'         :1e-3,
-        'mu'         :1e-7,
-        'beta2'      :0.999,
-        'file_suffix':'type1',
-    }
-    
-    pretrain = {}
-        
+    problem_name = 'chemistry'
+    with open('conf/conf_'+problem_name+'.yaml') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+
     # train
-    run(optimizer_name, problem_name,  n_constrs, constraint_type,
-        lr=lr, mu = mu, beta2 = beta2, 
-        max_iter = int(maxiter), 
-        save_model_every=save_model_every, save_plot_every=save_plot_every, 
-        pretrain=pretrain, file_suffix=file_suffix, stdout = stdout)
+    run(config)
     
     

@@ -249,7 +249,8 @@ class DarcyMatrix(BaseProblemFormal):
         return fs
 
     def constraint_func(self):      
-
+        if self.n_constrs == 0:
+          return torch.tensor([])
         # separate x1 and x2 from sample and set they require_grad
         nu = self.input[self.constr_pixel_idx[:,0],0,:,:] #1 and 0 values
         x1 = self.input[self.constr_pixel_idx[:,0],1,:,:].requires_grad_(True) #from 0 to 1 starting from left to right

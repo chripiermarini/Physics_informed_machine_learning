@@ -1,41 +1,36 @@
-output_folder: /content/drive/MyDrive/SQPPIML/results        # Main output folder. All the outputs (log, plots, models) will be saved to this folder
+output_folder: ./results        # Main output folder. All the outputs (log, plots, models) will be saved to this folder
 sub_folders:                    # Subfolder names for model, plot, and log                  
   model : mdl
   plot  : plot
   log   : log
   
 file_suffix: test               # str, all the leaf output file name will contain this suffix
-maxiter: 50000                  # Total number of epochs
+maxiter: 20000                  # Total number of epochs
 save_model_every: 100           # Save models and logs per [such] iterations
 save_plot_every: 100           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
-stdout : 0                      # 0: print to screen, 1: print to log file
+stdout : 1                      # 0: print to screen, 1: print to log file
 
 problem:                        # Parameters for problem
-  name  : Chemistry
+  name  : Chemistry 
+  train_file_path : ./problems/chemistry_train.txt
+  test_file_path : ./problems/chemistry_test.txt
   regs:                           # regularization multipliers of different losses composing objective function
-    pde     : 1
-    boundary: 1
+    pde     : 1.0e-3
+    boundary: 1.0e-3
     fitting : 1
-  n_constrs: 3                    # number of constraints ---
-  constrs_area_percent: [1]     # list of length n_constrs. the constraints applies at percentage of t_max
+  n_constrs: 0                    # number of constraints ---
   constraint_type : other       # pde, or fitting, or boundary, or other
   batch_size: full            # str full or int batch_size #TODO
-  nn_name       : FCN           # neural network name. This should be a class in nn_architecture.py
+  nn_name       : TwoHiddenLayerFCNN           # neural network name. This should be a class in nn_architecture.py
   nn_input      : 5
   nn_output     : 4
   nn_parameters:                # The keys can be different for different neural network
-    n_hidden: 32
-    n_layers: 3
+    n_neurons: 64
   t_max: 10                      # null or int. Largest time.
   t_discretization: 100         # null or int. discretization of time
-  dim_x: 0                      # int. dimension of domain
-  x_max: null                   # null or list of largest x of number dim_x
-  x_discretization: null        # null or list of discretization x of number dim_x
-  n_train_obj_samples_per_group: # number of samples of different losses composing objective function, 
-    pde     : all                 #it gets a number of initial conditions equal to the sum of the n_train_obj and gets the 100 discretization
-    boundary: all                 #for other MSE
-    fitting : 0.3
-  n_initial_conditions : 5     # int. number of initial condition generated
+  fitting_sample_percentage : 0.6
+  n_initial_conditions : 100     # int. number of initial condition generated
+  batch_size : full                # full or int smaller than n_initial_conditions
   n_test_initial_conditions: 1
   
 optimizer:
@@ -44,4 +39,7 @@ optimizer:
   mu    : 1.0e-7
   beta2 : 0.999
   pretrain: null              # null; or dict with keys: epoch_start and file_suffix
+  alpha_type: 'c_adam'         # 'ada', 'adam', 'c_ada', 'c_adam' 
+  beta1 : 0.1
+      
       

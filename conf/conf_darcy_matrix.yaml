@@ -7,18 +7,18 @@ sub_folders:                    # Subfolder names for model, plot, and log
 file_suffix: test               # str, all the leaf output file name will contain this suffix
 maxiter: 500                  # Total number of epochs
 save_model_every: 10           # Save models and logs per [such] iterations
-save_plot_every: 10           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
+save_plot_every: 100           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
 stdout : 1                      # 0: print to screen, 1: print to log file
 
 problem:                        # Parameters for problem
   name  : DarcyMatrix
   regs:                           # regularization multipliers of different losses composing objective function
-    pde     : 1.0e-4
-    boundary: 1.0e-1
+    pde     : 1.0e-2
+    boundary: 1.0e-2
     fitting : 1
   n_constrs: 10                    # number of constraints ---
-  constraint_type : boundary       # pde, or boundary
-  batch_size: 10            # str full or int batch_size #TODO
+  constraint_type : pde       # pde, or boundary
+  batch_size: full            # str full or int batch_size #TODO
   nn_name       : FNOLocal           # neural network name. This should be a class in nn_architecture.py
   nn_parameters:                # The keys can be different for different neural network
     n_discretize : 16
@@ -33,10 +33,10 @@ problem:                        # Parameters for problem
 
 optimizer:
   name : sqp                  # adam or sgd or sqp 
-  lr    : 1.0e-3
+  lr    : 1.0e-2
   mu    : 1.0e-7
   beta2 : 0.999
   pretrain: null              # null; or dict with keys: epoch_start and file_suffix
-  alpha_type: 'c_ada'         # 'ada', 'adam', 'c_ada', 'c_adam' 
+  alpha_type: 'c_adam'         # 'ada', 'adam', 'c_ada', 'c_adam' 
   beta1 : 0.9
       

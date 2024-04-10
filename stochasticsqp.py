@@ -36,8 +36,8 @@ class StochasticSQP(Optimizer):
                  step_size_decay = 0.5,
                  step_opt= 1,
                  problem=None,
-                 mu=100,
-                 beta2 = 0.999):
+                 config=None,
+                 ):
         defaults = dict()
         super(StochasticSQP, self).__init__(params, defaults)
         self.n_parameters = n_parameters
@@ -53,8 +53,10 @@ class StochasticSQP(Optimizer):
         self.initial_params = params
         self.step_opt = step_opt
         self.problem = problem
-        self.mu = mu
-        self.beta2 = beta2 
+        self.mu = config['mu']
+        self.beta2 = config['beta2']
+        self.alpha_type = config['alpha_type']
+        self.beta1 = config['beta1']       
         #self.printerBeginningSummary()
 
     def __setstate__(self, state):
@@ -85,34 +87,57 @@ class StochasticSQP(Optimizer):
         c = self.state['c']
         f = self.state['f']
         
+        if self.alpha_type == 'ada' or self.alpha_type == 'adam':
+            grad = g
+        elif self.alpha_type == 'c_ada' or self.alpha_type == 'c_adam':
+            grad = torch.eye(self.n_parameters) - torch.matmul(J.T,torch.linalg.solve(torch.matmul(J, J.T), J))
+            grad = torch.matmul(grad, g)
+        
         if 'iter' not in self.state:
             self.state['iter'] = 0
-            self.state['g_square_sum'] = (1-self.beta2) * g**2
+            self.state['g_square_sum'] = (1-self.beta2) * grad**2
+            self.state['g_sum'] = (1-self.beta1) * grad**2
         else:
             self.state['iter'] += 1
-            self.state['g_square_sum'] = self.beta2 * self.state['g_square_sum'] +  (1-self.beta2) * g**2
+            self.state['g_square_sum'] = self.beta2 * self.state['g_square_sum'] +  (1-self.beta2) * grad**2
+            self.state['g_sum'] = self.beta1 * self.state['g_sum'] +  (1-self.beta1) * grad
+        
+        if self.alpha_type == 'adam' or self.alpha_type == 'c_adam' :
+            m_hat = self.state['g_sum'] / (1 - self.beta1**(self.state['iter'] + 1))
+            v_hat = self.state['g_square_sum'] / (1 - self.beta2**(self.state['iter'] + 1))
+        elif self.alpha_type == 'ada' or self.alpha_type == 'c_ada' :
+            m_hat = grad # no momentum
+            v_hat = self.state['g_square_sum'] 
         
         loss = None
 
-        H_diag = torch.sqrt(self.state['g_square_sum'] + self.mu)
-        H =  torch.diag(H_diag) #torch.eye(self.n_parameters)
+        H_diag = torch.sqrt(v_hat + self.mu)
         self.state['H_diag'] = H_diag
-
-        ls_matrix = torch.cat((torch.cat((H, torch.transpose(J,0,1)), 1),
-                               torch.cat((J, torch.zeros(self.n_constrs,self.n_constrs)), 1)), 0)
-        ls_rhs = -torch.cat((g,c), 0)
-
-        # the line below is time-consuming if the linear system is large
-        # the computed system_solution
-        # remember to split the primal solution d (is the step that will be used to update 'param')
-        # and the dual solution y
-
-        system_solution = torch.linalg.solve(ls_matrix, ls_rhs)
-        d = system_solution[:self.n_parameters]
-        y = system_solution[self.n_parameters:]
-        self.norm_d = torch.norm(d)
         
-        self.kkt_norm = torch.norm(g + torch.matmul(torch.transpose(J,0,1), y), float('inf'))
+        if 1:
+            H =  torch.diag(H_diag) #torch.eye(self.n_parameters)
+            ls_matrix = torch.cat((torch.cat((H, torch.transpose(J,0,1)), 1),
+                                torch.cat((J, torch.zeros(self.n_constrs,self.n_constrs)), 1)), 0)
+            ls_rhs = -torch.cat((m_hat,c), 0)
+
+
+            # the line below is time-consuming if the linear system is large
+            system_solution = torch.linalg.solve(ls_matrix, ls_rhs)
+            d = system_solution[:self.n_parameters]
+            y = system_solution[self.n_parameters:]
+            
+            #self.kkt_norm = torch.norm(g + torch.matmul(torch.transpose(J,0,1), y), float('inf'))
+        else:
+            v = - torch.matmul(J.T,torch.linalg.solve(torch.matmul(J, J.T), c))
+            JHJT = torch.matmul(J*H_diag, J.T)
+            m_plus_Hv = m_hat + H_diag * v
+            q = torch.linalg.solve(JHJT, torch.matmul(J , m_plus_Hv))
+            u = - m_plus_Hv + torch.matmul(J.T, q)
+            d = u + v
+            # TODO: this d is not equal to the d from the first case. To be investigated.
+            
+        
+        self.norm_d = torch.norm(d)
 
         dHd = torch.matmul(torch.matmul(d, H), d)
         gd = torch.matmul(g, d)
@@ -238,8 +263,10 @@ class StochasticSQP(Optimizer):
         state = torch.load(optim_path)
         self.state['iter'] = state['iter']
         self.state['g_square_sum'] = state['g_square_sum']
+        self.state['g_sum'] = state['g_sum']
         
     def save_pretrain_state(self,optim_path):
         state = {'iter': self.state['iter'], 
-                'g_square_sum': self.state['g_square_sum']}
+                'g_square_sum': self.state['g_square_sum'],
+                'g_sum':self.state['g_sum'],}
         torch.save(state, optim_path)
