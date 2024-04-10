@@ -193,20 +193,20 @@ class Chemistry(BaseProblemFormal):
         return c
 
     def chemistry_plot(self, save_path):
-      prediction = self.net(torch.cat((self.test['y_initial'], self.test['t']),1)).cpu().detach().numpy()
+      prediction = self.net(torch.cat((self.test['y_initial'], self.test['t']),1)).cpu()
       # Create subplots
       fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # 1 row, 2 columns
 
       # Plot 1
       for i in range(4):
-          axs[0].plot(self.test['t'], self.test['y_label'][:, i], label = f'y_true_{i}') 
+          axs[0].plot(self.test['t'].cpu(), self.test['y_label'][:, i].cpu(), label = f'true_{i}') 
       axs[0].set_title('Test Label')  # Set subplot title
       axs[0].set_xlabel('t')  # Set xlabel
       axs[0].legend()  # Show legend
 
       # Plot 2
       for i in range(4):
-          axs[1].plot(self.test['t'], prediction[:, i], label = f'y_prediction_{i}')  # Example scatter plot
+          axs[1].plot(self.test['t'].cpu(), prediction[:, i], label = f'prediction_{i}')  # Example scatter plot
       axs[1].set_title('Prediction')  # Set subplot title
       axs[1].set_xlabel('t')  # Set xlabel
       axs[1].legend()  # Show legend
