@@ -192,28 +192,40 @@ class Chemistry(BaseProblemFormal):
 
         return c
 
-    def chemistry_plot(self, save_path):
-      prediction = self.net(torch.cat((self.test['y_initial'], self.test['t']),1)).cpu()
-      # Create subplots
-      fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # 1 row, 2 columns
+    def chemistry_plot(self, save_path = None, epoch_count = None, save_label = False, save_path_label = None):
+      # Plot label
+      if save_label == True:
+        fig1 = plt.figure(figsize = (8,6))
+        ax1= fig1.add_subplot(111)
+        for i in range(4):
+          ax1.plot(self.test['t'].cpu(), self.test['y_label'][:, i].cpu(), label = f'True $y_{i}$') 
+        ax1.set_title('Test Label')  # Set subplot title
+        ax1.set_xlabel('t')  # Set xlabel
+        ax1.set_ylabel('x')
+        ax1.legend()  # Show legend #do we want to fix the legend location? loc='upper left'
 
-      # Plot 1
-      for i in range(4):
-          axs[0].plot(self.test['t'].cpu(), self.test['y_label'][:, i].cpu(), label = f'true_{i}') 
-      axs[0].set_title('Test Label')  # Set subplot title
-      axs[0].set_xlabel('t')  # Set xlabel
-      axs[0].legend()  # Show legend
+        fig1.tight_layout()
+        fig1.savefig(save_path_label, format = 'png')
+        plt.close()
 
       # Plot 2
-      for i in range(4):
-          axs[1].plot(self.test['t'].cpu(), prediction[:, i], label = f'prediction_{i}')  # Example scatter plot
-      axs[1].set_title('Prediction')  # Set subplot title
-      axs[1].set_xlabel('t')  # Set xlabel
-      axs[1].legend()  # Show legend
+      else:
+        fig2 = plt.figure(figsize = (8,6))
+        ax2 = fig2.add_subplot(111)
+        prediction = self.net(torch.cat((self.test['y_initial'], self.test['t']),1)).cpu().detach().numpy() 
+        for i in range(4):
+            ax2.plot(self.test['t'].cpu(), prediction[:, i], label = f'Predicted $y_{i}$')  # Example scatter plot
+        if epoch_count != None:
+          ax2.set_title(f'Prediction - Epoch {epoch_count}')  # Set subplot title
+        else:
+          ax2.set_title('Prediction')  # Set subplot title
+        ax2.set_xlabel('t')  # Set xlabel
+        ax2.set_ylabel('x')
+        ax2.legend()  # Show legend #do we want to fix the legend location? loc='upper left'
 
-      plt.tight_layout()  # Adjust layout
-      plt.savefig(save_path)
-      plt.close("all")
+        fig2.tight_layout()  # Adjust layout
+        fig2.savefig(save_path, format = 'png')
+        plt.close("all")
       return
       
 

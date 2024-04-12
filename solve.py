@@ -102,7 +102,9 @@ def plot_prediction(folders, epoch, problem, config):
     elif problem.name == 'DarcyMatrix':
         problem.plot_prediction(file, sample_type='test')
     elif problem.name == 'Chemistry':
-        problem.chemistry_plot(save_path = file)
+        if epoch == 0:
+          problem.chemistry_plot(save_label = True, save_path_label = file.replace('plot_', 'label_'))
+        problem.chemistry_plot(save_path = file, epoch_count = epoch)
     return file
 
 def plot_gif(folders, problem, config, files):

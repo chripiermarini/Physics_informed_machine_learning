@@ -18,6 +18,7 @@ import torch
 from scipy.integrate import odeint
 import random
 import pandas as pd
+import matplotlib.pyplot as plt
 pd.set_option('display.max_rows', None)
 
 def initial_condition(x):
@@ -76,7 +77,7 @@ def true_burgers_solution(X, T):
     U = odeint(burg_system, u0, T, args=(k, mu, nu,))
     return U
 
-def create_burgers_dataset(n_points):
+def create_burgers_dataset(n_points, test = False):
     x = np.linspace(0, 1, n_points)
     t = np.linspace(0, 1, n_points)
     u_zero = initial_condition(x)
@@ -111,25 +112,69 @@ def create_burgers_dataset(n_points):
     fitting_meshgrid = meshgrid
     fitting_u_zero = repeated_u_zero
     u_labels = true_burgers_solution(x,t).flatten()
-    fitting_dataset = pd.DataFrame({'fitting_x': fitting_meshgrid[:,0],
-                                    'fitting_t': fitting_meshgrid[:,1],
-                                    'fitting_u_zero': fitting_u_zero,
-                                    'fitting_u_labels': u_labels})
+    if test == True:
+        fitting_dataset = pd.DataFrame({'test_x': fitting_meshgrid[:, 0],
+                                        'test_t': fitting_meshgrid[:, 1],
+                                        'test_u_zero': fitting_u_zero,
+                                        'test_u_labels': u_labels})
+    else:
+        fitting_dataset = pd.DataFrame({'fitting_x': fitting_meshgrid[:, 0],
+                                        'fitting_t': fitting_meshgrid[:, 1],
+                                        'fitting_u_zero': fitting_u_zero,
+                                        'fitting_u_labels': u_labels})
+
     return pde_dataset, IC_dataset, periodic_condition_dataset, fitting_dataset
 
-''' 
-pde_dataset, IC_dataset, periodic_condition_dataset, fitting_dataset = create_burgers_dataset(30)
 
+def crea_nuovo_dataset(n_points = 100):
+    range = (0,1)
+    x = np.linspace(*range, n_points)
+    t = np.linspace(*range, n_points)
+    ticks = np.linspace(0, 1, 5) * (range[1] - range[0]) + range[0]
+
+    u_zero = initial_condition(x) #same dimension of x
+
+    meshgrid = np.column_stack((np.meshgrid(x, t)[0].flatten(),
+                                   np.meshgrid(x, t)[1].flatten()))
+
+    transposed_array = np.transpose(u_zero)
+    stacked_u_zero = np.tile(transposed_array, (n_points**2, 1))
+    final_dataset = np.concatenate((meshgrid, stacked_u_zero), axis = 1)
+
+    u_labels = true_burgers_solution(x,t)  #(len(t), len(x))
+    # Plot meshgrid
+    plt.figure(figsize=(8, 6))
+    plt.imshow(u_labels, extent=[*range, *range], cmap='viridis')  # Use 'viridis' colormap for better visualization
+    plt.colorbar()  # Add a colorbar to show scale
+    plt.title('True solution')
+    plt.xticks(ticks)
+    plt.yticks(ticks)
+    plt.xlabel('t')
+    plt.ylabel('x')
+    plt.show()
+
+    return
+
+crea_nuovo_dataset()
+
+
+
+''' 
+pde_dataset, IC_dataset, periodic_condition_dataset, fitting_dataset = create_burgers_dataset(30, test= True)
+print(fitting_dataset, fitting_dataset.shape)
+data_folder = f'burgers_data_folder/'
+fitting_dataset.to_csv(data_folder + 'test_dataset.csv', sep = ',', index = False)
+
+pde_dataset, IC_dataset, periodic_condition_dataset, fitting_dataset = create_burgers_dataset(30)
+df = pd.read_csv(str(data_folder +'pde_dataset.csv'), sep=',', header=0)
+print(df)
 # Create a folder to save DataFrames
 data_folder = f'burgers_data_folder/'
 pde_dataset.to_csv(data_folder +'pde_dataset.csv', sep = ',', index = False)
 IC_dataset.to_csv(data_folder + 'IC_dataset.csv', sep = ',', index = False)
 periodic_condition_dataset.to_csv(data_folder + 'periodic_condition_dataset.csv', sep = ',', index = False)
 fitting_dataset.to_csv(data_folder + 'fitting_dataset.csv', sep = ',', index = False)
-
-df = pd.read_csv(str(data_folder +'fitting_dataset.csv'), sep=',', header=0)
 '''
-
 
 def kinetic_kosir(x, t) -> np.ndarray:
     # A -> 2B; A <-> C; A <-> D
