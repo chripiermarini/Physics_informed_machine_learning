@@ -11,7 +11,7 @@ save_plot_every: 1000           # Save plots per [such] iterations, maxiter / sa
 stdout : 1                      # 0: print to screen, 1: print to log file
 
 problem:                        # Parameters for problem
-  name  : SpringFormal
+  name  : Spring
   regs:                           # regularization multipliers of different losses composing objective function
     pde     : 1.0e-4
     boundary: 0

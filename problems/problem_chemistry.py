@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from scipy.integrate import odeint
-from problems.problem_base_formal import BaseProblemFormal
+from problems.problem_base import BaseProblem
 import pandas as pd
 import random
 import os
@@ -14,7 +14,7 @@ import os
 
 """ Problem statement Chemistry equation"""
 
-class Chemistry(BaseProblemFormal):
+class Chemistry(BaseProblem):
     name = 'Chemistry'
 
     def __init__(self, device, conf):

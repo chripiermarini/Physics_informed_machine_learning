@@ -1,7 +1,7 @@
 import torch
 from stochasticsqp import *
-from problems.problem_darcy_matrix import DarcyMatrix
-from problems.problem_spring_formal import SpringFormal
+from problems.problem_darcy import Darcy
+from problems.problem_spring import Spring
 from problems.problem_burgers import Burgers
 from problems.problem_chemistry import Chemistry
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -94,12 +94,12 @@ def save_model(folders, epoch, problem, optimizer, config):
 
 def plot_prediction(folders, epoch, problem, config):
     file = get_plot_path(folders, epoch, config['file_suffix'])
-    if problem.name == 'SpringFormal':
+    if problem.name == 'Spring':
         u_pred = problem.net(problem.t_test).detach()
         problem.plot_result(epoch,problem.t_test,problem.u_test, u_pred, problem.t_fitting, problem.u_fitting,problem.t_pde.detach(), save_file=None)
         plt.savefig(file, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
         plt.close("all")
-    elif problem.name == 'DarcyMatrix':
+    elif problem.name == 'Darcy':
         problem.plot_prediction(file, sample_type='test')
     elif problem.name == 'Chemistry':
         if epoch == 0:
@@ -109,7 +109,7 @@ def plot_prediction(folders, epoch, problem, config):
 
 def plot_gif(folders, problem, config, files):
     gif_path = get_gif_path(folders, config['file_suffix'])
-    if problem.name == 'SpringFormal':
+    if problem.name == 'Spring':
         problem.save_gif_PIL(gif_path, files, fps=20, loop=0)
 
 def run(config):     

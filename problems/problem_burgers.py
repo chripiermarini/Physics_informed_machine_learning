@@ -4,13 +4,13 @@ from torch.autograd import Variable
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-from problems.problem_base_formal import BaseProblemFormal
+from problems.problem_base import BaseProblem
 import random
 import pandas as pd
 
 """ Problem statement Burgers' equation"""
 
-class Burgers(BaseProblemFormal):
+class Burgers(BaseProblem):
     name = 'Burgers'
     def __init__(self, device, conf):
 

@@ -27,7 +27,7 @@ class StochasticSQP(Optimizer):
     epsilon=1e-6
     eta=1e-4 # line search parameter
     buffer=0
-    
+    eps_singular_matrix = 1
     def __init__(self, params, lr=required, 
                  n_parameters = 0, 
                  n_constrs = 0, 
@@ -56,7 +56,7 @@ class StochasticSQP(Optimizer):
         self.mu = config['mu']
         self.beta2 = config['beta2']
         self.alpha_type = config['alpha_type']
-        self.beta1 = config['beta1']       
+        self.beta1 = config['beta1']   
         #self.printerBeginningSummary()
 
     def __setstate__(self, state):
@@ -69,6 +69,21 @@ class StochasticSQP(Optimizer):
         for p in group['params']:
             p.data.add_(initial_value, alpha=1)
         return
+
+    def solve_linsys(self, A,b, i = 0):
+        solved = False
+        i = i
+        while not solved:
+            try: 
+                if i > 0:
+                    A = A + torch.diag(i * self.eps_singular_matrix * torch.ones(A.shape[0]))
+                x = torch.linalg.solve(A,b)
+                break
+            except Exception as e:
+                pass
+            finally:
+                i = i + 1
+        return x,i
 
     def step(self, closure=None):
         """ Performs a single optimization step.
@@ -90,8 +105,8 @@ class StochasticSQP(Optimizer):
         if self.alpha_type == 'ada' or self.alpha_type == 'adam':
             grad = g
         elif self.alpha_type == 'c_ada' or self.alpha_type == 'c_adam':
-            grad = torch.eye(self.n_parameters) - torch.matmul(J.T,torch.linalg.solve(torch.matmul(J, J.T), J))
-            grad = torch.matmul(grad, g)
+            Pg,singular_add_i = self.solve_linsys(J @ J.T, J@g)
+            grad = g - J.T @ Pg
         
         if 'iter' not in self.state:
             self.state['iter'] = 0
@@ -112,34 +127,30 @@ class StochasticSQP(Optimizer):
         loss = None
 
         H_diag = torch.sqrt(v_hat + self.mu)
+        
         self.state['H_diag'] = H_diag
         
-        if 1:
-            H =  torch.diag(H_diag) #torch.eye(self.n_parameters)
-            ls_matrix = torch.cat((torch.cat((H, torch.transpose(J,0,1)), 1),
+        if 0:
+            # Old method to compute d
+            H =  torch.diag(H_diag) 
+            ls_matrix = torch.cat((torch.cat((H, J.T), 1),
                                 torch.cat((J, torch.zeros(self.n_constrs,self.n_constrs)), 1)), 0)
             ls_rhs = -torch.cat((m_hat,c), 0)
-
-
             # the line below is time-consuming if the linear system is large
             system_solution = torch.linalg.solve(ls_matrix, ls_rhs)
             d = system_solution[:self.n_parameters]
-            y = system_solution[self.n_parameters:]
-            
-            #self.kkt_norm = torch.norm(g + torch.matmul(torch.transpose(J,0,1), y), float('inf'))
         else:
-            v = - torch.matmul(J.T,torch.linalg.solve(torch.matmul(J, J.T), c))
-            JHJT = torch.matmul(J*H_diag, J.T)
-            m_plus_Hv = m_hat + H_diag * v
-            q = torch.linalg.solve(JHJT, torch.matmul(J , m_plus_Hv))
-            u = - m_plus_Hv + torch.matmul(J.T, q)
+            v = - J.T @ self.solve_linsys(J @ J.T, c, i = singular_add_i)[0] 
+            JHinvJT = J*(1/H_diag) @ J.T
+            Hinvm_plus_v = 1/H_diag * m_hat + v
+            Pv = J.T @ self.solve_linsys(JHinvJT, J@Hinvm_plus_v, i = singular_add_i)[0] 
+            u = - Hinvm_plus_v +  1/H_diag * Pv 
             d = u + v
-            # TODO: this d is not equal to the d from the first case. To be investigated.
-            
         
         self.norm_d = torch.norm(d)
 
-        dHd = torch.matmul(torch.matmul(d, H), d)
+        # TODO Remove tau computation?
+        dHd = torch.matmul(d*H_diag, d)
         gd = torch.matmul(g, d)
         gd_plus_max_dHd_0 = gd + torch.max(dHd, torch.tensor(0))
         c_norm_1 = torch.linalg.norm(c, ord=1)

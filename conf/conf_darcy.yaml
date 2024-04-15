@@ -11,7 +11,7 @@ save_plot_every: 100           # Save plots per [such] iterations, maxiter / sav
 stdout : 1                      # 0: print to screen, 1: print to log file
 
 problem:                        # Parameters for problem
-  name  : DarcyMatrix
+  name  : Darcy
   regs:                           # regularization multipliers of different losses composing objective function
     pde     : 1.0e-2
     boundary: 1.0e-2

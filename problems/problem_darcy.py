@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from .problem_base_formal import BaseProblemFormal
+from .problem_base import BaseProblem
 from nn_architecture import *
 import torch
 from neuralop.datasets import load_darcy_flow_small
@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 # We use this one!
 """
 
-class DarcyMatrix(BaseProblemFormal):
+class Darcy(BaseProblem):
 
-    name = 'DarcyMatrix'
+    name = 'Darcy'
     f = 1
     
     def __init__(self, device, conf):

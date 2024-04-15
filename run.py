@@ -3,10 +3,10 @@ from solve import run
 import pandas as pd
 import matplotlib.pyplot as plt
 
-plot = True
-train = False
-problems = ['spring', 'darcy_matrix', 'chemistry']
-output_folder = '../results0409'
+plot = False
+train = True
+problems = ['chemistry', 'spring', 'darcy']
+output_folder = './test2'
 
 plt.style.use("fast")
 
@@ -20,33 +20,15 @@ def main():
                 config = yaml.load(f, Loader=yaml.FullLoader)
             
             settings = {
-                1: {
-                    'n_constrs': 0,
-                    'alpha_type': 'adam',
-                },
-                2: {
-                    'n_constrs': 10,
-                    'alpha_type': 'adam',
-                },
-                3: {
-                    'n_constrs': 10,
-                    'alpha_type': 'c_adam',
+                1: {},
                 }
-                }
-
-            if problem_name == 'spring':
-                settings[2]['n_constrs'] = 3
-                settings[3]['n_constrs'] = 3
-            
             
             for k,setting in settings.items():
-                #config['maxiter'] = 10
-                #config['save_model_every'] = 10
-                #config['save_plot_every'] = 10
+                config['maxiter'] = 100
+                config['save_model_every'] = 10
+                config['save_plot_every'] = 10
                 config['output_folder'] = output_folder
-                config['problem']['n_constrs'] = setting['n_constrs']
-                config['optimizer']['alpha_type'] = setting['alpha_type']
-                config['file_suffix'] = '%s%s%s' %(problem_name, 'setting', k)
+                config['file_suffix'] = '%s%s%s' %(problem_name, 'test', k)
                 run(config)
                 
         if plot == True:
@@ -70,18 +52,17 @@ def plot_f(problem):
                 'Data fitting loss': 'f_fitting'}    
     
     if problem == 'spring':
-        log_folder = 'SpringFormal'
-    elif problem == 'darcy_matrix':
-        log_folder = 'DarcyMatrix'
+        log_folder = 'Spring'
+    elif problem == 'darcy':
+        log_folder = 'Darcy'
         plot_columns ['Boundary'] = 'f_boundary'
     elif problem == 'chemistry':
         log_folder = 'Chemistry'
         plot_columns['Other MSE'] = 'f_boundary'
     
     log_dir = '%s/log/%s' %(output_folder, log_folder)
-    files = {'Adam_unc'     : 'setting1.txt',
-            'Adam_con'      : 'setting2.txt',
-            'PAdam_con'     : 'setting3.txt',
+    files = {'method1'     : '%ssetting1.txt' %(problem),
+            'method2'      : '%ssetting2.txt' %(problem),
             }
     first_header = 'epoch'
     x_column_name = 'epoch'
@@ -106,10 +87,6 @@ def plot_f(problem):
         # display the plot
         plt.savefig('%s/%s_%s.png' %(log_dir, problem, i))
         plt.close()
-
-
-
-
 
 
 if __name__ == '__main__':

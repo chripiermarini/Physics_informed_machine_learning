@@ -4,7 +4,7 @@ from torch.autograd import Variable
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-from .problem_base_formal import BaseProblemFormal
+from .problem_base import BaseProblem
 
 """
 ## Problem Statement
@@ -25,8 +25,8 @@ def oscillator(d, w0, x):
     y  = exp*2*A*cos
     return y
 
-class SpringFormal(BaseProblemFormal):
-    name = "SpringFormal"
+class Spring(BaseProblem):
+    name = "Spring"
     # Sprint parameters
     d = 2
     w0 = 20

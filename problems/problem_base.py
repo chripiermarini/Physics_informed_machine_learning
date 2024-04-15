@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 ## Base Problem Class
 """
 
-class BaseProblemFormal(ABC):
+class BaseProblem(ABC):
 
     @abstractmethod
     def __init__(self):
