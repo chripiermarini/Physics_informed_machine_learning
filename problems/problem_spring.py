@@ -1,9 +1,7 @@
 from nn_architecture import *
 import torch
-from torch.autograd import Variable
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image
 from .problem_base import BaseProblem
 
 """
@@ -166,7 +164,3 @@ class Spring(BaseProblem):
         if save_file is not None:
             plt.savefig(save_file)
 
-    def save_gif_PIL(self, outfile, files, fps=5, loop=0):
-        "Helper function for saving GIFs"
-        imgs = [Image.open(file) for file in files]
-        imgs[0].save(fp=outfile, format='GIF', append_images=imgs[1:], save_all=True, duration=int(1000/fps), loop=loop)

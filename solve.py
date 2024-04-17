@@ -105,11 +105,15 @@ def plot_prediction(folders, epoch, problem, config):
         if epoch == 0:
           problem.chemistry_plot(save_label = True, save_path_label = file.replace('plot_', 'label_'))
         problem.chemistry_plot(save_path = file, epoch_count = epoch)
+    elif problem.name == 'Burgers':
+        if epoch == 0:
+          problem.plot(save_label = True, save_path = file.replace('plot_', 'label_'))
+        problem.plot(save_path = file, epoch=epoch)
     return file
 
 def plot_gif(folders, problem, config, files):
     gif_path = get_gif_path(folders, config['file_suffix'])
-    if problem.name == 'Spring':
+    if problem.name in ['Spring', 'Burgers']:
         problem.save_gif_PIL(gif_path, files, fps=20, loop=0)
 
 def run(config):     

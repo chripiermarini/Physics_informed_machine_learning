@@ -5,10 +5,10 @@ sub_folders:                    # Subfolder names for model, plot, and log
   log   : log
   
 file_suffix: test               # str, all the leaf output file name will contain this suffix
-maxiter: 50000                  # Total number of epochs
+maxiter: 10000                  # Total number of epochs
 save_model_every: 100           # Save models and logs per [such] iterations
-save_plot_every: 1000           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
-stdout : 0                      # 0: print to screen, 1: print to log file
+save_plot_every: 100           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
+stdout : 1                      # 0: print to screen, 1: print to log file
 
 problem:                        # Parameters for problem
   name  : Burgers
@@ -16,31 +16,26 @@ problem:                        # Parameters for problem
     pde     : 1
     boundary: 1
     fitting : 1
-  n_constrs: 1                   # number of constraints ---
-  constrs_area_percent: [0.14]     # list of length n_constrs. the constraints applies at percentage of t_max
+  n_constrs: 10                   # number of constraints ---
   constraint_type : boundary       # pde, or boundary
   batch_size: full            # str full or int batch_size #TODO
   nn_name       : FCN           # neural network name. This should be a class in nn_architecture.py
-  nn_input      : 3             # x, t, u_zero
+  nn_input      : 2             # x, t, u_zero
   nn_output     : 1
   nn_parameters:                # The keys can be different for different neural network
     n_hidden: 32
     n_layers: 3
   t_max: 1                      # null or int. Largest time.
-  t_discretization: 500         # null or int. discretization of time
-  dim_x: 0                      # int. dimension of domain
-  x_max: null                   # null or list of largest x of number dim_x
-  x_discretization: null        # null or list of discretization x of number dim_x
+  t_discretization: 100         # null or int. discretization of time
+  dim_x: 1                      # int. dimension of domain
+  x_max: 1                   # null or list of largest x of number dim_x
+  x_discretization: 100        # null or list of discretization x of number dim_x
   n_group_pde_parameters: 1     # int. number of group of pde parameters
   n_train_obj_samples_per_group: # number of samples of different losses composing objective function
-    pde     : 30
-    boundary: 10
-    fitting : 10
-  fitting_area_percent: 0.4      # the largest percentage of range of t_max that fitting data covers, unique for spring
-  n_test_obj_samples_per_group:  # number of samples of different losses composing objective function #TODO
-    pde     : 0
-    boundary: 0
-    fitting : 0
+    pde     : [50,50]                # 30 * 30 grid
+    boundary: 50                # 50 point on the boundary
+    fitting : 300               # 300 in total randomly
+
   
 optimizer:
   name : sqp                  # adam or sgd or sqp 
@@ -48,4 +43,6 @@ optimizer:
   mu    : 1.0e-7
   beta2 : 0.999
   pretrain: null              # null; or dict with keys: epoch_start and file_suffix
+  alpha_type: c_adam
+  beta1: 0.9
       
