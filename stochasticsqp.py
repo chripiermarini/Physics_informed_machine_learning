@@ -104,7 +104,8 @@ class StochasticSQP(Optimizer):
         
         if self.alpha_type == 'ada' or self.alpha_type == 'adam':
             grad = g
-        elif self.alpha_type == 'c_ada' or self.alpha_type == 'c_adam' or self.alpha_type == 'adam':
+            singular_add_i = 0
+        elif self.alpha_type == 'c_ada' or self.alpha_type == 'c_adam':
             Pg,singular_add_i = self.solve_linsys(J @ J.T, J@g)
             grad = g - J.T @ Pg
         
