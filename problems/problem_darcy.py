@@ -21,13 +21,6 @@ class Darcy(BaseProblem):
             
         self.conf = conf
         
-        # Initialize NN
-        self.net = eval(self.conf['nn_name'])( self.conf['nn_parameters']['n_discretize'],  self.conf['nn_parameters']['hidden_channels'])
-        
-        self.net.to(device)
-        
-        self.n_parameters = self.count_parameters(self.net)
-        
         self.regs = self.conf['regs']
         
         self.constraint_type = self.conf['constraint_type']
@@ -53,6 +46,22 @@ class Darcy(BaseProblem):
         
         # Set indices pixels for constraints and fixed it
         self.constr_pixel_idx = self.set_constraint_pixel_idx()
+        
+        # Initialize NN
+        if self.conf['nn_name'] == 'FCN':
+            self.conf['nn_input'] = self.input[0].reshape(-1).shape[0]
+            self.conf['nn_output'] = self.ground_truth[0].reshape(-1).shape[0]
+            self.net = eval(self.conf['nn_name'])(self.conf['nn_input'], self.conf['nn_output'],
+                                                self.conf['nn_parameters']['n_hidden'],
+                                                self.conf['nn_parameters']['n_layers'],is_darcy=True)
+        elif self.conf['nn_name'] == 'FNOLocal':
+            self.conf['nn_parameters']['n_discretize'] = 16
+            self.conf['nn_parameters']['hidden_channels'] = 4
+            self.net = eval(self.conf['nn_name'])( self.conf['nn_parameters']['n_discretize'],  self.conf['nn_parameters']['hidden_channels'])
+        
+        self.net.to(device)
+        
+        self.n_parameters = self.count_parameters(self.net)
         
         self.mse_func = torch.nn.MSELoss() # Mean squared error
 
@@ -301,6 +310,7 @@ class Darcy(BaseProblem):
                 ax.set_title('Input nu')
             plt.xticks([], [])
             plt.yticks([], [])
+            plt.ylabel('%s sample # %s' %( sample_type,print_indices[i]))
 
             ax = fig.add_subplot(3, 3, i*3 + 2)
             ax.imshow(y[i].squeeze(),vmin=vmin, vmax=vmax)

@@ -5,9 +5,9 @@ sub_folders:                    # Subfolder names for model, plot, and log
   log   : log
   
 file_suffix: test               # str, all the leaf output file name will contain this suffix
-maxiter: 20000                  # Total number of epochs
+maxiter: 30000                  # Total number of epochs
 save_model_every: 100           # Save models and logs per [such] iterations
-save_plot_every: 100           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
+save_plot_every: 1000           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
 stdout : 1                      # 0: print to screen, 1: print to log file
 
 problem:                        # Parameters for problem
@@ -18,7 +18,7 @@ problem:                        # Parameters for problem
     pde     : 1.0e-3
     boundary: 1.0e-3
     fitting : 1
-  n_constrs: 0                    # number of constraints ---
+  n_constrs: 10                    # number of constraints ---
   constraint_type : other       # pde, or fitting, or boundary, or other
   batch_size: full            # str full or int batch_size #TODO
   nn_name       : TwoHiddenLayerFCNN           # neural network name. This should be a class in nn_architecture.py

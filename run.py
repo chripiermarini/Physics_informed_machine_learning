@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 plot = False
 train = True
-problems = ['chemistry', 'spring', 'darcy']
-output_folder = './test2'
+problems = ['spring', 'chemistry', 'burgers', 'darcy']
+output_folder = '../test'
 
 plt.style.use("fast")
 
@@ -15,20 +15,29 @@ def main():
     for problem_name in problems:
         
         if train == True:
-        
-            with open('conf/conf_'+problem_name+'.yaml') as f:
-                config = yaml.load(f, Loader=yaml.FullLoader)
             
             settings = {
-                1: {},
+                1: {'alpha_type':'adam',
+                    'is_constrained':0},
+                2: {'alpha_type':'adam',
+                    'is_constrained':1},
+                3: {'alpha_type':'c_adam',
+                    'is_constrained':1}
                 }
             
             for k,setting in settings.items():
-                config['maxiter'] = 100
-                config['save_model_every'] = 10
-                config['save_plot_every'] = 10
+                with open('conf/conf_'+problem_name+'.yaml') as f:
+                    config = yaml.load(f, Loader=yaml.FullLoader)
+                    
+                #config['maxiter'] = 100
+                #config['save_model_every'] = 10
+                #config['save_plot_every'] = 10
+                config['optimizer']['alpha_type'] = setting['alpha_type']
+                if setting['is_constrained'] == 0:
+                    config['problem']['n_constrs'] = 0    
+                
                 config['output_folder'] = output_folder
-                config['file_suffix'] = '%s%s%s' %(problem_name, 'test', k)
+                config['file_suffix'] = '%ssetting%s' %(problem_name,k)
                 run(config)
                 
         if plot == True:
@@ -56,13 +65,17 @@ def plot_f(problem):
     elif problem == 'darcy':
         log_folder = 'Darcy'
         plot_columns ['Boundary'] = 'f_boundary'
+    elif problem == 'burgers':
+        log_folder = 'Burgers'
+        plot_columns ['Boundary'] = 'f_boundary'
     elif problem == 'chemistry':
         log_folder = 'Chemistry'
         plot_columns['Other MSE'] = 'f_boundary'
     
     log_dir = '%s/log/%s' %(output_folder, log_folder)
-    files = {'method1'     : '%ssetting1.txt' %(problem),
-            'method2'      : '%ssetting2.txt' %(problem),
+    files = {'Adam(unconstrained)'     : '%ssetting1.txt' %(problem),
+            'Adam(constrained)'        : '%ssetting2.txt' %(problem),
+            'P-Adam(constrained)'      : '%ssetting3.txt' %(problem),
             }
     first_header = 'epoch'
     x_column_name = 'epoch'

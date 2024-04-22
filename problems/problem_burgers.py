@@ -57,7 +57,7 @@ class Burgers(BaseProblem):
     
     def true_burgers_solution(self, xs, ts, u0):
         #Wave number discretization
-        k = 2 * torch.pi * torch.fft.fftfreq( self.x_discretization, d = xs[1] - xs[0])
+        k = 2 * np.pi * np.fft.fftfreq( self.x_discretization, d = (xs[1] - xs[0]).cpu().detach().numpy() )
         
         ############## EQUATION SOLVING ###############
 
@@ -78,7 +78,7 @@ class Burgers(BaseProblem):
         
         
         #PDE resolution (ODE system resolution)
-        U = odeint(burg_system, u0, ts, args=(k,self.mu,self.nu,))
+        U = odeint(burg_system, u0.cpu(), ts.cpu(), args=(k,self.mu,self.nu,))
         return U
     
     
@@ -241,7 +241,7 @@ class Burgers(BaseProblem):
     def plot_u(self, save_path, u, title, is_true = False):
         
         # reshape u
-        u = u.reshape(self.x_discretization,-1).detach().numpy()
+        u = u.reshape(self.x_discretization,-1).cpu().detach().numpy()
         fig, ax = plt.subplots(figsize=(8, 6))
         plt.imshow(u, cmap='viridis',vmin=self.vmin, vmax=self.vmax)  # Use 'viridis' colormap for better visualization
         plt.colorbar()  # Add a colorbar to show scale
@@ -249,11 +249,11 @@ class Burgers(BaseProblem):
         plt.xlabel('x')
         plt.ylabel('t')
         if is_true:
-            ax.scatter(self.sample['ic_input'][:,0]*self.x_discretization,self.sample['ic_input'][:,1], marker='o',s=3,c='blue')
-            ax.scatter(self.sample['pc_input_0'][:,0]*self.x_discretization,self.sample['pc_input_0'][:,1]*self.t_discretization, marker='o',s=3,c='blue')
-            ax.scatter(self.sample['pc_input_1'][:,0]*(self.x_discretization-1),self.sample['pc_input_1'][:,1]*self.t_discretization, marker='o',s=3,c='blue')
-            ax.scatter(self.sample['fitting_input'][:,0]*(self.x_discretization-1),self.sample['fitting_input'][:,1]*(self.t_discretization-1), marker='o',s=3,c='red')
-            ax.scatter(self.sample['pde_input'][:,0]*(self.x_discretization-1),self.sample['pde_input'][:,1]*(self.t_discretization-1), marker='o',s=3,c='black')
+            ax.scatter(self.sample['ic_input'][:,0].cpu()*self.x_discretization,self.sample['ic_input'][:,1].cpu(), marker='o',s=3,c='blue')
+            ax.scatter(self.sample['pc_input_0'][:,0].cpu()*self.x_discretization,self.sample['pc_input_0'][:,1].cpu()*self.t_discretization, marker='o',s=3,c='blue')
+            ax.scatter(self.sample['pc_input_1'][:,0].cpu()*(self.x_discretization-1),self.sample['pc_input_1'][:,1].cpu()*self.t_discretization, marker='o',s=3,c='blue')
+            ax.scatter(self.sample['fitting_input'][:,0].cpu()*(self.x_discretization-1),self.sample['fitting_input'][:,1].cpu()*(self.t_discretization-1), marker='o',s=3,c='red')
+            ax.scatter(self.sample['pde_input'][:,0].cpu()*(self.x_discretization-1),self.sample['pde_input'][:,1].cpu()*(self.t_discretization-1), marker='o',s=3,c='black')
         ax.xaxis.tick_top()
         ax.set_xticks([0, u.shape[0]])
         ax.set_xticklabels([0, self.x_max])

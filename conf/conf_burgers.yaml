@@ -7,7 +7,7 @@ sub_folders:                    # Subfolder names for model, plot, and log
 file_suffix: test               # str, all the leaf output file name will contain this suffix
 maxiter: 10000                  # Total number of epochs
 save_model_every: 100           # Save models and logs per [such] iterations
-save_plot_every: 100           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
+save_plot_every: 1000           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
 stdout : 1                      # 0: print to screen, 1: print to log file
 
 problem:                        # Parameters for problem
@@ -17,7 +17,7 @@ problem:                        # Parameters for problem
     boundary: 1
     fitting : 1
   n_constrs: 10                   # number of constraints ---
-  constraint_type : boundary       # pde, or boundary
+  constraint_type : pde       # pde, or boundary
   batch_size: full            # str full or int batch_size #TODO
   nn_name       : FCN           # neural network name. This should be a class in nn_architecture.py
   nn_input      : 2             # x, t, u_zero
@@ -32,7 +32,7 @@ problem:                        # Parameters for problem
   x_discretization: 100        # null or list of discretization x of number dim_x
   n_group_pde_parameters: 1     # int. number of group of pde parameters
   n_train_obj_samples_per_group: # number of samples of different losses composing objective function
-    pde     : [50,50]                # 30 * 30 grid
+    pde     : [50,50]                # 50 * 50 grid
     boundary: 50                # 50 point on the boundary
     fitting : 300               # 300 in total randomly
 

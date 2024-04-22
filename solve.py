@@ -101,6 +101,7 @@ def plot_prediction(folders, epoch, problem, config):
         plt.close("all")
     elif problem.name == 'Darcy':
         problem.plot_prediction(file, sample_type='test')
+        problem.plot_prediction(file.replace('.png', '_train.png'), sample_type='train')
     elif problem.name == 'Chemistry':
         if epoch == 0:
           problem.chemistry_plot(save_label = True, save_path_label = file.replace('plot_', 'label_'))
