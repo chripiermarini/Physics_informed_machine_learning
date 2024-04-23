@@ -19,10 +19,11 @@ class Chemistry(BaseProblem):
 
     def __init__(self, device, conf):
         self.conf = conf
-
+        
         # Initialize NN
         self.net = eval(self.conf['nn_name'])(self.conf['nn_input'], self.conf['nn_output'],
-                                              n_neurons=self.conf['nn_parameters']['n_neurons'])
+                                              self.conf['nn_parameters']['n_hidden'],
+                                              self.conf['nn_parameters']['n_layers'])
         self.net.to(device)
 
         self.n_parameters = self.count_parameters(self.net)
@@ -148,18 +149,16 @@ class Chemistry(BaseProblem):
         return pde, dt
 
     def objective_func(self):
-        
+        fitting_idx = self.fitting_sample_indices
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.train_sample_size)
-            fitting_idx = self.fitting_sample_indices
         else:
-            # TODO
-            pass
-            # fitting_idx should be the intersection
+            batch_idx = torch.randint(low=0,high=self.train['t'].size(0),size=(int(self.train['t'].size(0)*self.conf['batch_size']),))
         
-        
-        output = self.net(torch.cat((self.train['y_initial'][batch_idx], self.train['t'][batch_idx]), 1))
-        pde_values, dt = self.pde(output, self.train['t'])
+        y_initial_pde = self.train['y_initial'][batch_idx]
+        t_pde =  self.train['t'][batch_idx]
+        output = self.net(torch.cat((y_initial_pde,t_pde), 1))
+        pde_values, dt = self.pde(output, t_pde)
         
         # PDE objective function
         pde_loss = self.mse_cost_function(pde_values, torch.zeros_like(pde_values))

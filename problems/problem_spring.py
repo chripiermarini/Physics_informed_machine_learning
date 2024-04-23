@@ -96,14 +96,19 @@ class Spring(BaseProblem):
         Arguments:
             optimizer: the optimizer object 
         """
+        if self.conf['batch_size'] == 'full':
+            batch_idx = torch.arange(self.t_pde.size(0))
+        else:
+            batch_idx = torch.randint(low=0,high=self.t_pde.size(0),size=(int(self.t_pde.size(0)*self.conf['batch_size']),))
 
         # fitting loss
         u_fitting_pred = self.net(self.t_fitting)
         fitting_loss = torch.mean((u_fitting_pred- self.u_fitting)**2)
 
         # pde loss
-        u_pde_pred = self.net(self.t_pde)
-        pde_residual = self.pde(u_pde_pred, self.t_pde)
+        t_pde_batch = self.t_pde[batch_idx]
+        u_pde_pred = self.net(t_pde_batch)
+        pde_residual = self.pde(u_pde_pred, t_pde_batch)
         pde_loss = torch.mean((pde_residual)**2)
 
         # boundary loss

@@ -18,7 +18,7 @@ problem:                        # Parameters for problem
     fitting : 1
   n_constrs: 10                   # number of constraints ---
   constraint_type : pde       # pde, or boundary
-  batch_size: full            # str full or int batch_size #TODO
+  batch_size: 0.5            # str full or int batch_size #TODO
   nn_name       : FCN           # neural network name. This should be a class in nn_architecture.py
   nn_input      : 2             # x, t, u_zero
   nn_output     : 1

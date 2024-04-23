@@ -217,8 +217,7 @@ class Darcy(BaseProblem):
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.input.size(0))
         else:
-            batch_idx = torch.randint(low=0,high=self.input.size(0),size=(self.conf['batch_size'],))
-        
+            batch_idx = torch.randint(low=0,high=self.input.size(0),size=(int(self.input.size(0)*self.conf['batch_size']),))
         
         # separate x1 and x2 from sample and set they require_grad
         nu = self.input[batch_idx,0,:,:] #1 and 0 values

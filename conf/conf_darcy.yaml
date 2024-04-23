@@ -18,7 +18,7 @@ problem:                        # Parameters for problem
     fitting : 1
   n_constrs: 10                    # number of constraints ---
   constraint_type : pde       # pde, or boundary
-  batch_size: full            # str full or int batch_size #TODO
+  batch_size: 0.2            # str full or int batch_size #TODO
   nn_name       : FNOLocal           # neural network name. This should be a class in nn_architecture.py
   nn_parameters:                # The keys can be different for different neural network
     n_discretize : 16

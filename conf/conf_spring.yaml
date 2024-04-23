@@ -19,7 +19,7 @@ problem:                        # Parameters for problem
   n_constrs: 3                    # number of constraints ---
   constrs_area_percent: [0.14, 0.4, 0.7]     # list of length n_constrs. the constraints applies at percentage of t_max
   constraint_type : pde       # pde, or fitting
-  batch_size: full            # str full or int batch_size #TODO
+  batch_size: 0.5            # str full or int batch_size in [1,n_train_obj_samples_per_group['pde']]
   nn_name       : FCN           # neural network name. This should be a class in nn_architecture.py
   nn_input      : 1
   nn_output     : 1
@@ -37,10 +37,7 @@ problem:                        # Parameters for problem
     boundary: 0
     fitting : 10
   fitting_area_percent: 0.4      # the largest percentage of range of t_max that fitting data covers, unique for spring
-  n_test_obj_samples_per_group:  # number of samples of different losses composing objective function #TODO
-    pde     : 0
-    boundary: 0
-    fitting : 0
+
   
 optimizer:
   name : sqp                  # adam or sgd or sqp 

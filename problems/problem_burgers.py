@@ -182,15 +182,20 @@ class Burgers(BaseProblem):
         pde_function = output_dt + self.mu * torch.mul(output.squeeze(), output_dx) - self.nu*output_second_dx
         return pde_function
 
-    def objective_func(self, return_multiple_f = False):
+    def objective_func(self):
+
+        if self.conf['batch_size'] == 'full':
+            batch_idx = torch.arange(self.sample['pde_input'].size(0))
+        else:
+            batch_idx = torch.randint(low=0,high=self.sample['pde_input'].size(0),size=(int(self.sample['pde_input'].size(0)*self.conf['batch_size']),))
 
         # fitting loss
         u_fitting_pred = self.net(self.sample['fitting_input'])
         fitting_loss = self.mse_cost_function(u_fitting_pred.squeeze(), self.sample['fitting_u_true'])
 
         # pde loss
-        x_pde = self.sample['pde_input'][:,0].requires_grad_(True) 
-        t_pde = self.sample['pde_input'][:,1].requires_grad_(True) 
+        x_pde = self.sample['pde_input'][batch_idx,0].requires_grad_(True) 
+        t_pde = self.sample['pde_input'][batch_idx,1].requires_grad_(True) 
         u_pde_pred = self.net(torch.stack((x_pde, t_pde), axis=1)).requires_grad_(True)
         pde_residual = self.pde(u_pde_pred, x_pde, t_pde)
         pde_loss = self.mse_cost_function(pde_residual, torch.zeros_like(pde_residual))
