@@ -3,6 +3,7 @@ from stochasticsqp import *
 from problems.problem_darcy import Darcy
 from problems.problem_spring import Spring
 from problems.problem_burgers import Burgers
+from problems.problem_burgersinf import Burgersinf
 from problems.problem_chemistry import Chemistry
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
@@ -106,7 +107,7 @@ def plot_prediction(folders, epoch, problem, config):
         if epoch == 0:
           problem.chemistry_plot(save_label = True, save_path_label = file.replace('plot_', 'label_'))
         problem.chemistry_plot(save_path = file, epoch_count = epoch)
-    elif problem.name == 'Burgers':
+    elif problem.name == 'Burgers' or problem.name == 'Burgersinf' :
         if epoch == 0:
           problem.plot(save_label = True, save_path = file.replace('plot_', 'label_'))
         problem.plot(save_path = file, epoch=epoch)
@@ -114,7 +115,7 @@ def plot_prediction(folders, epoch, problem, config):
 
 def plot_gif(folders, problem, config, files):
     gif_path = get_gif_path(folders, config['file_suffix'])
-    if problem.name in ['Spring', 'Burgers']:
+    if problem.name in ['Spring', 'Burgers', 'Burgersinf']:
         problem.save_gif_PIL(gif_path, files, fps=20, loop=0)
 
 def run(config):     
@@ -249,8 +250,8 @@ def run(config):
         values['elapse'] = int(t_end)
 
         # Save model and optimizer parameters
-        if np.mod(epoch+1-epoch_start,config['save_model_every']) == 0:
-            save_model(folders, epoch+1, problem, optimizer, config)
+        #if np.mod(epoch+1-epoch_start,config['save_model_every']) == 0:
+        #    save_model(folders, epoch+1, problem, optimizer, config)
 
         # Print Iteration Information   
         if np.mod(epoch-epoch_start,config['save_model_every']) == 0:

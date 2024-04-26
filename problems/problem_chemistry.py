@@ -115,7 +115,8 @@ class Chemistry(BaseProblem):
         if not os.path.exists(self.conf['test_file_path']):
             self.create_dataset(number_of_initial_cond = self.conf['n_test_initial_conditions'], 
                                 n_discretization = self.n_discretization, 
-                                name=self.conf['test_file_path'])
+                                name=self.conf['test_file_path'],
+                                name='test')
 
         test_sample = np.loadtxt(self.conf['test_file_path'],delimiter=',').astype('float32')
         test = {
