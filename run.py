@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
-plot = False
-train = True
-problems = ['spring', 'chemistry', 'darcy', 'burgersinf']
-#problems = ['chemistry']
-output_folder = '../test'
+plot = True
+train = False
+#problems = ['spring', 'chemistry', 'darcy', 'burgersinf']
+problems = ['spring']
+output_folder = '../test0428'
 n_run = 3
 
 plt.style.use("fast")
@@ -89,34 +89,47 @@ def find_header_row_number(file, first_header):
     return i
 
 def plot_f(problem):
+    
+    lr = 0
+    batch='batch'
 
-    plot_columns = {'PDE loss': 'f_pde', 
-                'Data fitting loss': 'f_fitting'}    
+    plot_columns = {'Residual loss': 'f_pde', 
+                'Data-fitting loss': 'f_fitting'}    
     
     if problem == 'spring':
         log_folder = 'Spring'
     elif problem == 'darcy':
         log_folder = 'Darcy'
-        plot_columns ['Boundary'] = 'f_boundary'
+        plot_columns ['Boundary residual loss'] = 'f_boundary'
     elif problem == 'burgersinf':
         log_folder = 'Burgersinf'
-        plot_columns ['Boundary'] = 'f_boundary'
+        plot_columns ['Boundary residual loss'] = 'f_boundary'
     elif problem == 'chemistry':
         log_folder = 'Chemistry'
-        plot_columns['Other MSE'] = 'f_boundary'
+        plot_columns['Mass balance residual loss'] = 'f_boundary'
     
     log_dir = '%s/log/%s' %(output_folder, log_folder)
-    files = {
-            # 'Adam(unconstrained)-full'       : '%ssetting1' %(problem),
-            # 'Adam(constrained)-full'       : '%ssetting2' %(problem),
-            # 'P-Adam(constrained)-full'       : '%ssetting3' %(problem),
-            'Adam(unconstrained)-batch'      : '%ssetting4' %(problem),
-            'Adam(constrained)-batch'        : '%ssetting5' %(problem),
-            'P-Adam(constrained)-batch'      : '%ssetting6' %(problem),
-            }
+    
+    if batch == 'full':
+    
+        files = {
+                'Adam(unconstrained)-full'       : '%ssetting1_lr%s' %(problem, lr),
+                'Adam(constrained)-full'       : '%ssetting2_lr%s' %(problem, lr),
+                'P-Adam(constrained)-full'       : '%ssetting3_lr%s' %(problem, lr),
+                }
+    elif batch == 'batch':
+            
+        files = {
+                'Adam(unconstrained)-batch'      : '%ssetting4_lr%s' %(problem,lr),
+                'Adam(constrained)-batch'        : '%ssetting5_lr%s' %(problem,lr),
+                'P-Adam(constrained)-batch'      : '%ssetting6_lr%s' %(problem,lr),
+                }
+        
     first_header = 'epoch'
     x_column_name = 'epoch'
-    suffix='batch'
+    
+    suffix = '%s_lr%s' %(batch,lr) 
+    
     dfs = {}
     for k, file in files.items():
         dfs[k] = {}
@@ -142,6 +155,7 @@ def plot_f(problem):
             ax.fill_between(x, (y_mean - y_std), ((y_mean + y_std)), alpha=0.3)
         #plt.yscale('log')
         ax.set_yticks(ax.get_yticks(), [r'$10^{%s}$'%int(t) for t in ax.get_yticks()])
+        plt.locator_params(axis='y',nbins=4)
         ax.set_title('%s %s' %(loss_name, suffix))
         ax.legend()
         plt.xlabel('Epoch')

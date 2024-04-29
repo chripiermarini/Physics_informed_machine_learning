@@ -188,8 +188,8 @@ class Chemistry(BaseProblem):
 
     def plot_prediction(self, save_path = None, epoch = None, save_label = False):
         # Plot label
-        y_max = torch.max(self.test['y_label'])+5
-        y_min = torch.min(self.test['y_label'])-5
+        y_max = torch.max(self.test['y_label']).cpu()+5
+        y_min = torch.min(self.test['y_label']).cpu()-5
         fig = plt.figure(figsize = self.figsize)
         ax = fig.add_subplot(111)
         if save_label == True:
