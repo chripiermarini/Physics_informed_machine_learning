@@ -5,10 +5,12 @@ sub_folders:                    # Subfolder names for model, plot, and log
   log   : log
   
 file_suffix: test               # str, all the leaf output file name will contain this suffix
-maxiter: 1000                  # Total number of epochs
-save_model_every: 10           # Save models and logs per [such] iterations
-save_plot_every: 100           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
+n_epoch: 1000                  # Total number of epochs
+save_model_every: 10           # Save models and logs per [such] epochs
+save_plot_every: 100           # Save plots per [such] epochs, n_epoch / save_plot_every better not exceed 500
 stdout : 1                      # 0: print to screen, 1: print to log file
+n_run : 5                       # number of runs; valid only when batch_size is not 'full'
+
 
 problem:                        # Parameters for problem
   name  : Darcy
@@ -28,8 +30,8 @@ problem:                        # Parameters for problem
   x_discretization: 16          # discretization of x for all dim_x
   n_train_group_pde_parameters: 1000     # int. number of group of pde parameters
   fitting_sample_group_percent: 0.2           # the fitting sample is interior points of all n_train_group_pde_parameters * [fitting_sample_group_percent]
-  n_test_group_pde_parameters: 50     # int(50 at most). number of group of pde parameters 
-  print_test_indices: [2,5,40]      # indicies of n_test_group_ped_parameters for plotting
+  n_test_group_pde_parameters: 3     # int(50 at most). number of group of pde parameters 
+  print_test_indices: [0,1,2]      # indicies of n_test_group_ped_parameters for plotting
 
 optimizer:
   name : sqp                  # adam or sgd or sqp 

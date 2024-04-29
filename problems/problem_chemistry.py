@@ -16,7 +16,8 @@ import os
 
 class Chemistry(BaseProblem):
     name = 'Chemistry'
-
+    noise_level = 1
+    
     def __init__(self, device, conf):
         self.conf = conf
         
@@ -45,29 +46,23 @@ class Chemistry(BaseProblem):
         
         self.n_fitting_sample = int(self.train_sample_size * self.conf['fitting_sample_percentage'])
         
-        self.fitting_sample_indices = torch.randint(0, self.train_sample_size, size= (self.n_fitting_sample,))
+        self.fitting_sample_indices = torch.randperm(self.train_sample_size)[:self.n_fitting_sample]
         
         self.mse_cost_function = torch.nn.MSELoss()  # Mean squared error
 
-    def create_dataset(self, number_of_initial_cond, n_discretization = 100, name = 'train'):
+    def create_dataset(self, number_of_initial_cond, n_discretization = 100, save_name = None):
         ''' When called, this function creates new data to be stored in the .txt files
         It generates samples of the t ranging from 0 to 10 divide by the number of objective values constraints
         t until 10, noise_level is 1
         '''
-        random.seed(1776526)
-        np.random.seed(1776526)
-        if name == 'test':
-          random.seed(1776)
-          np.random.seed(1776)
+        random.seed(number_of_initial_cond)
+        np.random.seed(number_of_initial_cond)
 
         time_range = self.t_max
         time_discretization = time_range / n_discretization
         time_span = np.arange(0, time_range, time_discretization)
 
-    # np.repeat(time_span, n_obj_sample, axis = 0)
-
-        noise_level = 1
-        x_init = [np.random.uniform(-noise_level, noise_level, size=(4,)) for _ in range(number_of_initial_cond)]
+        x_init = [np.random.uniform(-self.noise_level, self.noise_level, size=(4,)) for _ in range(number_of_initial_cond)]
         for e in range(number_of_initial_cond):
             x_init[e][0] = x_init[e][0] + 14.5467204
             x_init[e][1] = x_init[e][1] + 16.3351668
@@ -88,19 +83,20 @@ class Chemistry(BaseProblem):
             solution = odeint(func=kinetic_kosir_gen, y0=element, t=time_span)
             samples[index * n_discretization : (index+1) * n_discretization] = np.concatenate((np.expand_dims(time_span,axis=1), np.repeat(np.expand_dims(element, axis=0), n_discretization, axis=0), solution), axis=1)
 
-        np.savetxt(name, samples, delimiter=',') 
-
+        #np.savetxt(save_name, samples, delimiter=',') 
+        return samples.astype('float32')
+    
     def generate_sample(self,device):
         """ This function reads the .txt files and extract data to feed the objective function
         Remember that y has dimension 4""" 
         
         # Generate training data
         if not os.path.exists(self.conf['train_file_path']):
-            self.create_dataset(number_of_initial_cond =self.conf['n_initial_conditions'], 
+            train_sample = self.create_dataset(number_of_initial_cond =self.conf['n_initial_conditions'], 
                                 n_discretization = self.n_discretization, 
-                                name='train')
-
-        train_sample = np.loadtxt(self.conf['train_file_path'],delimiter=',').astype('float32')
+                                save_name=self.conf['train_file_path'])
+        else:
+            train_sample = np.loadtxt(self.conf['train_file_path'],delimiter=',')
  
         train = {
             't':torch.tensor(train_sample[:,0:1]).to(device).requires_grad_(True),
@@ -108,16 +104,15 @@ class Chemistry(BaseProblem):
             'y_label': torch.tensor(train_sample[:,5:]).to(device)
         }
         
-        #TODO: choose evenly
-        constr_row_select = np.random.randint(0, self.train_sample_size,  size=self.n_constrs)
+        constr_row_select = torch.randperm(self.train_sample_size)[:self.n_constrs]
         
         # Generate testing data
         if not os.path.exists(self.conf['test_file_path']):
-            self.create_dataset(number_of_initial_cond = self.conf['n_test_initial_conditions'], 
+            test_sample = self.create_dataset(number_of_initial_cond = self.conf['n_test_initial_conditions'], 
                                 n_discretization = self.n_discretization, 
-                                name='test')
-
-        test_sample = np.loadtxt(self.conf['test_file_path'],delimiter=',').astype('float32')
+                                save_name=self.conf['test_file_path'])
+        else:
+            test_sample = np.loadtxt(self.conf['test_file_path'],delimiter=',')
         test = {
             't':torch.tensor(test_sample[:,0:1]).to(device),
             'y_initial': torch.tensor(test_sample[:,1:5]).to(device),
@@ -153,7 +148,7 @@ class Chemistry(BaseProblem):
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.train_sample_size)
         else:
-            batch_idx = torch.randint(low=0,high=self.train['t'].size(0),size=(int(self.train['t'].size(0)*self.conf['batch_size']),))
+            batch_idx = torch.randperm(self.train['t'].size(0))[:int(self.train['t'].size(0)*self.conf['batch_size'])]
         
         y_initial_pde = self.train['y_initial'][batch_idx]
         t_pde =  self.train['t'][batch_idx]
@@ -191,41 +186,32 @@ class Chemistry(BaseProblem):
 
         return c
 
-    def chemistry_plot(self, save_path = None, epoch_count = None, save_label = False, save_path_label = None):
-      # Plot label
-      if save_label == True:
-        fig1 = plt.figure(figsize = (8,6))
-        ax1= fig1.add_subplot(111)
-        for i in range(4):
-          ax1.plot(self.test['t'].cpu(), self.test['y_label'][:, i].cpu(), label = f'True $y_{i}$') 
-        ax1.set_title('Test Label')  # Set subplot title
-        ax1.set_xlabel('t')  # Set xlabel
-        ax1.set_ylabel('x')
-        ax1.legend()  # Show legend #do we want to fix the legend location? loc='upper left'
-
-        fig1.tight_layout()
-        fig1.savefig(save_path_label, format = 'png')
-        plt.close()
-
-      # Plot 2
-      else:
-        fig2 = plt.figure(figsize = (8,6))
-        ax2 = fig2.add_subplot(111)
-        prediction = self.net(torch.cat((self.test['y_initial'], self.test['t']),1)).cpu().detach().numpy() 
-        for i in range(4):
-            ax2.plot(self.test['t'].cpu(), prediction[:, i], label = f'Predicted $y_{i}$')  # Example scatter plot
-        if epoch_count != None:
-          ax2.set_title(f'Prediction - Epoch {epoch_count}')  # Set subplot title
+    def plot_prediction(self, save_path = None, epoch = None, save_label = False):
+        # Plot label
+        y_max = torch.max(self.test['y_label'])+5
+        y_min = torch.min(self.test['y_label'])-5
+        fig = plt.figure(figsize = self.figsize)
+        ax = fig.add_subplot(111)
+        if save_label == True:
+            for i in range(4):
+                ax.plot(self.test['t'].cpu(), self.test['y_label'][:, i].cpu(), label = f'True $u_{i}$') 
+            title = 'Test Label'
         else:
-          ax2.set_title('Prediction')  # Set subplot title
-        ax2.set_xlabel('t')  # Set xlabel
-        ax2.set_ylabel('x')
-        ax2.legend()  # Show legend #do we want to fix the legend location? loc='upper left'
+            prediction = self.net(torch.cat((self.test['y_initial'], self.test['t']),1)).cpu().detach().numpy() 
+            for i in range(4):
+                ax.plot(self.test['t'].cpu(), prediction[:, i], label = f'Predicted $u_{i}$')  # Example scatter plot
+            if epoch != None:
+                title = f'Prediction - Epoch {epoch}'
+            else:
+                title = 'Prediction'
 
-        fig2.tight_layout()  # Adjust layout
-        fig2.savefig(save_path, format = 'png')
-        plt.close("all")
-      return
+        ax.set_ylim(ymin=y_min,ymax=y_max)
+        ax.set_xlabel('t')  
+        ax.legend(loc='upper left')  
+        ax.set_title(title)
+        fig.tight_layout()
+        fig.savefig(save_path, format = 'png')
+        plt.close()
       
 
 

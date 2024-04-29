@@ -99,7 +99,7 @@ class Spring(BaseProblem):
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.t_pde.size(0))
         else:
-            batch_idx = torch.randint(low=0,high=self.t_pde.size(0),size=(int(self.t_pde.size(0)*self.conf['batch_size']),))
+            batch_idx = torch.randperm(self.t_pde.size(0))[:int(self.t_pde.size(0)*self.conf['batch_size'])]
 
         # fitting loss
         u_fitting_pred = self.net(self.t_fitting)
@@ -143,29 +143,26 @@ class Spring(BaseProblem):
 
         return c
     
-    def plot_result(self,epoch, t,u_true, u_pred, t_fitting,u_fitting,t_pde=None, save_file=None):
-        "Pretty plot training results"
-        t = t.cpu()
-        u_true = u_true.cpu()
-        u_pred = u_pred.cpu()
-        t_fitting = t_fitting.cpu()
-        u_fitting = u_fitting.cpu()
-        t_pde = t_pde.cpu()
-        plt.figure(figsize=(10,4))
+    def plot_prediction(self,save_path, epoch):
+        
+        u_pred = self.net(self.t_test).detach().cpu()
+        t = self.t_test.cpu()
+        u_true = self.u_test.cpu()
+        t_fitting = self.t_fitting.cpu()
+        u_fitting = self.u_fitting.cpu()
+        t_pde = self.t_pde.cpu().detach()
+        plt.figure(figsize=self.figsize_rectangle)
         plt.plot(t,u_true, color="grey", linewidth=2, alpha=0.8, label="Exact solution")
-        plt.plot(t,u_pred, color="tab:blue", linewidth=4, alpha=0.8, label="Neural network prediction")
-        plt.scatter(t_fitting, u_fitting, s=60, color="tab:orange", alpha=0.4, label='Training data')
+        plt.plot(t,u_pred, color="tab:blue", linewidth=3, alpha=0.8, label="Neural network prediction")
+        plt.scatter(t_fitting, u_fitting, s=30, color="tab:orange", alpha=0.7, label='Training data')
         if t_pde is not None:
-            plt.scatter(t_pde, -0*torch.ones_like(t_pde), s=60, color="tab:green", alpha=0.4, 
+            plt.scatter(t_pde, -0*torch.ones_like(t_pde), s=30, color="tab:green", alpha=0.7, 
                         label='Physics loss training locations')
-        #l = plt.legend(loc=(1.01,0.34), frameon=False, fontsize="large")
-        l = plt.legend(loc=(0.7,0), frameon=False, fontsize="small")
+        l = plt.legend(loc=(0.48,0.55), frameon=False,fontsize="small")
         plt.setp(l.get_texts(), color="k")
         plt.xlim(-0.05, 1.05)
-        plt.ylim(-1.1, 1.1)
-        #plt.text(1.065,0.7,"Training step: %i"%(epoch+1),fontsize="xx-large",color="k")
-        plt.text(0.72,-0.5,"Training step: %i"%(epoch),fontsize="medium",color="k")
-        #plt.axis("off")
-        if save_file is not None:
-            plt.savefig(save_file)
+        plt.ylim(-0.9, 1.2)
+        plt.title("Epoch: %i"%(epoch))
+        plt.savefig(save_path, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
+        plt.close("all")
 

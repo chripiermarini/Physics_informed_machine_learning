@@ -118,7 +118,7 @@ class Burgersinf(BaseProblem):
             input, U_true, u0 = self.generate_one_group(xs, ts, device)
             
             # Fitting sample
-            fitting_idx = torch.randint(low=0,high=input.shape[0],size=(self.n_obj_sample_fitting,))
+            fitting_idx = torch.randperm(input.shape[0])[:self.n_obj_sample_fitting]
             fitting_input = input[fitting_idx]
             fitting_u_true = U_true[fitting_idx]
             if k == 0:
@@ -171,13 +171,13 @@ class Burgersinf(BaseProblem):
         
         # all possible couples for the pde of the objective constraints
         if self.constraint_type == 'pde':
-            constr_row_select =  torch.randint(low=0,high=sample['pde_input'].shape[0],size=(self.n_constrs,))
+            constr_row_select =  torch.randperm(sample['pde_input'].shape[0])[:self.n_constrs]
         elif self.constraint_type == 'boundary':
             # half periodic condition and half initial condition
             half = int(self.n_constrs/2)
             constr_row_select={}
-            constr_row_select['pc'] =  torch.randint(low=0,high=self.sample['pc_input_0'].shape[0],size=(half,))
-            constr_row_select['ic'] =  torch.randint(low=0,high=self.sample['pc_input_0'].shape[0],size=(self.n_constrs - half,))
+            constr_row_select['pc'] =  torch.randperm(self.sample['pc_input_0'].shape[0])[:half]
+            constr_row_select['ic'] =  torch.randperm(self.sample['pc_input_0'].shape[0])[:(self.n_constrs - half)]
             
         return sample, constr_row_select
 
@@ -205,7 +205,7 @@ class Burgersinf(BaseProblem):
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.sample['pde_input'].size(0))
         else:
-            batch_idx = torch.randint(low=0,high=self.sample['pde_input'].size(0),size=(int(self.sample['pde_input'].size(0)*self.conf['batch_size']),))
+            batch_idx = torch.randperm(self.sample['pde_input'].size(0))[:int(self.sample['pde_input'].size(0)*self.conf['batch_size'])]
 
         # fitting loss
         u_fitting_pred = self.net(self.sample['fitting_input'])
@@ -264,21 +264,28 @@ class Burgersinf(BaseProblem):
             c = torch.cat((c1,c2))
         return c
 
-    def plot(self,save_label=False,save_path=None,epoch=0):
-        fig = plt.figure(figsize=(8,3))
+    def plot_prediction(self,save_label=False,save_path=None,epoch=0):
+        fig = plt.figure(figsize=self.figsize_rectangle_vertical)
         for i in range(self.n_group_pde_parameters_test):
-            ax = fig.add_subplot(1, 3, i + 1)
+            ax = fig.add_subplot(3,1, i + 1)
             vmax=torch.max(self.sample['test'][i]['u_true'])
             vmin=torch.min(self.sample['test'][i]['u_true'])
             if save_label:
                 u = self.sample['test'][i]['u_true']
+                if i == 0:
+                    ax.set_title('Test Label')
+                plt.xticks([], [])
+                plt.yticks([], [])
+                plt.ylabel('sample # %s' %(i))
             else:
                 u = self.net(self.sample['test'][i]['input'])
+                if i == 0:
+                    ax.set_title('Epoch %s' %(epoch))
+                plt.xticks([], [])
+                plt.yticks([], [])
             u = u.reshape(self.x_discretization,-1).cpu().detach().numpy()
             ax.imshow(u, cmap='viridis',vmin=vmin, vmax=vmax)  # Use 'viridis' colormap for better visualization
-            plt.xticks([], [])
-            plt.yticks([], [])
-        fig.suptitle('iteration %s' %(epoch), y=0.98)
+
         plt.tight_layout()
         fig.savefig(save_path)
         plt.close("all")

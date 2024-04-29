@@ -5,22 +5,24 @@ sub_folders:                    # Subfolder names for model, plot, and log
   log   : log
   
 file_suffix: test               # str, all the leaf output file name will contain this suffix
-maxiter: 30000                  # Total number of epochs
-save_model_every: 100           # Save models and logs per [such] iterations
-save_plot_every: 1000           # Save plots per [such] iterations, maxiter / save_plot_every better not exceed 500
+n_epoch: 50000                  # Total number of epochs
+save_model_every: 100           # Save models and logs per [such] epochs
+save_plot_every: 1000           # Save plots per [such] epochs, n_epoch / save_plot_every better not exceed 500
 stdout : 1                      # 0: print to screen, 1: print to log file
+n_run : 5                       # number of runs; valid only when batch_size is not 'full'
+
 
 problem:                        # Parameters for problem
   name  : Chemistry 
   train_file_path : ./problems/chemistry_train.txt
   test_file_path : ./problems/chemistry_test.txt
   regs:                           # regularization multipliers of different losses composing objective function
-    pde     : 1.0e-3
-    boundary: 1.0e-3
+    pde     : 1.0e-2
+    boundary: 1.0e-2
     fitting : 1
   n_constrs: 10                    # number of constraints ---
   constraint_type : other       # pde, or fitting, or boundary, or other
-  batch_size: 0.5               # str full or int batch_size #TODO
+  batch_size: 0.2               # str full or int batch_size #TODO
   nn_name       : FCN           # neural network name. This should be a class in nn_architecture.py
   nn_input      : 5             # x, t, u_zero
   nn_output     : 4
@@ -28,9 +30,9 @@ problem:                        # Parameters for problem
     n_hidden: 64
     n_layers: 3
   t_max: 10                      # null or int. Largest time.
-  t_discretization: 100         # null or int. discretization of time
-  fitting_sample_percentage : 0.6
-  n_initial_conditions : 100     # int. number of initial condition generated
+  t_discretization: 64         # null or int. discretization of time
+  fitting_sample_percentage : 0.2
+  n_initial_conditions : 1000     # int. number of initial condition generated
   n_test_initial_conditions: 1
   
 optimizer:
@@ -40,6 +42,4 @@ optimizer:
   beta2 : 0.999
   pretrain: null              # null; or dict with keys: epoch_start and file_suffix
   alpha_type: 'c_adam'         # 'ada', 'adam', 'c_ada', 'c_adam' 
-  beta1 : 0.1
-      
-      
+  beta1 : 0.9

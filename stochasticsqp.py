@@ -57,7 +57,6 @@ class StochasticSQP(Optimizer):
         self.beta2 = config['beta2']
         self.alpha_type = config['alpha_type']
         self.beta1 = config['beta1']   
-        #self.printerBeginningSummary()
 
     def __setstate__(self, state):
         super(StochasticSQP, self).__setstate__(state)
@@ -230,46 +229,8 @@ class StochasticSQP(Optimizer):
             else:
                 alpha_pre = self.step_size
                 self.step_size = self.step_size * self.step_size_decay
-            #self.printerIteration()
 
         return loss
-    
-    def printerBeginningSummary(self):
-        print('-----------------------------------StochasticSQPOptimizer--------------------------------')
-        print('Problem name:          ', self.problem.name)
-        print('Number of parameters:  ', self.n_parameters)
-        print('Number of constraints: ', self.n_constrs)
-        print('Sample size:           ', self.problem.n_obj_sample)
-        print('-----------------------------------------------------------------------------------------')
-    
-    def printerHeader(self):
-        
-        print('{:>8s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s} {:>11s}'
-              .format('Iter', 'f', 'f_interior', 'f_boundary', '||c||_1', 'merit_f', 'phi_new', 'search_rhs','stepsize','merit_param','ratio_param',
-                      'trial_merit', 'trial_ratio', 'norm_d','kkt_norm', 'ls_Iter'))
-
-    def printerIteration(self,every=1):
-        if np.mod(self.state['iter'],every) == 0:
-            print('{:8d} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11.4e} {:11d}'.format(
-                self.state['iter'], 
-                self.state['f'], 
-                self.state['f_interior'], 
-                self.state['f_boundary'], 
-                torch.linalg.norm(self.state['c'], 1), 
-                self.state['cur_merit_f'],
-                self.state['phi_new'],
-                self.state['search_rhs'],
-                self.step_size,
-                self.merit_param,
-                self.ratio_param,
-                self.trial_merit,
-                self.trial_ratio,
-                self.norm_d,
-                self.kkt_norm,
-                self.ls_k
-                ))
-            if np.mod(self.state['iter'],every*20) == 0 and (self.state['iter'] != 0):
-                self.printerHeader()
 
     def load_pretrain_state(self,optim_path):
         state = torch.load(optim_path)

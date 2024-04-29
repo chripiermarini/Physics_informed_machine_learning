@@ -1,5 +1,3 @@
-import random
-import numpy as np
 from .problem_base import BaseProblem
 from nn_architecture import *
 import torch
@@ -136,13 +134,13 @@ class Darcy(BaseProblem):
 
     def set_constraint_pixel_idx(self):
         # Selected sample for constraints
-        sample_idx = torch.randint(low=0,high=self.n_train_group_pde_parameters,size=(self.n_constrs,))
+        sample_idx = torch.randperm(self.n_train_group_pde_parameters)[:self.n_constrs]
         
         if self.constraint_type == 'pde':
-            pixel_select = torch.randint(low=0,high=self.n_interior_pixels_each_sample,size=(self.n_constrs,))
+            pixel_select = torch.randperm(self.n_interior_pixels_each_sample)[:self.n_constrs]
             pixel_idx = self.interior_idx[pixel_select]
         elif self.constraint_type == 'boundary':        
-            pixel_select = torch.randint(low=0,high=self.n_boundary_pixels_each_sample,size=(self.n_constrs,))
+            pixel_select = torch.randperm(self.n_boundary_pixels_each_sample)[:self.n_constrs]
             pixel_idx = self.boundary_idx[pixel_select]
         
         constr_pixel_idx = torch.concatenate((sample_idx.reshape(self.n_constrs,1), pixel_idx),dim=1)
@@ -217,7 +215,7 @@ class Darcy(BaseProblem):
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.input.size(0))
         else:
-            batch_idx = torch.randint(low=0,high=self.input.size(0),size=(int(self.input.size(0)*self.conf['batch_size']),))
+            batch_idx = torch.randperm(self.input.size(0))[:int(self.input.size(0)*self.conf['batch_size'])]
         
         # separate x1 and x2 from sample and set they require_grad
         nu = self.input[batch_idx,0,:,:] #1 and 0 values
@@ -277,57 +275,55 @@ class Darcy(BaseProblem):
         
         return c
     
-    def plot_prediction(self, save_path, sample_type='test'):
-        fig = plt.figure(figsize=(7, 7))
+    def plot_prediction(self, save_path=None, epoch=None, save_label=False):
         print_indices = self.conf['print_test_indices']
-        if sample_type == 'train':
-            # Input x
-            x = self.input[print_indices]
-            # Ground-truth
-            y = self.ground_truth[print_indices]
-            # Model prediction
-            out = self.net(self.input[print_indices])
-        elif sample_type == 'test':
+        # Ground-truth
+        y = self.test_ground_truth[print_indices]
+        y = y.cpu()
+        if save_label == True:
             # Input x
             x = self.test_input_data[print_indices]
-            # Ground-truth
-            y = self.test_ground_truth[print_indices]
-            # Model prediction
+            x = x.cpu()
+            
+            fig = plt.figure(figsize=self.figsize_rectangle2_vertical)
+            
+            for i in range(len(print_indices)):
+
+                vmax=torch.max(y[i])
+                vmin=torch.min(y[i])
+
+                ax = fig.add_subplot(3, 2, i*2 + 1)
+                ax.imshow(x[i,0], cmap='gray')
+                if i == 0:
+                    ax.set_title('Input nu')
+                plt.xticks([], [])
+                plt.yticks([], [])
+                plt.ylabel('sample # %s' %(print_indices[i]))
+
+                ax = fig.add_subplot(3, 2, i*2 + 2)
+                ax.imshow(y[i].squeeze(),vmin=vmin, vmax=vmax)
+                if i == 0:
+                    ax.set_title('Test Label')
+                plt.xticks([], [])
+                plt.yticks([], [])
+        else:
+            # Prediction
             out = self.net(self.test_input_data[print_indices])
-        
-        x = x.cpu()
-        y = y.cpu()
-        out = out.cpu()
-        for i in range(len(print_indices)):
-
-            vmax=torch.max(y[i])
-            vmin=torch.min(y[i])
-
-            ax = fig.add_subplot(3, 3, i*3 + 1)
-            ax.imshow(x[i,0], cmap='gray')
-            if i == 0:
-                ax.set_title('Input nu')
-            plt.xticks([], [])
-            plt.yticks([], [])
-            plt.ylabel('%s sample # %s' %( sample_type,print_indices[i]))
-
-            ax = fig.add_subplot(3, 3, i*3 + 2)
-            ax.imshow(y[i].squeeze(),vmin=vmin, vmax=vmax)
-            if i == 0:
-                ax.set_title('Ground-truth u')
-            plt.xticks([], [])
-            plt.yticks([], [])
+            out = out.cpu()
             
+            fig = plt.figure(figsize=self.figsize_rectangle_vertical)
+            for i in range(len(print_indices)):
 
-            ax = fig.add_subplot(3, 3, i*3 + 3)
-            ax.imshow(out[i].squeeze().detach().numpy(),vmin=vmin, vmax=vmax)
-            if i == 0:
-                ax.set_title('Model prediction u')
-            plt.xticks([], [])
-            plt.yticks([], [])
-            
+                vmax=torch.max(y[i])
+                vmin=torch.min(y[i])
+                
+                ax = fig.add_subplot(3, 1, i + 1)
+                ax.imshow(out[i].squeeze().detach().numpy(),vmin=vmin, vmax=vmax)
+                if i == 0:
+                    ax.set_title('Epoch %s' %(epoch))
+                plt.xticks([], [])
+                plt.yticks([], [])
 
-        fig.suptitle('Inputs, ground-truth output and prediction.', y=0.98)
         plt.tight_layout()
         fig.savefig(save_path)
         plt.close("all")
