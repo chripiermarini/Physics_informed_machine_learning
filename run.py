@@ -5,75 +5,85 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
-plot = True
-train = False
-#problems = ['spring', 'chemistry', 'darcy', 'burgersinf']
-problems = ['spring']
-output_folder = '../test0428'
-n_run = 3
+plot = False
+train = True
+problems = ['chemistry', 'burgersinf'] # Qi runs chemistry and burgersinf
+#problems = ['spring', 'darcy']         # Christian runs spring and darcy
+output_folder = '../result0430'
+
+settings = {
+    1: {'alpha_type':'adam',
+        'is_constrained':0,
+        'is_full_batch':1},
+    2: {'alpha_type':'adam',
+        'is_constrained':1,
+        'is_full_batch':1},
+    3: {'alpha_type':'c_adam',
+        'is_constrained':1,
+        'is_full_batch':1},
+    4: {'alpha_type':'adam',
+        'is_constrained':0,
+        'is_full_batch':0},
+    5: {'alpha_type':'adam',
+        'is_constrained':1,
+        'is_full_batch':0},
+    6: {'alpha_type':'c_adam',
+        'is_constrained':1,
+        'is_full_batch':0},
+    }
+
+lrs_all = [1e-3, 5e-4, 1e-4]
+lrs_darcy = [1e-2, 5e-3, 1e-3, 5e-4, 1e-4]
+
+n_run = 5
 
 plt.style.use("fast")
 
 def main():
 
-    for problem_name in problems:
-        
-        if train == True:
-            
-            #lrs = [1e-3, 5e-4, 1e-4]
-            lrs = [1e-3]
-            if problem_name == 'darcy':
-                lrs = [1e-2]#, 5e-3, 1e-3, 5e-4, 1e-4]
-            
-            for lr_i, lr in enumerate(lrs):
-            
-                settings = {
-                    1: {'alpha_type':'adam',
-                        'is_constrained':0,
-                        'is_full_batch':1},
-                    2: {'alpha_type':'adam',
-                        'is_constrained':1,
-                        'is_full_batch':1},
-                    3: {'alpha_type':'c_adam',
-                        'is_constrained':1,
-                        'is_full_batch':1},
-                    4: {'alpha_type':'adam',
-                        'is_constrained':0,
-                        'is_full_batch':0},
-                    5: {'alpha_type':'adam',
-                        'is_constrained':1,
-                        'is_full_batch':0},
-                    6: {'alpha_type':'c_adam',
-                        'is_constrained':1,
-                        'is_full_batch':0},
-                    }
+    if train == True:
+        for batch_seed in range(n_run):
+            for problem_name in problems:
+                if problem_name == 'darcy':
+                    lrs = lrs_darcy
+                else:
+                    lrs = lrs_all
+                    
+                for lr_i, lr in enumerate(lrs):
+                    
+                    for k,setting in settings.items():
+                        print('Running batch_seed:%s, problem: %s, lr: %s, setting: %s' %(batch_seed, problem_name, lr, k))
+                        # full batch setting only have one run
+                        if k in [1,2,3] and batch_seed != 0:
+                            continue
+                        
+                        with open('conf/conf_'+problem_name+'.yaml') as f:
+                            config = yaml.load(f, Loader=yaml.FullLoader)
+                        
+                        config['batch_seed'] = batch_seed    
+                        
+                        #config['n_epoch'] = 2
+                        #config['save_model_every'] = 1
+                        #config['save_plot_every'] = 1
+                        
+                        config['optimizer']['lr'] = lr
+                    
+                        config['optimizer']['alpha_type'] = setting['alpha_type']
+                        
+                        if setting['is_constrained'] == 0:
+                            config['problem']['n_constrs'] = 0    
+                        
+                        if setting['is_full_batch'] == 1:
+                            config['problem']['batch_size'] = 'full'    
+                        
+                        config['output_folder'] = output_folder
+                        
+                        config['file_suffix'] = '%ssetting%s_lr%s' %(problem_name,k,lr_i)
+                        
+                        run(config)
                 
-                for k,setting in settings.items():
-                    with open('conf/conf_'+problem_name+'.yaml') as f:
-                        config = yaml.load(f, Loader=yaml.FullLoader)
-                    
-                    config['n_run'] = 3    
-                    # config['n_epoch'] = 10
-                    # config['save_model_every'] = 5
-                    # config['save_plot_every'] = 5
-                    
-                    config['optimizer']['lr'] = lr
-                
-                    config['optimizer']['alpha_type'] = setting['alpha_type']
-                    
-                    if setting['is_constrained'] == 0:
-                        config['problem']['n_constrs'] = 0    
-                    
-                    if setting['is_full_batch'] == 1:
-                        config['problem']['batch_size'] = 'full'    
-                    
-                    config['output_folder'] = output_folder
-                    
-                    config['file_suffix'] = '%ssetting%s_lr%s' %(problem_name,k,lr_i)
-                    
-                    run(config)
-                
-        if plot == True:
+    if plot == True:
+        for problem_name in problems:
             plot_f(problem_name)
 
 
@@ -172,6 +182,6 @@ if __name__ == '__main__':
       IN_COLAB = True
     except:
       IN_COLAB = False
-    if IN_COLAB:
-      from google.colab import runtime
-      runtime.unassign()
+    #if IN_COLAB:
+    #  from google.colab import runtime
+    #  runtime.unassign()

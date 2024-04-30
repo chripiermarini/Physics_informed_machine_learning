@@ -9,7 +9,7 @@ n_epoch: 50000                  # Total number of epochs
 save_model_every: 100           # Save models and logs per [such] epochs
 save_plot_every: 1000           # Save plots per [such] epochs, n_epoch / save_plot_every better not exceed 500
 stdout : 1                      # 0: print to screen, 1: print to log file
-n_run : 5                       # number of runs; valid only when batch_size is not 'full'
+batch_seed : 5                       # number of runs; valid only when batch_size is not 'full'
 
 
 problem:                        # Parameters for problem

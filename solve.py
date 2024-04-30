@@ -112,185 +112,185 @@ def plot_gif(folders, problem, config, files):
 
 def run(config):     
     if config['problem']['batch_size'] == 'full':# 'full' or percentage of sample 
-        n_run = 1
+        batch_seed = 0
     else:
-        n_run = config['n_run'] 
+        batch_seed = config['batch_seed'] 
     file_suffix = config['file_suffix']
-    for run_i in range(n_run):
-        np.random.seed(22)
-        torch.manual_seed(123)
-
-        # Adjust file_suffix by run_i
-        config['file_suffix'] = file_suffix + '_' + str(run_i)
-
-        # Create output folders
-        folders = create_output_folders(config['output_folder'],config['sub_folders'],config['problem']['name'])
-
-        # Load problem instance
-        problem = eval(config['problem']['name'])(DEVICE,config['problem'])
-        
-        # Set_torch_random_seed(self, seed)
-        problem.set_torch_random_seed(run_i)
-        
-        # Add problem number of parameters to config
-        config['problem']['n_parameters'] = problem.n_parameters
-
-        # Load optimizer
-        if config['optimizer']['name'] == 'adam':
-            optimizer = torch.optim.Adam(problem.net.parameters(),lr=config['optimizer']['lr'])
-        elif config['optimizer']['name'] == 'sgd':
-            optimizer = torch.optim.SGD(problem.net.parameters(),lr=config['optimizer']['lr'])
-        elif config['optimizer']['name'] == 'sqp':
-            optimizer = StochasticSQP(problem.net.parameters(),
-                                lr = config['optimizer']['lr'],
-                                config = config['optimizer'],
-                                n_parameters = problem.n_parameters, 
-                                n_constrs = problem.n_constrs,
-                                merit_param_init = 1, 
-                                ratio_param_init = 1,
-                                step_opt= 2,
-                                problem = problem,)
-        
-        # Open log file IO
-        if config['stdout'] == 1:
-            log_file_name = '%s/%s.txt' %(folders['log'],config['file_suffix'])
-            log_f = open(log_file_name,'w')
-        elif config['stdout'] == 0:
-            log_f = None
-
-
-        # reload the model and optimizer. Now only apply to sqp optimizer
-        if (config['optimizer']['pretrain'] is not None) and (config['optimizer']['name'] == 'sqp'):
-            epoch_start = config['optimizer']['pretrain']['epoch_start']
-            pretrain_suffix = config['optimizer']['pretrain']['file_suffix']
-            mdl_path=get_mdl_path(folders, epoch_start, pretrain_suffix)
-            problem.load_net(mdl_path)
-            optim_path = get_optim_path(folders, epoch_start, pretrain_suffix)
-            optimizer.load_pretrain_state(optim_path)
-            iter = optimizer.state['iter']
-        else:
-            epoch_start=0
-            iter = 0
-
-            
-        #printer header
-        headers = printerBeginningSummary(config, log_f)
-        values = {k:-1 for k in headers}
-
-        #optimizer.initialize_param(0.1)
-        #check_gradient(optimizer, problem)
-        #x0 = get_x(problem)
-        
-        files = []
-        
-        # plot the initial prediction
-        file = plot_prediction(folders, epoch_start, problem, config)
-        files.append(file)
-        
-        # Set starting time
-        t_start = time.time()
-
-        # Main Loop
-        for epoch in range(epoch_start, epoch_start+config['n_epoch']+1):
     
-            batch_size = config['problem']['batch_size'] # 'full' or percentage of sample 
-            if batch_size == 'full':
-                n_batch = 1
+    np.random.seed(22)
+    torch.manual_seed(123)
+
+    # Adjust file_suffix by batch_seed
+    config['file_suffix'] = file_suffix + '_' + str(batch_seed)
+
+    # Create output folders
+    folders = create_output_folders(config['output_folder'],config['sub_folders'],config['problem']['name'])
+
+    # Load problem instance
+    problem = eval(config['problem']['name'])(DEVICE,config['problem'])
+    
+    # Set_torch_random_seed(self, seed)
+    problem.set_torch_random_seed(batch_seed)
+    
+    # Add problem number of parameters to config
+    config['problem']['n_parameters'] = problem.n_parameters
+
+    # Load optimizer
+    if config['optimizer']['name'] == 'adam':
+        optimizer = torch.optim.Adam(problem.net.parameters(),lr=config['optimizer']['lr'])
+    elif config['optimizer']['name'] == 'sgd':
+        optimizer = torch.optim.SGD(problem.net.parameters(),lr=config['optimizer']['lr'])
+    elif config['optimizer']['name'] == 'sqp':
+        optimizer = StochasticSQP(problem.net.parameters(),
+                            lr = config['optimizer']['lr'],
+                            config = config['optimizer'],
+                            n_parameters = problem.n_parameters, 
+                            n_constrs = problem.n_constrs,
+                            merit_param_init = 1, 
+                            ratio_param_init = 1,
+                            step_opt= 2,
+                            problem = problem,)
+    
+    # Open log file IO
+    if config['stdout'] == 1:
+        log_file_name = '%s/%s.txt' %(folders['log'],config['file_suffix'])
+        log_f = open(log_file_name,'w')
+    elif config['stdout'] == 0:
+        log_f = None
+
+
+    # reload the model and optimizer. Now only apply to sqp optimizer
+    if (config['optimizer']['pretrain'] is not None) and (config['optimizer']['name'] == 'sqp'):
+        epoch_start = config['optimizer']['pretrain']['epoch_start']
+        pretrain_suffix = config['optimizer']['pretrain']['file_suffix']
+        mdl_path=get_mdl_path(folders, epoch_start, pretrain_suffix)
+        problem.load_net(mdl_path)
+        optim_path = get_optim_path(folders, epoch_start, pretrain_suffix)
+        optimizer.load_pretrain_state(optim_path)
+        iter = optimizer.state['iter']
+    else:
+        epoch_start=0
+        iter = 0
+
+        
+    #printer header
+    headers = printerBeginningSummary(config, log_f)
+    values = {k:-1 for k in headers}
+
+    #optimizer.initialize_param(0.1)
+    #check_gradient(optimizer, problem)
+    #x0 = get_x(problem)
+    
+    files = []
+    
+    # plot the initial prediction
+    file = plot_prediction(folders, epoch_start, problem, config)
+    files.append(file)
+    
+    # Set starting time
+    t_start = time.time()
+
+    # Main Loop
+    for epoch in range(epoch_start, epoch_start+config['n_epoch']+1):
+
+        batch_size = config['problem']['batch_size'] # 'full' or percentage of sample 
+        if batch_size == 'full':
+            n_batch = 1
+        else:
+            n_batch = int(1/batch_size)
+        
+        # Add printer values    
+        values['epoch'] = epoch
+            
+        for batch_i in range(n_batch):
+
+            # Compute f, g, c, J
+            fs, g = problem.objective_func_and_grad(optimizer)
+            c, J = problem.constraint_func_and_grad(optimizer)
+            
+            # Add printer values
+            values['iter'] = iter
+            values['f'] = fs['f'].data
+            values['f_pde'] = fs['pde'].data
+            values['f_boundary'] = fs['boundary'].data
+            values['f_fitting'] = fs['fitting'].data
+            if config['problem']['n_constrs'] > 0:
+                values['||c||inf'] = torch.norm(c,p=float('inf'))
             else:
-                n_batch = int(1/batch_size)
+                values['||c||inf'] = torch.tensor(0.)
+            values['||c||1'] = torch.norm(c,p=1)
             
-            # Add printer values    
-            values['epoch'] = epoch
-                
-            for batch_i in range(n_batch):
+            # Update f, g, c, J to optimizer
+            optimizer.state['f'] = fs['f'].data
+            optimizer.state['g'] = g
+            optimizer.state['c'] = c
+            optimizer.state['J'] = J
+            optimizer.state["f_g_hand"] = problem.objective_func_and_grad
+            optimizer.state["c_J_hand"] = problem.constraint_func_and_grad
 
-                # Compute f, g, c, J
-                fs, g = problem.objective_func_and_grad(optimizer)
-                c, J = problem.constraint_func_and_grad(optimizer)
-                
-                # Add printer values
-                values['iter'] = iter
-                values['f'] = fs['f'].data
-                values['f_pde'] = fs['pde'].data
-                values['f_boundary'] = fs['boundary'].data
-                values['f_fitting'] = fs['fitting'].data
-                if config['problem']['n_constrs'] > 0:
-                    values['||c||inf'] = torch.norm(c,p=float('inf'))
-                else:
-                    values['||c||inf'] = torch.tensor(0.)
-                values['||c||1'] = torch.norm(c,p=1)
-                
-                # Update f, g, c, J to optimizer
-                optimizer.state['f'] = fs['f'].data
-                optimizer.state['g'] = g
-                optimizer.state['c'] = c
-                optimizer.state['J'] = J
-                optimizer.state["f_g_hand"] = problem.objective_func_and_grad
-                optimizer.state["c_J_hand"] = problem.constraint_func_and_grad
-
-                # Take a step inside optimizer
-                optimizer.step()
-                
-                # if epoch == 0:
-                #     x1 = get_x(problem)
-                #     diff = (x1 - x0)*1000 
-                #     with open('g_test_%s.txt' %(optimizer_name),'w') as f_g_test: 
-                #         for i in diff:
-                #             f_g_test.write(str(i.detach().numpy())+'\n')
-
-                # get max and min step size
-                if config['optimizer']['name'] == 'adam':
-                    values['alpha'] = optimizer.param_groups[0]['lr']
-                    beta1_adam,beta2_adam = optimizer.param_groups[0]['betas']
-                    eps_adam = optimizer.param_groups[0]['eps']
-                    H = np.sqrt(1-beta2_adam**(iter+1)) / (1-beta1_adam**(iter+1)) 
-                    vt = torch.tensor([])
-                    mt = torch.tensor([])
-                    for group in optimizer.param_groups:
-                        for p in group['params']:
-                            state = optimizer.state[p]
-                            vt = torch.concat((vt,state['exp_avg_sq'].view(-1)))
-                            mt = torch.concat((mt,state['exp_avg'].view(-1)))
-                    H = H / (torch.sqrt(vt) + eps_adam)
-                    values['H_max'] = torch.max(H)
-                    values['H_min'] = torch.min(H)
-                    # x0 - x1 should be equal to alpha_max * mt. They have small difference now. 
-                elif config['optimizer']['name'] == 'sqp':
-                    values['alpha'] = optimizer.state['alpha_sqp']
-                    values['merit_f'] = optimizer.state['cur_merit_f']
-                    values['tau'] = optimizer.state['merit_param']
-                    values['H_max'] = torch.max(optimizer.state['H_diag'])
-                    values['H_min'] = torch.min(optimizer.state['H_diag'])
+            # Take a step inside optimizer
+            optimizer.step()
             
-                # Print Initial Information
-                if epoch==epoch_start and batch_i == 0:
-                    printRow(log_f,type='value',headers=headers,values=values)
-            
-                iter += 1
-                
-            # Add time elapse
-            t_end = time.time() - t_start
-            values['elapse'] = int(t_end)
+            # if epoch == 0:
+            #     x1 = get_x(problem)
+            #     diff = (x1 - x0)*1000 
+            #     with open('g_test_%s.txt' %(optimizer_name),'w') as f_g_test: 
+            #         for i in diff:
+            #             f_g_test.write(str(i.detach().numpy())+'\n')
 
-            # Save model and optimizer parameters
-            if np.mod(epoch+1-epoch_start,config['save_model_every']) == 0:
-                save_model(folders, epoch+1, problem, optimizer, config)
-
-            # Print Iteration Information   
-            if np.mod(epoch-epoch_start,config['save_model_every']) == 0:
+            # get max and min step size
+            if config['optimizer']['name'] == 'adam':
+                values['alpha'] = optimizer.param_groups[0]['lr']
+                beta1_adam,beta2_adam = optimizer.param_groups[0]['betas']
+                eps_adam = optimizer.param_groups[0]['eps']
+                H = np.sqrt(1-beta2_adam**(iter+1)) / (1-beta1_adam**(iter+1)) 
+                vt = torch.tensor([])
+                mt = torch.tensor([])
+                for group in optimizer.param_groups:
+                    for p in group['params']:
+                        state = optimizer.state[p]
+                        vt = torch.concat((vt,state['exp_avg_sq'].view(-1)))
+                        mt = torch.concat((mt,state['exp_avg'].view(-1)))
+                H = H / (torch.sqrt(vt) + eps_adam)
+                values['H_max'] = torch.max(H)
+                values['H_min'] = torch.min(H)
+                # x0 - x1 should be equal to alpha_max * mt. They have small difference now. 
+            elif config['optimizer']['name'] == 'sqp':
+                values['alpha'] = optimizer.state['alpha_sqp']
+                values['merit_f'] = optimizer.state['cur_merit_f']
+                values['tau'] = optimizer.state['merit_param']
+                values['H_max'] = torch.max(optimizer.state['H_diag'])
+                values['H_min'] = torch.min(optimizer.state['H_diag'])
+        
+            # Print Initial Information
+            if epoch==epoch_start and batch_i == 0:
                 printRow(log_f,type='value',headers=headers,values=values)
+        
+            iter += 1
+            
+        # Add time elapse
+        t_end = time.time() - t_start
+        values['elapse'] = int(t_end)
 
-            # Plot prediction
-            if np.mod(epoch-epoch_start,config['save_plot_every']) == 0:
-                file = plot_prediction(folders, epoch+1, problem, config)
-                files.append(file)         
+        # Save model and optimizer parameters
+        if np.mod(epoch+1-epoch_start,config['save_model_every']) == 0:
+            save_model(folders, epoch+1, problem, optimizer, config)
+
+        # Print Iteration Information   
+        if np.mod(epoch-epoch_start,config['save_model_every']) == 0:
+            printRow(log_f,type='value',headers=headers,values=values)
+
+        # Plot prediction
+        if np.mod(epoch-epoch_start,config['save_plot_every']) == 0:
+            file = plot_prediction(folders, epoch+1, problem, config)
+            files.append(file)         
             
         # Plot GIF
         plot_gif(folders, problem, config, files)
 
-        # Close file IO
-        if config['stdout'] == 1:
-            log_f.close()
+    # Close file IO
+    if config['stdout'] == 1:
+        log_f.close()
 
 if __name__ == '__main__':
 
