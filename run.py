@@ -7,7 +7,7 @@ import numpy as np
 
 plot = False
 train = True
-problems = ['chemistry', 'burgersinf'] # Qi runs chemistry and burgersinf
+problems = ['chemistry', 'burgersinf']  # Qi runs chemistry and burgersinf
 #problems = ['spring', 'darcy']         # Christian runs spring and darcy
 output_folder = '../result0430'
 
@@ -32,25 +32,42 @@ settings = {
         'is_full_batch':0},
     }
 
-lrs_all = [1e-3, 5e-4, 1e-4]
-lrs_darcy = [1e-2, 5e-3, 1e-3, 5e-4, 1e-4]
+lrs_all = {
+  0:1e-3,
+  1:5e-4,
+  2:1e-4
+}
 
-n_run = 5
+
+lrs_darcy = {
+  0:1e-2, 
+  1:5e-3, 
+  2:1e-3, 
+  3:5e-4, 
+  4:1e-4}
+
+n_run = {
+  0:0,
+  1:1,
+  2:2,
+  3:3,
+  4:4
+}
 
 plt.style.use("fast")
 
 def main():
 
     if train == True:
-        for batch_seed in range(n_run):
+        for batch_seed in n_run.values():
             for problem_name in problems:
                 if problem_name == 'darcy':
                     lrs = lrs_darcy
                 else:
                     lrs = lrs_all
                     
-                for lr_i, lr in enumerate(lrs):
-                    
+                for lr_i, lr in lrs.items():
+
                     for k,setting in settings.items():
                         print('Running batch_seed:%s, problem: %s, lr: %s, setting: %s' %(batch_seed, problem_name, lr, k))
                         # full batch setting only have one run
