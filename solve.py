@@ -285,8 +285,8 @@ def run(config):
             file = plot_prediction(folders, epoch+1, problem, config)
             files.append(file)         
             
-        # Plot GIF
-        plot_gif(folders, problem, config, files)
+    # Plot GIF
+    plot_gif(folders, problem, config, files)
 
     # Close file IO
     if config['stdout'] == 1:
