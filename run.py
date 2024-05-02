@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
-plot = False
-train = True
-problems = ['chemistry', 'burgersinf']  # Qi runs chemistry and burgersinf
+plot = True
+train = False
+problems = ['darcy']  # Qi runs chemistry and burgersinf
 #problems = ['spring', 'darcy']         # Christian runs spring and darcy
 output_folder = '../result0430'
 
@@ -44,7 +44,8 @@ lrs_darcy = {
   1:5e-3, 
   2:1e-3, 
   3:5e-4, 
-  4:1e-4}
+  4:1e-4
+  }
 
 n_run = {
   0:0,
@@ -117,79 +118,104 @@ def find_header_row_number(file, first_header):
 
 def plot_f(problem):
     
-    lr = 0
-    batch='batch'
+    if problem == 'darcy':
+        lrs = lrs_darcy
+    else:
+        lrs = lrs_all
+    
+    batch_setting = [ 'mini-batch', 'full batch']
+    for lr_i, lr in lrs.items():
+        for batch in batch_setting:
 
-    plot_columns = {'Residual loss': 'f_pde', 
-                'Data-fitting loss': 'f_fitting'}    
-    
-    if problem == 'spring':
-        log_folder = 'Spring'
-    elif problem == 'darcy':
-        log_folder = 'Darcy'
-        plot_columns ['Boundary residual loss'] = 'f_boundary'
-    elif problem == 'burgersinf':
-        log_folder = 'Burgersinf'
-        plot_columns ['Boundary residual loss'] = 'f_boundary'
-    elif problem == 'chemistry':
-        log_folder = 'Chemistry'
-        plot_columns['Mass balance residual loss'] = 'f_boundary'
-    
-    log_dir = '%s/log/%s' %(output_folder, log_folder)
-    
-    if batch == 'full':
-    
-        files = {
-                'Adam(unconstrained)-full'       : '%ssetting1_lr%s' %(problem, lr),
-                'Adam(constrained)-full'       : '%ssetting2_lr%s' %(problem, lr),
-                'P-Adam(constrained)-full'       : '%ssetting3_lr%s' %(problem, lr),
-                }
-    elif batch == 'batch':
+            plot_columns = {'Residual loss': 'f_pde', 
+                        'Data-fitting loss': 'f_fitting',
+                        'Objective': 'f'}    
             
-        files = {
-                'Adam(unconstrained)-batch'      : '%ssetting4_lr%s' %(problem,lr),
-                'Adam(constrained)-batch'        : '%ssetting5_lr%s' %(problem,lr),
-                'P-Adam(constrained)-batch'      : '%ssetting6_lr%s' %(problem,lr),
-                }
-        
-    first_header = 'epoch'
-    x_column_name = 'epoch'
-    
-    suffix = '%s_lr%s' %(batch,lr) 
-    
-    dfs = {}
-    for k, file in files.items():
-        dfs[k] = {}
-        filenames = [filename for filename in os.listdir(log_dir) if filename.startswith(file)]
-        for run_i, filename in enumerate(filenames):
-            full_file = '%s/%s' %(log_dir, filename)
-            i = find_header_row_number(full_file,first_header)
-            df = pd.read_csv(full_file,skiprows=i, sep='\s+',)
-            dfs[k][run_i] = df
-    for loss_name,i in plot_columns.items():
-        # plot the data
-        fig = plt.figure(figsize=(4.2,3.2))
-        ax = fig.add_subplot(1, 1, 1)
-        for k, runs in dfs.items():
-            x = runs[0][x_column_name]
-            ys = np.zeros((len(runs), len(x)))
-            for run_i, df in runs.items():
-                ys[run_i] = df[i]
-            ys = np.log10(ys)               # use log scale y
-            y_mean = np.mean(ys,axis=0)
-            y_std = np.std(ys, axis=0)
-            ax.plot(x, y_mean, label=k)
-            ax.fill_between(x, (y_mean - y_std), ((y_mean + y_std)), alpha=0.3)
-        #plt.yscale('log')
-        ax.set_yticks(ax.get_yticks(), [r'$10^{%s}$'%int(t) for t in ax.get_yticks()])
-        plt.locator_params(axis='y',nbins=4)
-        ax.set_title('%s %s' %(loss_name, suffix))
-        ax.legend()
-        plt.xlabel('Epoch')
-        plt.tight_layout()
-        # display the plot
-        plt.savefig('%s/%s_%s_%s.png' %(log_dir, problem, i,suffix))
-        plt.close()
+            if problem == 'spring':
+                log_folder = 'Spring'
+            elif problem == 'darcy':
+                log_folder = 'Darcy'
+                plot_columns ['Boundary residual loss'] = 'f_boundary'
+            elif problem == 'burgersinf':
+                log_folder = 'Burgersinf'
+                plot_columns ['Boundary residual loss'] = 'f_boundary'
+            elif problem == 'chemistry':
+                log_folder = 'Chemistry'
+                plot_columns['Mass balance residual loss'] = 'f_boundary'
+            
+            log_dir = '%s/log/%s' %(output_folder, log_folder)
+            
+            if batch == 'full batch':
+            
+                files = {
+                        'Adam(unc)'       : '%ssetting1_lr%s' %(problem, lr_i),
+                        'Adam(con)'       : '%ssetting2_lr%s' %(problem, lr_i),
+                        'P-Adam(con)'       : '%ssetting3_lr%s' %(problem, lr_i),
+                        }
+            elif batch == 'mini-batch':
+                    
+                files = {
+                        'Adam(unc)'      : '%ssetting4_lr%s' %(problem,lr_i),
+                        'Adam(con)'        : '%ssetting5_lr%s' %(problem,lr_i),
+                        'P-Adam(con)'      : '%ssetting6_lr%s' %(problem,lr_i),
+                        }
+            
+            markers = {
+                'Adam(unc)': 's', 
+                'Adam(con)': 'o',
+                'P-Adam(con)': 'v'
+            }
+                
+            first_header = 'epoch'
+            x_column_name = 'epoch'
+            
+            suffix = '%s_lr%s' %(batch,lr) 
+            
+            dfs = {}
+            for k, file in files.items():
+                dfs[k] = {}
+                filenames = [filename for filename in os.listdir(log_dir) if filename.startswith(file)]
+                for run_i, filename in enumerate(filenames):
+                    full_file = '%s/%s' %(log_dir, filename)
+                    i = find_header_row_number(full_file,first_header)
+                    df = pd.read_csv(full_file,skiprows=i, sep='\s+',)
+                    dfs[k][run_i] = df
+            for loss_name,i in plot_columns.items():
+                # plot the data
+                fig = plt.figure(figsize=(4.2,3.2))
+                ax = fig.add_subplot(1, 1, 1)
+                for k, runs in dfs.items():
+                    if problem == 'chemistry':
+                        x = runs[0][x_column_name][:202]
+                        ys = np.zeros((len(runs), len(x)))
+                        for run_i, df in runs.items():
+                            ys[run_i] = df[i][:202]
+                    else:
+                        x = runs[0][x_column_name]
+                        ys = np.zeros((len(runs), len(x)))
+                        for run_i, df in runs.items():
+                            ys[run_i] = df[i]
+                    ys = np.log10(ys)               # use log scale y
+                    y_mean = np.mean(ys,axis=0)
+                    y_std = np.std(ys, axis=0)
+                    ax.plot(x, y_mean, label=k, marker = markers[k], markevery=5, markersize=5)
+                    ax.fill_between(x, (y_mean - y_std), (y_mean + y_std), alpha=0.3)
+                #plt.yscale('log')
+                log_tick_label = []
+                for t in ax.get_yticks():
+                    t = str(round(t,1))
+                    if t[-1] == '0':
+                        t = t[:-2]
+                    log_tick_label.append(r'$10^{%s}$' %t)
+                ax.set_yticks(ax.get_yticks(), log_tick_label)
+                plt.locator_params(axis='y',nbins=4)
+                ax.set_title('%s (%s, $%s$)' %(loss_name, batch, lr))
+                ax.legend()
+                plt.xlabel('Epoch')
+                plt.tight_layout()
+                # display the plot
+                plt.savefig('%s/loss_plots/%s_%s_%s.png' %(output_folder, problem, i,suffix))
+                plt.close()
 
 
 if __name__ == '__main__':

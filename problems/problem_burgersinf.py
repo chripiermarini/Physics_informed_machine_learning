@@ -10,7 +10,7 @@ from scipy.integrate import odeint
 class Burgersinf(BaseProblem):
     name = 'Burgersinf'
     nu = 0.01   ##kinematic viscosity coefficient
-    mu = 0.5    
+    mu = 1    
     
     def __init__(self, device, conf):
 
