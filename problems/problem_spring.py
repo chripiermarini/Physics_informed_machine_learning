@@ -158,11 +158,14 @@ class Spring(BaseProblem):
         if t_pde is not None:
             plt.scatter(t_pde, -0*torch.ones_like(t_pde), s=30, color="tab:green", alpha=0.7, 
                         label='Physics loss training locations')
-        l = plt.legend(loc=(0.48,0.55), frameon=False,fontsize="small")
-        plt.setp(l.get_texts(), color="k")
-        plt.xlim(-0.05, 1.05)
+        #l = plt.legend(loc=(0.48,0.55), frameon=False,fontsize="small")
+        #plt.setp(l.get_texts(), color="k")
+        plt.xlim(-0.02, 1.02)
         plt.ylim(-0.9, 1.2)
+        plt.xticks([], [])
+        plt.yticks([], [])
         plt.title("Epoch: %i"%(epoch))
+        plt.tight_layout()
         plt.savefig(save_path, bbox_inches='tight', pad_inches=0.1, dpi=100, facecolor="white")
         plt.close("all")
 
