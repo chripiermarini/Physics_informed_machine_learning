@@ -8,6 +8,7 @@ from PIL import Image
 class BaseProblem(ABC):
     figsize=(4.2, 3.2) 
     figsize_rectangle_vertical =(2.2, 5.3)
+    figsize_rectangle_horizontal =(5.3, 2.2)
     figsize_rectangle2_vertical =(4, 5.3)
     figsize_rectangle =(4.2, 2.2)
     @abstractmethod
@@ -25,7 +26,10 @@ class BaseProblem(ABC):
         torch.save(self.net.state_dict(), path)
 
     def load_net(self,path):
-        self.net.load_state_dict(torch.load(path,map_location=torch.device('cpu')))
+        try:
+            self.net.load_state_dict(torch.load(path,map_location=torch.device('cpu')))
+        except:
+            self.net.load_state_dict(torch.load(path+'.zip',map_location=torch.device('cpu')))
         self.net.eval()
         
     def objective_func_and_grad(self, optimizer, no_grad = False):

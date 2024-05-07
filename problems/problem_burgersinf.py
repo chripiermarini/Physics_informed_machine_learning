@@ -265,21 +265,21 @@ class Burgersinf(BaseProblem):
         return c
 
     def plot_prediction(self,save_label=False,save_path=None,epoch=0):
-        fig = plt.figure(figsize=self.figsize_rectangle_vertical)
+        fig = plt.figure(figsize=self.figsize_rectangle_horizontal)
         for i in range(self.n_group_pde_parameters_test):
-            ax = fig.add_subplot(3,1, i + 1)
+            ax = fig.add_subplot(1,self.n_group_pde_parameters_test, i + 1)
             vmax=torch.max(self.sample['test'][i]['u_true'])
             vmin=torch.min(self.sample['test'][i]['u_true'])
             if save_label:
                 u = self.sample['test'][i]['u_true']
-                if i == 0:
-                    ax.set_title('Test Label')
+                if i == 1:
+                    ax.set_title('True Solution')
                 plt.xticks([], [])
                 plt.yticks([], [])
-                plt.ylabel('sample # %s' %(i))
+                #plt.ylabel('sample # %s' %(i))
             else:
                 u = self.net(self.sample['test'][i]['input'])
-                if i == 0:
+                if i == 1:
                     ax.set_title('Epoch %s' %(epoch))
                 plt.xticks([], [])
                 plt.yticks([], [])

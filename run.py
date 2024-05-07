@@ -5,37 +5,37 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
-plot = True
-train = False
-problems = ['darcy']  # Qi runs chemistry and burgersinf
+plot = False
+train = True
+problems = ['burgersinf']  # Qi runs chemistry and burgersinf
 #problems = ['spring', 'darcy']         # Christian runs spring and darcy
-output_folder = '../result0430'
+output_folder = '../result0430burgers' # '../result0506chemistry'
 
 settings = {
-    1: {'alpha_type':'adam',
-        'is_constrained':0,
-        'is_full_batch':1},
-    2: {'alpha_type':'adam',
-        'is_constrained':1,
-        'is_full_batch':1},
-    3: {'alpha_type':'c_adam',
-        'is_constrained':1,
-        'is_full_batch':1},
-    4: {'alpha_type':'adam',
-        'is_constrained':0,
-        'is_full_batch':0},
-    5: {'alpha_type':'adam',
-        'is_constrained':1,
-        'is_full_batch':0},
+    # 1: {'alpha_type':'adam',
+    #     'is_constrained':0,
+    #     'is_full_batch':1},
+    # 2: {'alpha_type':'adam',
+    #     'is_constrained':1,
+    #     'is_full_batch':1},
+    # 3: {'alpha_type':'c_adam',
+    #     'is_constrained':1,
+    #     'is_full_batch':1},
+    # 4: {'alpha_type':'adam',
+    #     'is_constrained':0,
+    #     'is_full_batch':0},
+    # 5: {'alpha_type':'adam',
+    #     'is_constrained':1,
+    #     'is_full_batch':0},
     6: {'alpha_type':'c_adam',
         'is_constrained':1,
         'is_full_batch':0},
     }
 
 lrs_all = {
-  0:1e-3,
+  #0:1e-3,
   1:5e-4,
-  2:1e-4
+  #2:1e-4
 }
 
 
@@ -49,10 +49,10 @@ lrs_darcy = {
 
 n_run = {
   0:0,
-  1:1,
-  2:2,
-  3:3,
-  4:4
+#   1:1,
+#   2:2,
+#   3:3,
+#   4:4
 }
 
 plt.style.use("fast")
@@ -80,7 +80,7 @@ def main():
                         
                         config['batch_seed'] = batch_seed    
                         
-                        #config['n_epoch'] = 2
+                        config['n_epoch'] = 0
                         #config['save_model_every'] = 1
                         #config['save_plot_every'] = 1
                         
@@ -96,7 +96,12 @@ def main():
                         
                         config['output_folder'] = output_folder
                         
-                        config['file_suffix'] = '%ssetting%s_lr%s' %(problem_name,k,lr_i)
+                        config['file_suffix'] = '%ssetting%s_lr%scontd' %(problem_name,k,lr_i)
+                        
+                        config['optimizer']['pretrain'] = {
+                            'epoch_start': 10000,
+                            'file_suffix': '%ssetting%s_lr%s_0' %(problem_name,k,lr_i)
+                        }
                         
                         run(config)
                 
@@ -185,21 +190,15 @@ def plot_f(problem):
                 fig = plt.figure(figsize=(4.2,3.2))
                 ax = fig.add_subplot(1, 1, 1)
                 for k, runs in dfs.items():
-                    if problem == 'chemistry':
-                        x = runs[0][x_column_name][:202]
-                        ys = np.zeros((len(runs), len(x)))
-                        for run_i, df in runs.items():
-                            ys[run_i] = df[i][:202]
-                    else:
-                        x = runs[0][x_column_name]
-                        ys = np.zeros((len(runs), len(x)))
-                        for run_i, df in runs.items():
-                            ys[run_i] = df[i]
+                    x = runs[0][x_column_name]
+                    ys = np.zeros((len(runs), len(x)))
+                    for run_i, df in runs.items():
+                        ys[run_i] = df[i]
                     ys = np.log10(ys)               # use log scale y
                     y_mean = np.mean(ys,axis=0)
                     y_std = np.std(ys, axis=0)
                     ax.plot(x, y_mean, label=k, marker = markers[k], markevery=5, markersize=5)
-                    ax.fill_between(x, (y_mean - y_std), (y_mean + y_std), alpha=0.3)
+                    ax.fill_between(x, (y_mean - y_std), (y_mean + y_std), alpha=0.5)
                 #plt.yscale('log')
                 log_tick_label = []
                 for t in ax.get_yticks():

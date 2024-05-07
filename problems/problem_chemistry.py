@@ -195,7 +195,7 @@ class Chemistry(BaseProblem):
         if save_label == True:
             for i in range(4):
                 ax.plot(self.test['t'].cpu(), self.test['y_label'][:, i].cpu(), label = f'True $u_{i}$') 
-            title = 'Test Label'
+            title = 'True solution'
         else:
             prediction = self.net(torch.cat((self.test['y_initial'], self.test['t']),1)).cpu().detach().numpy() 
             for i in range(4):
@@ -206,8 +206,9 @@ class Chemistry(BaseProblem):
                 title = 'Prediction'
 
         ax.set_ylim(ymin=y_min,ymax=y_max)
-        ax.set_xlabel('t')  
-        ax.legend(loc='upper left')  
+        plt.xticks([], [])
+        plt.yticks([], [])
+        #ax.legend(loc='upper left')  
         ax.set_title(title)
         fig.tight_layout()
         fig.savefig(save_path, format = 'png')
