@@ -10,7 +10,7 @@ plot = False
 train = True
 problems = ['burgers']  # Qi runs chemistry and burgers
 #problems = ['spring', 'darcy']         # Christian runs spring and darcy
-output_folder = '../resultburgerstest' # '../result0506chemistry'
+output_folder = '../resultburgerstest0509' # '../result0506chemistry'
 
 settings = {
     1: {'alpha_type':'adam',
@@ -22,15 +22,15 @@ settings = {
     3: {'alpha_type':'c_adam',
         'is_constrained':1,
         'is_full_batch':1},
-    # 4: {'alpha_type':'adam',
-    #     'is_constrained':0,
-    #     'is_full_batch':0},
-    # 5: {'alpha_type':'adam',
-    #     'is_constrained':1,
-    #     'is_full_batch':0},
-    # 6: {'alpha_type':'c_adam',
-    #     'is_constrained':1,
-    #     'is_full_batch':0},
+    4: {'alpha_type':'adam',
+        'is_constrained':0,
+        'is_full_batch':0},
+    5: {'alpha_type':'adam',
+        'is_constrained':1,
+        'is_full_batch':0},
+    6: {'alpha_type':'c_adam',
+        'is_constrained':1,
+        'is_full_batch':0},
     }
 
 lrs_all = {
@@ -50,10 +50,10 @@ lrs_darcy = {
 
 n_run = {
   0:0,
-#   1:1,
-#   2:2,
-#   3:3,
-#   4:4
+  1:1,
+  2:2,
+  3:3,
+  4:4
 }
 
 plt.style.use("fast")
@@ -81,7 +81,7 @@ def main():
                         
                         config['batch_seed'] = batch_seed    
                         
-                        config['n_epoch'] = 0
+                        #config['n_epoch'] = 0
                         #config['save_model_every'] = 1
                         #config['save_plot_every'] = 1
                         
@@ -97,12 +97,12 @@ def main():
                         
                         config['output_folder'] = output_folder
                         
-                        config['file_suffix'] = '%ssetting%s_lr%scontd' %(problem_name,k,lr_i)
+                        config['file_suffix'] = '%ssetting%s_lr%s' %(problem_name,k,lr_i)
                         
-                        config['optimizer']['pretrain'] = {
-                            'epoch_start': 10000,
-                            'file_suffix': '%ssetting%s_lr%s_0' %(problem_name,k,lr_i)
-                        }
+                        # config['optimizer']['pretrain'] = {
+                        #     'epoch_start': 10000,
+                        #     'file_suffix': '%ssetting%s_lr%s_0' %(problem_name,k,lr_i)
+                        # }
                         
                         run(config)
                 

@@ -8,7 +8,7 @@ from scipy.integrate import odeint
 """ Problem statement Burgers' equation"""
 
 class Burgers(BaseProblem):
-    name = 'Burgersinf'
+    name = 'Burgers'
     nu = 0.01   ##kinematic viscosity coefficient
     mu = 1    
     
