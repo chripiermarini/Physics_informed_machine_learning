@@ -8,15 +8,18 @@ from scipy.integrate import odeint
 """ Problem statement Burgers' equation"""
 
 class Burgers(BaseProblem):
-    name = 'Burgers'
+    name = 'Burgersinf'
     nu = 0.01   ##kinematic viscosity coefficient
-    mu = 0.5    
+    mu = 1    
     
     def __init__(self, device, conf):
 
         self.conf = conf
 
         # Initialize NN
+        self.x_discretization = self.conf['x_discretization']
+        self.conf['nn_input'] += self.x_discretization
+        
         self.net = eval(self.conf['nn_name'])(self.conf['nn_input'], self.conf['nn_output'],
                                               self.conf['nn_parameters']['n_hidden'],
                                               self.conf['nn_parameters']['n_layers'])
@@ -32,27 +35,23 @@ class Burgers(BaseProblem):
         
         self.x_max = self.conf['x_max']
         
-        self.x_discretization = self.conf['x_discretization']
-        
         self.t_max = self.conf['t_max']
         
         self.t_discretization = self.conf['t_discretization']
 
-        self.n_obj_sample_pde = self.conf['n_train_obj_samples_per_group']['pde']
-        self.n_obj_sample_boundary = self.conf['n_train_obj_samples_per_group']['boundary']
-        self.n_obj_sample_fitting = self.conf['n_train_obj_samples_per_group']['fitting']
+        self.n_obj_sample_fitting = self.conf['n_obj_sample_fitting_per_group']
+
+        self.n_group_pde_parameters = self.conf['n_group_pde_parameters']
+        self.n_group_pde_parameters_test = self.conf['n_group_pde_parameters_test']
         
         # Generate sample
         self.sample, self.constr_row_select = self.generate_sample(device)
         
-        self.vmax=torch.max(self.sample['U_true'])
-        self.vmin=torch.min(self.sample['U_true'])
-        
         self.mse_cost_function = torch.nn.MSELoss()  # Mean squared error
 
-    def initial_function(self, xs):
+    def initial_function(self, xs, initial_rand_phase):
         # We use the fix initial function u_0(x) = 3*sin(2pi x)
-        u0 = torch.sin(2*torch.pi * xs)
+        u0 = torch.sin(2*torch.pi * xs + initial_rand_phase)
         return u0
     
     def true_burgers_solution(self, xs, ts, u0):
@@ -82,15 +81,12 @@ class Burgers(BaseProblem):
         return U
     
     
-    def generate_sample(self,device):
-        sample = {}
+    def generate_one_group(self, xs, ts, device):
         
-        # Generate x and t discretization
-        xs = torch.linspace(0,self.x_max,self.x_discretization)
-        ts = torch.linspace(0,self.t_max,self.t_discretization)
+        initial_rand_phase = torch.randint(100,(1,))/50* torch.pi*0.1
         
         # Compute Initial condition
-        u0 = self.initial_function(xs)
+        u0 = self.initial_function(xs,initial_rand_phase)
         
         # compute true solution
         u_true = self.true_burgers_solution(xs, ts, u0)
@@ -101,65 +97,87 @@ class Burgers(BaseProblem):
         X, T = torch.meshgrid(xs, ts, indexing='xy')
         X = X.flatten()
         T = T.flatten()
-        test_input = torch.stack((X,T), axis=1)
+        input = torch.stack((X,T), axis=1)
+        input = torch.cat((input,u0.repeat(input.shape[0],1)), axis=1)
         U_true = u_true.flatten()
+        return input, U_true,u0
+    
+    
+    def generate_sample(self,device):
+        sample = {}
         
-        n_total = len(X)
-        sample['test_input'] = test_input
-        sample['U_true'] = U_true
-        sample['u0'] = u0
+        # sample['test_input'] = test_input
+        # sample['U_true'] = U_true
+        # sample['u0'] = u0
+        # Generate x and t discretization
+        xs = torch.linspace(0,self.x_max,self.x_discretization)
+        ts = torch.linspace(0,self.t_max,self.t_discretization)
         
-        # Fitting sample
-        fitting_idx = torch.randint(low=0,high=n_total,size=(self.n_obj_sample_fitting,))
-        fitting_input = test_input[fitting_idx]
-        fitting_u_true = U_true[fitting_idx]
-        sample['fitting_input'] = fitting_input
-        sample['fitting_u_true'] = fitting_u_true
+        # Generate trainning data
+        for k in range(self.n_group_pde_parameters):
+            input, U_true, u0 = self.generate_one_group(xs, ts, device)
+            
+            # Fitting sample
+            fitting_idx = torch.randperm(input.shape[0])[:self.n_obj_sample_fitting]
+            fitting_input = input[fitting_idx]
+            fitting_u_true = U_true[fitting_idx]
+            if k == 0:
+                sample['fitting_input'] = fitting_input
+                sample['fitting_u_true'] = fitting_u_true
+            else:
+                sample['fitting_input'] = torch.cat((sample['fitting_input'], fitting_input), axis=0)
+                sample['fitting_u_true'] = torch.cat((sample['fitting_u_true'], fitting_u_true), axis=0)
                 
-        # boundary condition sample
-        # u(0,t) = u(1,t) for some t
-        assert(np.mod(self.t_discretization, self.n_obj_sample_boundary) == 0)
-        step = self.t_discretization / self.n_obj_sample_boundary
-        t_pc =  torch.arange(0, self.t_discretization, step)
-        pc_input_0 = torch.zeros(self.n_obj_sample_boundary, 2)
-        pc_input_1 = torch.ones(self.n_obj_sample_boundary, 2)
-        pc_input_0[:,1] = ts[t_pc.int()]
-        pc_input_1[:,1] = ts[t_pc.int()]
-        sample['pc_input_0'] = pc_input_0
-        sample['pc_input_1'] = pc_input_1
+            # boundary condition sample
+            # u(0,t) = u(1,t) for some t
+            pc_input_0 = torch.zeros(self.t_discretization, 2)
+            pc_input_1 = torch.ones(self.t_discretization, 2)
+            pc_input_0[:,1] = ts
+            pc_input_1[:,1] = ts
+            pc_input_0 = torch.cat((pc_input_0,u0.repeat(pc_input_0.shape[0],1)), axis=1)
+            pc_input_1 = torch.cat((pc_input_1,u0.repeat(pc_input_1.shape[0],1)), axis=1)
+            if k == 0:
+                sample['pc_input_0'] = pc_input_0
+                sample['pc_input_1'] = pc_input_1
+            else:
+                sample['pc_input_0'] = torch.cat((sample['pc_input_0'], pc_input_0), axis=0)
+                sample['pc_input_1'] = torch.cat((sample['pc_input_1'], pc_input_1), axis=0)
         
-        # u(x,0) = u0(x) for some x
-        assert(np.mod(self.x_discretization, self.n_obj_sample_boundary) == 0)
-        x_step = self.x_discretization / self.n_obj_sample_boundary
-        x_ic =  torch.arange(0, self.x_discretization, x_step)
-        ic_input = torch.zeros(self.n_obj_sample_boundary, 2)
-        ic_input[:,0] = xs[x_ic.int()]
-        ic_u0 = u0[x_ic.int()]
-        sample['ic_input'] = ic_input
-        sample['ic_u0'] = ic_u0
+            # u(x,0) = u0(x) for some x
+            ic_input = torch.zeros(self.x_discretization, 2)
+            ic_input[:,0] = xs
+            ic_input = torch.cat((ic_input,u0.repeat(ic_input.shape[0],1)), axis=1)
+            ic_u0 = u0
+            if k == 0:
+                sample['ic_input'] = ic_input
+                sample['ic_u0'] = ic_u0
+            else:
+                sample['ic_input'] = torch.cat((sample['ic_input'], ic_input), axis=0)
+                sample['ic_u0'] = torch.cat((sample['ic_u0'], ic_u0), axis=0)
+            
+            # PDE sample
+            if k == 0:
+                sample['pde_input'] = input
+            else:
+                sample['pde_input'] = torch.cat((sample['pde_input'], input), axis=0)
         
-        # PDE sample
-        assert(np.mod(self.x_discretization, self.n_obj_sample_pde[0]) == 0)
-        assert(np.mod(self.t_discretization, self.n_obj_sample_pde[1]) == 0)
-        x_step = self.x_discretization / self.n_obj_sample_pde[0]
-        t_step = self.t_discretization / self.n_obj_sample_pde[1]
-        x_pde = torch.arange(0, self.x_discretization, x_step)
-        t_pde =  torch.arange(0, self.t_discretization, t_step)
-        X_pde, T_pde = torch.meshgrid(xs[x_pde.int()], ts[t_pde.int()], indexing='xy')
-        X_pde = X_pde.flatten()
-        T_pde = T_pde.flatten()
-        pde_input = torch.stack((X_pde,T_pde), axis=1)
-        sample['pde_input'] = pde_input
+        # Generate testing data
+        sample['test'] = {k: {} for k in range(self.n_group_pde_parameters_test)} 
+        for k in range(self.n_group_pde_parameters_test):
+            input, U_true, u0 = self.generate_one_group(xs, ts, device)
+            # PDE sample
+            sample['test'][k]['input'] = input
+            sample['test'][k]['u_true'] = U_true
         
         # all possible couples for the pde of the objective constraints
         if self.constraint_type == 'pde':
-            constr_row_select =  torch.randint(low=0,high=pde_input.shape[0],size=(self.n_constrs,))
+            constr_row_select =  torch.randperm(sample['pde_input'].shape[0])[:self.n_constrs]
         elif self.constraint_type == 'boundary':
             # half periodic condition and half initial condition
             half = int(self.n_constrs/2)
             constr_row_select={}
-            constr_row_select['pc'] =  torch.randint(low=0,high=self.n_obj_sample_boundary,size=(half,))
-            constr_row_select['ic'] =  torch.randint(low=0,high=self.n_obj_sample_boundary,size=(self.n_constrs - half,))
+            constr_row_select['pc'] =  torch.randperm(self.sample['pc_input_0'].shape[0])[:half]
+            constr_row_select['ic'] =  torch.randperm(self.sample['pc_input_0'].shape[0])[:(self.n_constrs - half)]
             
         return sample, constr_row_select
 
@@ -187,7 +205,7 @@ class Burgers(BaseProblem):
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.sample['pde_input'].size(0))
         else:
-            batch_idx = torch.randint(low=0,high=self.sample['pde_input'].size(0),size=(int(self.sample['pde_input'].size(0)*self.conf['batch_size']),))
+            batch_idx = torch.randperm(self.sample['pde_input'].size(0))[:int(self.sample['pde_input'].size(0)*self.conf['batch_size'])]
 
         # fitting loss
         u_fitting_pred = self.net(self.sample['fitting_input'])
@@ -195,8 +213,10 @@ class Burgers(BaseProblem):
 
         # pde loss
         x_pde = self.sample['pde_input'][batch_idx,0].requires_grad_(True) 
-        t_pde = self.sample['pde_input'][batch_idx,1].requires_grad_(True) 
-        u_pde_pred = self.net(torch.stack((x_pde, t_pde), axis=1)).requires_grad_(True)
+        t_pde = self.sample['pde_input'][batch_idx,1].requires_grad_(True)
+        u0 =  self.sample['pde_input'][batch_idx,2:]
+        pde_input = torch.cat((torch.stack((x_pde, t_pde), axis=1), u0), axis=1)
+        u_pde_pred = self.net(pde_input).requires_grad_(True)
         pde_residual = self.pde(u_pde_pred, x_pde, t_pde)
         pde_loss = self.mse_cost_function(pde_residual, torch.zeros_like(pde_residual))
 
@@ -224,8 +244,10 @@ class Burgers(BaseProblem):
 
         if self.constraint_type == 'pde':
             x_pde = self.sample['pde_input'][self.constr_row_select,0].requires_grad_(True) 
-            t_pde = self.sample['pde_input'][self.constr_row_select,1].requires_grad_(True) 
-            u_pde_pred = self.net(torch.stack((x_pde, t_pde), axis=1)).requires_grad_(True)
+            t_pde = self.sample['pde_input'][self.constr_row_select,1].requires_grad_(True)
+            u0 =  self.sample['pde_input'][self.constr_row_select,2:]
+            pde_input = torch.cat((torch.stack((x_pde, t_pde), axis=1), u0), axis=1)
+            u_pde_pred = self.net(pde_input).requires_grad_(True)
             c = self.pde(u_pde_pred, x_pde, t_pde)
 
         if self.constraint_type == 'boundary':
@@ -242,39 +264,28 @@ class Burgers(BaseProblem):
             c = torch.cat((c1,c2))
         return c
 
+    def plot_prediction(self,save_label=False,save_path=None,epoch=0):
+        fig = plt.figure(figsize=self.figsize_rectangle_horizontal)
+        for i in range(self.n_group_pde_parameters_test):
+            ax = fig.add_subplot(1,self.n_group_pde_parameters_test, i + 1)
+            vmax=torch.max(self.sample['test'][i]['u_true'])
+            vmin=torch.min(self.sample['test'][i]['u_true'])
+            if save_label:
+                u = self.sample['test'][i]['u_true']
+                if i == 1:
+                    ax.set_title('True Solution')
+                plt.xticks([], [])
+                plt.yticks([], [])
+                #plt.ylabel('sample # %s' %(i))
+            else:
+                u = self.net(self.sample['test'][i]['input'])
+                if i == 1:
+                    ax.set_title('Epoch %s' %(epoch))
+                plt.xticks([], [])
+                plt.yticks([], [])
+            u = u.reshape(self.x_discretization,-1).cpu().detach().numpy()
+            ax.imshow(u, cmap='viridis',vmin=vmin, vmax=vmax)  # Use 'viridis' colormap for better visualization
 
-    def plot_u(self, save_path, u, title, is_true = False):
-        
-        # reshape u
-        u = u.reshape(self.x_discretization,-1).cpu().detach().numpy()
-        fig, ax = plt.subplots(figsize=(8, 6))
-        plt.imshow(u, cmap='viridis',vmin=self.vmin, vmax=self.vmax)  # Use 'viridis' colormap for better visualization
-        plt.colorbar()  # Add a colorbar to show scale
-        plt.title(title)
-        plt.xlabel('x')
-        plt.ylabel('t')
-        if is_true:
-            ax.scatter(self.sample['ic_input'][:,0].cpu()*self.x_discretization,self.sample['ic_input'][:,1].cpu(), marker='o',s=3,c='blue')
-            ax.scatter(self.sample['pc_input_0'][:,0].cpu()*self.x_discretization,self.sample['pc_input_0'][:,1].cpu()*self.t_discretization, marker='o',s=3,c='blue')
-            ax.scatter(self.sample['pc_input_1'][:,0].cpu()*(self.x_discretization-1),self.sample['pc_input_1'][:,1].cpu()*self.t_discretization, marker='o',s=3,c='blue')
-            ax.scatter(self.sample['fitting_input'][:,0].cpu()*(self.x_discretization-1),self.sample['fitting_input'][:,1].cpu()*(self.t_discretization-1), marker='o',s=3,c='red')
-            ax.scatter(self.sample['pde_input'][:,0].cpu()*(self.x_discretization-1),self.sample['pde_input'][:,1].cpu()*(self.t_discretization-1), marker='o',s=3,c='black')
-        ax.xaxis.tick_top()
-        ax.set_xticks([0, u.shape[0]])
-        ax.set_xticklabels([0, self.x_max])
-        ax.set_yticks([0, u.shape[1]])
-        ax.set_yticklabels([0, self.t_max])
         plt.tight_layout()
         fig.savefig(save_path)
-        plt.close()
-        return
-    
-    def plot(self,save_label=False,save_path=None,epoch=0):
-        if save_label:
-            title = 'True solution'
-            self.plot_u(save_path, self.sample['U_true'], title, is_true = True)
-        else:
-            title = 'Prediction %s' %(epoch)
-            # Compute prediction
-            u_pred = self.net(self.sample['test_input'])
-            self.plot_u(save_path, u_pred, title)
+        plt.close("all")

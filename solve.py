@@ -3,7 +3,6 @@ from stochasticsqp import *
 from problems.problem_darcy import Darcy
 from problems.problem_spring import Spring
 from problems.problem_burgers import Burgers
-from problems.problem_burgersinf import Burgersinf
 from problems.problem_chemistry import Chemistry
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import numpy as np
@@ -100,15 +99,14 @@ def save_model(folders, epoch, problem, optimizer, config):
 
 def plot_prediction(folders, epoch, problem, config):
     file = get_plot_path(folders, epoch, config['file_suffix'])
-    if problem.name in ['Darcy', 'Burgersinf', 'Chemistry'] and epoch == 0:
+    if problem.name in ['Darcy', 'Burgers', 'Chemistry'] and epoch == 0:
         problem.plot_prediction(save_label = True, save_path = file.replace('plot_', 'label_'))    
     problem.plot_prediction(save_path = file, epoch=epoch)
     return file
 
 def plot_gif(folders, problem, config, files):
     gif_path = get_gif_path(folders, config['file_suffix'])
-    if problem.name in ['Spring', 'Darcy', 'Burgersinf', 'Chemistry']:
-        problem.save_gif_PIL(gif_path, files, fps=20, loop=0)
+    problem.save_gif_PIL(gif_path, files, fps=20, loop=0)
 
 def run(config):     
     if config['problem']['batch_size'] == 'full':# 'full' or percentage of sample 
@@ -164,9 +162,9 @@ def run(config):
         epoch_start = config['optimizer']['pretrain']['epoch_start']
         pretrain_suffix = config['optimizer']['pretrain']['file_suffix']
         mdl_path=get_mdl_path(folders, epoch_start, pretrain_suffix)
-        problem.load_net(mdl_path)
+        problem.load_net(mdl_path,DEVICE)
         optim_path = get_optim_path(folders, epoch_start, pretrain_suffix)
-        optimizer.load_pretrain_state(optim_path)
+        optimizer.load_pretrain_state(optim_path,DEVICE)
         iter = optimizer.state['iter']
     else:
         epoch_start=0
@@ -273,15 +271,15 @@ def run(config):
         values['elapse'] = int(t_end)
 
         # Save model and optimizer parameters
-        if np.mod(epoch+1-epoch_start,config['save_model_every']) == 0:
+        if np.mod(epoch+1-epoch_start,config['save_plot_model_every']) == 0:
             save_model(folders, epoch+1, problem, optimizer, config)
 
         # Print Iteration Information   
-        if np.mod(epoch-epoch_start,config['save_model_every']) == 0:
+        if np.mod(epoch-epoch_start,config['save_loss_every']) == 0:
             printRow(log_f,type='value',headers=headers,values=values)
 
         # Plot prediction
-        if np.mod(epoch-epoch_start,config['save_plot_every']) == 0:
+        if np.mod(epoch-epoch_start,config['save_plot_model_every']) == 0:
             file = plot_prediction(folders, epoch+1, problem, config)
             files.append(file)         
             

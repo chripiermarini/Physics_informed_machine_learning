@@ -6,8 +6,8 @@ sub_folders:                    # Subfolder names for model, plot, and log
   
 file_suffix: test               # str, all the leaf output file name will contain this suffix
 n_epoch: 1000                  # Total number of epochs
-save_model_every: 10           # Save models and logs per [such] epochs
-save_plot_every: 100           # Save plots per [such] epochs, n_epoch / save_plot_every better not exceed 500
+save_loss_every: 10           # Save logs per [such] epochs
+save_plot_model_every: 100           # Save model and plots per [such] epochs, n_epoch / save_plot_every better not exceed 500
 stdout : 1                      # 0: print to screen, 1: print to log file
 batch_seed : 5                       # number of runs; valid only when batch_size is not 'full'
 

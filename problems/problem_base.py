@@ -25,11 +25,11 @@ class BaseProblem(ABC):
     def save_net(self,path):
         torch.save(self.net.state_dict(), path)
 
-    def load_net(self,path):
+    def load_net(self,path,device):
         try:
-            self.net.load_state_dict(torch.load(path,map_location=torch.device('cpu')))
+            self.net.load_state_dict(torch.load(path,map_location=device))
         except:
-            self.net.load_state_dict(torch.load(path+'.zip',map_location=torch.device('cpu')))
+            self.net.load_state_dict(torch.load(path+'.zip',map_location=device))
         self.net.eval()
         
     def objective_func_and_grad(self, optimizer, no_grad = False):

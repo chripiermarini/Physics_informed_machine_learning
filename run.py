@@ -4,38 +4,39 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+from utils import create_dir
 
 plot = False
 train = True
-problems = ['burgersinf']  # Qi runs chemistry and burgersinf
+problems = ['burgers']  # Qi runs chemistry and burgers
 #problems = ['spring', 'darcy']         # Christian runs spring and darcy
-output_folder = '../result0430burgers' # '../result0506chemistry'
+output_folder = '../resultburgerstest' # '../result0506chemistry'
 
 settings = {
-    # 1: {'alpha_type':'adam',
-    #     'is_constrained':0,
-    #     'is_full_batch':1},
-    # 2: {'alpha_type':'adam',
-    #     'is_constrained':1,
-    #     'is_full_batch':1},
-    # 3: {'alpha_type':'c_adam',
-    #     'is_constrained':1,
-    #     'is_full_batch':1},
+    1: {'alpha_type':'adam',
+        'is_constrained':0,
+        'is_full_batch':1},
+    2: {'alpha_type':'adam',
+        'is_constrained':1,
+        'is_full_batch':1},
+    3: {'alpha_type':'c_adam',
+        'is_constrained':1,
+        'is_full_batch':1},
     # 4: {'alpha_type':'adam',
     #     'is_constrained':0,
     #     'is_full_batch':0},
     # 5: {'alpha_type':'adam',
     #     'is_constrained':1,
     #     'is_full_batch':0},
-    6: {'alpha_type':'c_adam',
-        'is_constrained':1,
-        'is_full_batch':0},
+    # 6: {'alpha_type':'c_adam',
+    #     'is_constrained':1,
+    #     'is_full_batch':0},
     }
 
 lrs_all = {
-  #0:1e-3,
+  0:1e-3,
   1:5e-4,
-  #2:1e-4
+  2:1e-4
 }
 
 
@@ -123,26 +124,28 @@ def find_header_row_number(file, first_header):
 
 def plot_f(problem):
     
+    create_dir('%s/loss_plots' %(output_folder))
+    
     if problem == 'darcy':
         lrs = lrs_darcy
     else:
         lrs = lrs_all
     
-    batch_setting = [ 'mini-batch', 'full batch']
+    batch_setting =['full batch'] #[ 'mini-batch', 'full batch']
     for lr_i, lr in lrs.items():
         for batch in batch_setting:
 
             plot_columns = {'Residual loss': 'f_pde', 
                         'Data-fitting loss': 'f_fitting',
-                        'Objective': 'f'}    
+                        'Loss': 'f'}    
             
             if problem == 'spring':
                 log_folder = 'Spring'
             elif problem == 'darcy':
                 log_folder = 'Darcy'
                 plot_columns ['Boundary residual loss'] = 'f_boundary'
-            elif problem == 'burgersinf':
-                log_folder = 'Burgersinf'
+            elif problem == 'burgers':
+                log_folder = 'Burgers'
                 plot_columns ['Boundary residual loss'] = 'f_boundary'
             elif problem == 'chemistry':
                 log_folder = 'Chemistry'
@@ -179,7 +182,7 @@ def plot_f(problem):
             dfs = {}
             for k, file in files.items():
                 dfs[k] = {}
-                filenames = [filename for filename in os.listdir(log_dir) if filename.startswith(file)]
+                filenames = [filename for filename in os.listdir(log_dir) if filename.startswith(file+'_')]
                 for run_i, filename in enumerate(filenames):
                     full_file = '%s/%s' %(log_dir, filename)
                     i = find_header_row_number(full_file,first_header)
@@ -189,6 +192,7 @@ def plot_f(problem):
                 # plot the data
                 fig = plt.figure(figsize=(4.2,3.2))
                 ax = fig.add_subplot(1, 1, 1)
+                
                 for k, runs in dfs.items():
                     x = runs[0][x_column_name]
                     ys = np.zeros((len(runs), len(x)))
@@ -197,17 +201,24 @@ def plot_f(problem):
                     ys = np.log10(ys)               # use log scale y
                     y_mean = np.mean(ys,axis=0)
                     y_std = np.std(ys, axis=0)
-                    ax.plot(x, y_mean, label=k, marker = markers[k], markevery=5, markersize=5)
-                    ax.fill_between(x, (y_mean - y_std), (y_mean + y_std), alpha=0.5)
+                    ax.plot(x, y_mean, label=k, marker = markers[k], markevery=int(0.1 * len(x)), markersize=5, alpha=0.9)
+                    ax.fill_between(x, (y_mean - y_std), (y_mean + y_std), alpha=0.3)
                 #plt.yscale('log')
-                log_tick_label = []
-                for t in ax.get_yticks():
-                    t = str(round(t,1))
-                    if t[-1] == '0':
-                        t = t[:-2]
-                    log_tick_label.append(r'$10^{%s}$' %t)
-                ax.set_yticks(ax.get_yticks(), log_tick_label)
-                plt.locator_params(axis='y',nbins=4)
+                # log_tick_label = []
+                # for t in ax.get_yticks():
+                #     t = str(round(t,1))
+                #     if t[-1] == '0':
+                #         t = t[:-2]
+                #     log_tick_label.append(r'$10^{%s}$' %t)
+                # ax.set_yticks(ax.get_yticks(), log_tick_label)
+                # plt.locator_params(axis='y',nbins=4)
+                if problem == 'burgers':
+                    y_ticks = [-4, -2, -0, 2]
+                else:
+                    #TODO
+                    pass
+                ax.set_yticks(y_ticks)
+                ax.set_yticklabels([r'$10^{%s}$'%(t) for t in y_ticks ])
                 ax.set_title('%s (%s, $%s$)' %(loss_name, batch, lr))
                 ax.legend()
                 plt.xlabel('Epoch')

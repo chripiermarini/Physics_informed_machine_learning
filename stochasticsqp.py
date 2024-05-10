@@ -232,8 +232,8 @@ class StochasticSQP(Optimizer):
 
         return loss
 
-    def load_pretrain_state(self,optim_path):
-        state = torch.load(optim_path,map_location=torch.device('cpu'))
+    def load_pretrain_state(self,optim_path,device):
+        state = torch.load(optim_path,map_location=device)
         self.state['iter'] = state['iter']
         self.state['g_square_sum'] = state['g_square_sum']
         self.state['g_sum'] = state['g_sum']
