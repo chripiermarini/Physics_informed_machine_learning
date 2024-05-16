@@ -11,6 +11,7 @@ class BaseProblem(ABC):
     figsize_rectangle_horizontal =(5.3, 2.2)
     figsize_rectangle2_vertical =(4, 5.3)
     figsize_rectangle =(4.2, 2.2)
+    figsize_square =(2.2, 2.2)
     @abstractmethod
     def __init__(self):
         pass

@@ -265,26 +265,23 @@ class Burgers(BaseProblem):
         return c
 
     def plot_prediction(self,save_label=False,save_path=None,epoch=0):
-        fig = plt.figure(figsize=self.figsize_rectangle_horizontal)
-        for i in range(self.n_group_pde_parameters_test):
-            ax = fig.add_subplot(1,self.n_group_pde_parameters_test, i + 1)
-            vmax=torch.max(self.sample['test'][i]['u_true'])
-            vmin=torch.min(self.sample['test'][i]['u_true'])
-            if save_label:
-                u = self.sample['test'][i]['u_true']
-                if i == 1:
-                    ax.set_title('True Solution')
-                plt.xticks([], [])
-                plt.yticks([], [])
-                #plt.ylabel('sample # %s' %(i))
-            else:
-                u = self.net(self.sample['test'][i]['input'])
-                if i == 1:
-                    ax.set_title('Epoch %s' %(epoch))
-                plt.xticks([], [])
-                plt.yticks([], [])
-            u = u.reshape(self.x_discretization,-1).cpu().detach().numpy()
-            ax.imshow(u, cmap='viridis',vmin=vmin, vmax=vmax)  # Use 'viridis' colormap for better visualization
+        fig = plt.figure(figsize=self.figsize_square)
+        plot_pde_parameters_test_group_idx=2
+        ax = fig.add_subplot(1,1, 1)
+        vmax=torch.max(self.sample['test'][plot_pde_parameters_test_group_idx]['u_true'])
+        vmin=torch.min(self.sample['test'][plot_pde_parameters_test_group_idx]['u_true'])
+        if save_label:
+            u = self.sample['test'][plot_pde_parameters_test_group_idx]['u_true']
+            ax.set_title('True Solution')
+            plt.xticks([], [])
+            plt.yticks([], [])
+        else:
+            u = self.net(self.sample['test'][plot_pde_parameters_test_group_idx]['input'])
+            ax.set_title('Epoch %s' %(epoch))
+            plt.xticks([], [])
+            plt.yticks([], [])
+        u = u.reshape(self.x_discretization,-1).cpu().detach().numpy()
+        ax.imshow(u, cmap='viridis',vmin=vmin, vmax=vmax)  # Use 'viridis' colormap for better visualization
 
         plt.tight_layout()
         fig.savefig(save_path)

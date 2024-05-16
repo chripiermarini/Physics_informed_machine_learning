@@ -44,6 +44,7 @@ class Darcy(BaseProblem):
         
         # Set indices pixels for constraints and fixed it
         self.constr_pixel_idx = self.set_constraint_pixel_idx()
+        print(self.constr_pixel_idx)
         
         # Initialize NN
         if self.conf['nn_name'] == 'FCN':
@@ -285,25 +286,24 @@ class Darcy(BaseProblem):
             x = self.test_input_data[print_indices]
             x = x.cpu()
             
-            fig = plt.figure(figsize=self.figsize_rectangle2_vertical)
+            fig = plt.figure(figsize=(4.2, 2.2))
             
             for i in range(len(print_indices)):
 
                 vmax=torch.max(y[i])
                 vmin=torch.min(y[i])
 
-                ax = fig.add_subplot(3, 2, i*2 + 1)
+                ax = fig.add_subplot(len(print_indices), 2, i*2 + 1)
                 ax.imshow(x[i,0], cmap='gray')
                 if i == 0:
-                    ax.set_title('Input nu')
+                    ax.set_title(r'Input $\nu$')
                 plt.xticks([], [])
                 plt.yticks([], [])
-                plt.ylabel('sample # %s' %(print_indices[i]))
 
-                ax = fig.add_subplot(3, 2, i*2 + 2)
+                ax = fig.add_subplot(len(print_indices), 2, i*2 + 2)
                 ax.imshow(y[i].squeeze(),vmin=vmin, vmax=vmax)
                 if i == 0:
-                    ax.set_title('Test Label')
+                    ax.set_title('True Solution')
                 plt.xticks([], [])
                 plt.yticks([], [])
         else:
@@ -311,13 +311,13 @@ class Darcy(BaseProblem):
             out = self.net(self.test_input_data[print_indices])
             out = out.cpu()
             
-            fig = plt.figure(figsize=self.figsize_rectangle_vertical)
+            fig = plt.figure(figsize=(2.2, 2.2))
             for i in range(len(print_indices)):
 
                 vmax=torch.max(y[i])
                 vmin=torch.min(y[i])
                 
-                ax = fig.add_subplot(3, 1, i + 1)
+                ax = fig.add_subplot(len(print_indices), 1, i + 1)
                 ax.imshow(out[i].squeeze().detach().numpy(),vmin=vmin, vmax=vmax)
                 if i == 0:
                     ax.set_title('Epoch %s' %(epoch))

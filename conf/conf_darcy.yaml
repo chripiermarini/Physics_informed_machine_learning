@@ -31,7 +31,7 @@ problem:                        # Parameters for problem
   n_train_group_pde_parameters: 1000     # int. number of group of pde parameters
   fitting_sample_group_percent: 0.2           # the fitting sample is interior points of all n_train_group_pde_parameters * [fitting_sample_group_percent]
   n_test_group_pde_parameters: 3     # int(50 at most). number of group of pde parameters 
-  print_test_indices: [0,1,2]      # indicies of n_test_group_ped_parameters for plotting
+  print_test_indices: [1]      # indicies of n_test_group_ped_parameters for plotting
 
 optimizer:
   name : sqp                  # adam or sgd or sqp 
