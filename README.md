@@ -1,27 +1,26 @@
 # SQPPIML
-### Install Python (Skip if Python3 (>=3.12) is installed)
-(Suppose this repository is already put the ideal directory, and unzipped. Suppose Python3 (>=3.12) is installed. If you would like to create a new python environment and install python 3.12 with conda, you can use 
+### Install Python (Skip if Python3 (>=3.12) is already installed)
+If you need to create a new Python environment and install Python 3.12 with conda, you can use the following command:
 ```
 conda create -n myenv python=3.12
 ```
-and once the environment is created, use
+Once the environment is created, use:
 ```
 conda activate myenv
 ```
-to source the python environment.
-)
+to activate the Python environment.
 
-### Install requirement packages
+### Install required packages
 ```
 pip3 install -r requirements.txt
 ```
 
 ### Run a test
-Run
+To run a test, use:
 ```
 python3 solve.py spring_test
 ```
-and then a folder `results` will be created with structure shown below. 
+A folder `results` will be created with the structure shown below:
 
 ```
 results/
@@ -43,11 +42,10 @@ results/
         └── plot_test_0_00001001.png
 ```
 
-Then configuration of this test run is in the file `./conf/spring_test.yaml`. Other config files are also in the `./conf/` directory.
-
+The configuration for this test run is in the file `./conf/spring_test.yaml`. Other config files are also in the `./conf/` directory.
 
 ### Run experiments in the paper
 ```
 python3 run.py
 ```
-You may modify the settings in the top lines of `run.py` to run experiments for a specific problem, an algorithm, or a learning rate. 
+You may modify the settings in the top lines of `run.py` to run experiments for a specific problem, algorithm, or learning rate. 
