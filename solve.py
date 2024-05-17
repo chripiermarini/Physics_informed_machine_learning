@@ -292,11 +292,9 @@ def run(config):
 
 if __name__ == '__main__':
 
-    problem_name = 'chemistry'
-    with open('conf/conf_'+problem_name+'.yaml') as f:
+    conf_name = sys.argv[1] 
+    with open('conf/'+conf_name+'.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     # train
     run(config)
-    
-    

@@ -44,7 +44,6 @@ class Darcy(BaseProblem):
         
         # Set indices pixels for constraints and fixed it
         self.constr_pixel_idx = self.set_constraint_pixel_idx()
-        print(self.constr_pixel_idx)
         
         # Initialize NN
         if self.conf['nn_name'] == 'FCN':

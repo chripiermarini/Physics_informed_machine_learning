@@ -5,11 +5,11 @@ sub_folders:                    # Subfolder names for model, plot, and log
   log   : log
   
 file_suffix: test               # str, all the leaf output file name will contain this suffix
-n_epoch: 30000                  # Total number of epochs
+n_epoch: 1000                  # Total number of epochs
 save_loss_every: 100           # Save logs per [such] epochs
-save_plot_model_every: 1000           # Save model and plots per [such] epochs, n_epoch / save_plot_every better not exceed 500
+save_plot_model_every: 100           # Save model and plots per [such] epochs, n_epoch / save_plot_every better not exceed 500
 stdout : 1                      # 0: print to screen, 1: print to log file
-batch_seed : 5                       # random seed for mini-batch; valid only when batch_size is not 'full'
+batch_seed : 0                       # random seed for mini-batch; valid only when batch_size is not 'full'
 
 problem:                        # Parameters for problem
   name  : Spring
@@ -20,7 +20,7 @@ problem:                        # Parameters for problem
   n_constrs: 3                    # number of constraints ---
   constrs_area_percent: [0.14, 0.4, 0.7]     # list of length n_constrs. the constraints applies at percentage of t_max
   constraint_type : pde       # pde, or fitting
-  batch_size: 0.5            # str full or float(0,1) represents the percentage of n_train_obj_samples_per_group['pde'] use for mini-batch
+  batch_size: full            # str full or float(0,1) represents the percentage of n_train_obj_samples_per_group['pde'] use for mini-batch
   nn_name       : FCN           # neural network name. This should be a class in nn_architecture.py
   nn_input      : 1
   nn_output     : 1
@@ -45,7 +45,7 @@ optimizer:
   lr    : 1.0e-3
   mu    : 1.0e-7
   beta2 : 0.999
-  alpha_type: 'p_adam'        
+  alpha_type: 'p_adam'         
   beta1 : 0.9
   pretrain: null              # null; or dict with keys: epoch_start and file_suffix
       

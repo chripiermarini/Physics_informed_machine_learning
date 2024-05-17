@@ -19,7 +19,6 @@ class StochasticSQP(Optimizer):
         ratio_param_init: initial \xi
         step_size_decay : factor for decreasing stepsize, i.e., alpha = step_size_decay * alpha
         sigma :
-        epsilon: ratio parameter for numerical stability
         step_opt: option variable to set specific stepsize selection ( 1 for simple function reduction, 2 for Armijo)
     """
     
@@ -101,10 +100,10 @@ class StochasticSQP(Optimizer):
         c = self.state['c']
         f = self.state['f']
         
-        if self.alpha_type == 'ada' or self.alpha_type == 'adam':
+        if self.alpha_type == 'adam':
             grad = g
             singular_add_i = 0
-        elif self.alpha_type == 'c_ada' or self.alpha_type == 'c_adam':
+        elif self.alpha_type == 'p_adam':
             Pg,singular_add_i = self.solve_linsys(J @ J.T, J@g)
             grad = g - J.T @ Pg
         
@@ -117,12 +116,9 @@ class StochasticSQP(Optimizer):
             self.state['g_square_sum'] = self.beta2 * self.state['g_square_sum'] +  (1-self.beta2) * grad**2
             self.state['g_sum'] = self.beta1 * self.state['g_sum'] +  (1-self.beta1) * grad
         
-        if self.alpha_type == 'adam' or self.alpha_type == 'c_adam' :
-            m_hat = self.state['g_sum'] / (1 - self.beta1**(self.state['iter'] + 1))
-            v_hat = self.state['g_square_sum'] / (1 - self.beta2**(self.state['iter'] + 1))
-        elif self.alpha_type == 'ada' or self.alpha_type == 'c_ada' :
-            m_hat = grad # no momentum
-            v_hat = self.state['g_square_sum'] 
+
+        m_hat = self.state['g_sum'] / (1 - self.beta1**(self.state['iter'] + 1))
+        v_hat = self.state['g_square_sum'] / (1 - self.beta2**(self.state['iter'] + 1))
         
         loss = None
 
@@ -149,7 +145,6 @@ class StochasticSQP(Optimizer):
         
         self.norm_d = torch.norm(d)
 
-        # TODO Remove tau computation?
         dHd = torch.matmul(d*H_diag, d)
         gd = torch.matmul(g, d)
         gd_plus_max_dHd_0 = gd + torch.max(dHd, torch.tensor(0))
@@ -172,7 +167,6 @@ class StochasticSQP(Optimizer):
                 self.merit_param = self.trial_merit * (1 - self.epsilon)
 
             ## Update ratio parameter
-            # since d is the solution of the linear system, it entails delta_q defined through the formula (2.4)
             delta_q = - self.merit_param * (gd + 0.5 * torch.max(dHd, torch.tensor(0))) + c_norm_1
             self.trial_ratio = delta_q / (self.merit_param * self.norm_d ** (2))
             if self.ratio_param > self.trial_ratio:
@@ -180,7 +174,7 @@ class StochasticSQP(Optimizer):
 
         
         """
-        Line Search step-size
+        step-size
 
         """
         #get current values of parameters, f is the current phi
@@ -193,6 +187,8 @@ class StochasticSQP(Optimizer):
         phi = self.merit_param * f + torch.linalg.norm(c, 1)
         self.ls_k = 0
         self.step_size = self.step_size_init
+        
+        # no line search, only one iteration
         for self.ls_k in range(1):
 
             ## Update parameters
@@ -201,9 +197,6 @@ class StochasticSQP(Optimizer):
             d_p_i_start = 0
             for p in group['params']:
                 #print(p.view(-1).shape)
-                # TODO: check of p.grad is None
-                #if p.grad is None:
-                #    continue
                 d_p_i_end = d_p_i_start + len(p.view(-1))
                 d_p = d[d_p_i_start:d_p_i_end].reshape(p.shape)
                 p.data.add_(d_p, alpha=self.step_size-alpha_pre)

@@ -1,12 +1,53 @@
 # SQPPIML
-Using Stochastic SQP algorithm to solve physics-informed machine learning problem
-
-Solve a problem :
+### Step[0] (Skip if Python3 (>=3.12) is installed)
+(Suppose this repository is already put the ideal directory, and unzipped. Suppose Python3 (>=3.12) is installed. If you would like to create a new python environment and install python 3.12 with conda, you can use 
 ```
-python solve.py Spring
+conda create -n myenv python=3.12
+```
+and once the environment is created, use
+```
+conda activate myenv
+```
+to source the python environment.
+)
+
+### Install requirement packages using
+```
+pip3 install -r requirements.txt
 ```
 
-`stochasticsqp.py` is the optimizer, where the `step` method is to compute the step to update neural network parameters. This `step` method is a simplified version of Stochastic SQP method in [Berahas, Albert S., et al. "Sequential quadratic optimization for nonlinear equality constrained stochastic optimization." SIAM Journal on Optimization 31.2 (2021): 1352-1379.]
+### Run a test
+Run
+```
+python3 solve.py spring_test
+```
+and then a folder `results` will be created with structure shown below. 
 
-`test_stochasicsqp_pde_example.ipynb` is a demo of how to use the above optimizer to solve pde constrained machine learning problem. Try to run each block of this jupyter notebook file.
+```
+results/
+├── log
+│   └── Spring
+│       └── test_0.txt
+├── mdl
+│   └── Spring
+│       ├── nn_test_0_1000
+│       ├── ... 
+│       ├── nn_test_0_900
+│       ├── optim_test_0_1000.pt
+│       ├── ...
+│       └── optim_test_0_900.pt
+└── plot
+    └── Spring
+        ├── animation_test_0.gif
+        ├── ...
+        └── plot_test_0_00001001.png
+```
 
+Then configuration of this test run is in the file `./conf/spring_test.yaml`. Other config files are also in the `./conf/` directory.
+
+
+### Run experiments in the paper
+```
+python3 run.py
+```
+You may modify the settings in the top lines of `run.py` to run experiments for specific problems or algorithms. 

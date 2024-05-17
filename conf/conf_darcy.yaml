@@ -9,7 +9,7 @@ n_epoch: 1000                  # Total number of epochs
 save_loss_every: 10           # Save logs per [such] epochs
 save_plot_model_every: 100           # Save model and plots per [such] epochs, n_epoch / save_plot_every better not exceed 500
 stdout : 1                      # 0: print to screen, 1: print to log file
-batch_seed : 5                       # number of runs; valid only when batch_size is not 'full'
+batch_seed : 5                       # random seed for mini-batch; valid only when batch_size is not 'full'
 
 
 problem:                        # Parameters for problem
@@ -18,9 +18,9 @@ problem:                        # Parameters for problem
     pde     : 1.0e-2
     boundary: 1.0e-2
     fitting : 1
-  n_constrs: 10                    # number of constraints ---
+  n_constrs: 50                    # number of constraints ---
   constraint_type : pde       # pde, or boundary
-  batch_size: 0.2            # str full or int batch_size #TODO
+  batch_size: 0.2            # str full or float(0,1) represents the percentage of n_train_obj_samples_per_group['pde'] use for mini-batch
   nn_name       : FNOLocal           # neural network name. This should be a class in nn_architecture.py
   nn_parameters:                # The keys can be different for different neural network
     n_discretize : 16
@@ -35,10 +35,10 @@ problem:                        # Parameters for problem
 
 optimizer:
   name : sqp                  # adam or sgd or sqp 
-  lr    : 1.0e-2
+  lr    : 1.0e-3
   mu    : 1.0e-7
   beta2 : 0.999
   pretrain: null              # null; or dict with keys: epoch_start and file_suffix
-  alpha_type: 'c_adam'         # 'ada', 'adam', 'c_ada', 'c_adam' 
+  alpha_type: 'p_adam'        
   beta1 : 0.9
       
