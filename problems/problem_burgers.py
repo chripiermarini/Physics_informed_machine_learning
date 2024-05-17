@@ -105,15 +105,12 @@ class Burgers(BaseProblem):
     
     def generate_sample(self,device):
         sample = {}
-        
-        # sample['test_input'] = test_input
-        # sample['U_true'] = U_true
-        # sample['u0'] = u0
+    
         # Generate x and t discretization
         xs = torch.linspace(0,self.x_max,self.x_discretization)
         ts = torch.linspace(0,self.t_max,self.t_discretization)
         
-        # Generate trainning data
+        # Generate training data
         for k in range(self.n_group_pde_parameters):
             input, U_true, u0 = self.generate_one_group(xs, ts, device)
             

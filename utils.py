@@ -45,15 +45,7 @@ def check_gradient(optimizer, problem):
         g_param = param.grad.view(-1)
         for i in range(len(param.view(-1))):
             
-            #print('Before-------')
-            #for name_cur, param_cur in problem.net.named_parameters():
-            #    print(param_cur.data)
-            
             param.view(-1).data[i] += 1e-4
-            
-            #print('After-------')
-            #for name_cur, param_cur in problem.net.named_parameters():
-            #    print(param_cur.data)
                 
             f_i,g = problem.objective_func_and_grad(optimizer)
             d_i = (f_i - f)/1e-4

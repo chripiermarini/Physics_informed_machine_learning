@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 """
 ## Problem Statement Darcy
-# We use this one!
 """
 
 class Darcy(BaseProblem):
@@ -67,8 +66,8 @@ class Darcy(BaseProblem):
         """
         Generate input tensor
 
-        input_data is composed by n_obj points, which are 3 images of 16x16 pixels
-        the first image is nu, the second are values from 0 to 1 from left to right,
+        input_data is composed by n_obj points, which are 3 channels of 16x16 pixels
+        the first channel is nu, the second are values from 0 to 1 from left to right,
         the third are values from 0 to 1 from top to bottom
 
         ground_truth are labels, following the same structure (only one image for each data points)
@@ -170,37 +169,11 @@ class Darcy(BaseProblem):
                                            allow_unused=True)
         div_argument = [nu * first_derivative[i] for i in range(len(first_derivative))]
 
-        """
-        second_derivative_x1 = torch.autograd.grad(outputs=div_argument[0].sum(), inputs=x1, create_graph=True)[0]
-        second_derivative_x2 = torch.autograd.grad(outputs=div_argument[1].sum(), inputs=x2, create_graph=True)[0]
-
-        
-        # PDE residual of size torch.Size([n_train_group_pde_parameters, n_discretize, n_discretize])
-        p_matrix = - (second_derivative_x1 + second_derivative_x2) - 1
-        
-        """ 
-        # new by Qi
         first_derivative_nu_x1 = torch.zeros_like(x1)
         first_derivative_nu_x1[:,:(self.n_discretize-1),:] = (nu[:,1:self.n_discretize,:] - nu[:,:(self.n_discretize-1),:])  / (self.conf['x_max'] /  (self.n_discretize - 1))
         
         first_derivative_nu_x2 = torch.zeros_like(x2)
         first_derivative_nu_x2[:,:,:(self.n_discretize-1)] = (nu[:,:,1:self.n_discretize] - nu[:,:,:(self.n_discretize-1)]) / (self.conf['x_max'] /  (self.n_discretize - 1))
-        # end new by Qi
-        """
-        first_derivative_nu_x1 = (
-                    ((nu[:,1:self.n_discretize - 1, 2:self.n_discretize] - nu[:,1:self.n_discretize - 1, 1:self.n_discretize - 1]) > 0) * 16 +
-                    ((nu[:,1:self.n_discretize - 1, 1:self.n_discretize - 1] - nu[:,1:self.n_discretize - 1,
-                                                                   2:self.n_discretize]) > 0) * -16)  # CORRECT//SHAPE 14X14
-
-        first_derivative_nu_x1 = self.apply_frame(first_derivative_nu_x1, self.n_discretize)
-
-        first_derivative_nu_x2 = (
-                    ((nu[:,0:self.n_discretize-2,1:self.n_discretize - 1] - nu[:,1:self.n_discretize - 1,1:self.n_discretize - 1]) > 0) * 16 +
-                    ((nu[:,1:self.n_discretize - 1, 1:self.n_discretize - 1] - nu[:,0:self.n_discretize - 2,
-                                                                   1:self.n_discretize - 1]) > 0) * -16)  # CORRECT//SHAPE 14X14
-
-        first_derivative_nu_x2 = self.apply_frame(first_derivative_nu_x2, self.n_discretize)
-        """
 
         second_derivative_x1 = torch.autograd.grad(outputs=div_argument[0].sum(), inputs=x1, create_graph=True)[0]
         second_derivative_x2 = torch.autograd.grad(outputs=div_argument[1].sum(), inputs=x2, create_graph=True)[0]

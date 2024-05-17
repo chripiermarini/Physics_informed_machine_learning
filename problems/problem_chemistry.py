@@ -1,16 +1,11 @@
 from nn_architecture import *
 import torch
-from torch.autograd import Variable
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image
 from scipy.integrate import odeint
 from problems.problem_base import BaseProblem
-import pandas as pd
 import random
 import os
-#DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-#torch.set_default_device(DEVICE)
 
 """ Problem statement Chemistry equation"""
 
@@ -51,10 +46,6 @@ class Chemistry(BaseProblem):
         self.mse_cost_function = torch.nn.MSELoss()  # Mean squared error
 
     def create_dataset(self, number_of_initial_cond, n_discretization = 100, save_name = None):
-        ''' When called, this function creates new data to be stored in the .txt files
-        It generates samples of the t ranging from 0 to 10 divide by the number of objective values constraints
-        t until 10, noise_level is 1
-        '''
         random.seed(number_of_initial_cond)
         np.random.seed(number_of_initial_cond)
 
@@ -86,10 +77,7 @@ class Chemistry(BaseProblem):
         #np.savetxt(save_name, samples, delimiter=',') 
         return samples.astype('float32')
     
-    def generate_sample(self,device):
-        """ This function reads the .txt files and extract data to feed the objective function
-        Remember that y has dimension 4""" 
-        
+    def generate_sample(self,device):        
         # Generate training data
         if not os.path.exists(self.conf['train_file_path']):
             train_sample = self.create_dataset(number_of_initial_cond =self.conf['n_initial_conditions'], 

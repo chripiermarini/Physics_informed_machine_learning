@@ -31,10 +31,6 @@ class Spring(BaseProblem):
     mu, k = 2*d, w0**2
     
     def __init__(self, device, conf):
-        '''
-        Input: 
-            constraint_type: str, only 'pde' or 'fitting'
-        '''
         
         self.conf = conf
         
@@ -89,13 +85,6 @@ class Spring(BaseProblem):
         return pde_residual
 
     def objective_func(self):
-        """
-        Compute objective function value and gradient value
-        Output: 
-            objective function value and gradient value
-        Arguments:
-            optimizer: the optimizer object 
-        """
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.t_pde.size(0))
         else:
@@ -123,14 +112,6 @@ class Spring(BaseProblem):
 
     
     def constraint_func(self):
-        """
-        Compute constraint function value and Jacobian value
-        Output: 
-            constraint function value and Jacobian value
-        Arguments:
-            optimizer: the optimizer object 
-        """
-
         if self.constraint_type == 'pde':
             t_pde_constr = self.t_pde[self.constr_row_select]
             u_pde_constr_pred = self.net(t_pde_constr)
@@ -158,8 +139,6 @@ class Spring(BaseProblem):
         if t_pde is not None:
             plt.scatter(t_pde, -0*torch.ones_like(t_pde), s=30, color="tab:green", alpha=0.7, 
                         label='Physics loss training locations')
-        #l = plt.legend(loc=(0.48,0.55), frameon=False,fontsize="small")
-        #plt.setp(l.get_texts(), color="k")
         plt.xlim(-0.02, 1.02)
         plt.ylim(-0.9, 1.2)
         plt.xticks([], [])

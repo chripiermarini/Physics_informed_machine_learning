@@ -10,10 +10,8 @@ torch.set_default_device(DEVICE)
 import sys
 torch.set_printoptions(precision=8)
 import time
-import os
 import yaml
 from utils import create_dir
-import matplotlib.pyplot as plt
 
 def create_output_folders(output_folder, sub_folders, problem_name):
     create_dir(output_folder)
@@ -175,9 +173,6 @@ def run(config):
     headers = printerBeginningSummary(config, log_f)
     values = {k:-1 for k in headers}
 
-    #optimizer.initialize_param(0.1)
-    #check_gradient(optimizer, problem)
-    #x0 = get_x(problem)
     
     files = []
     
@@ -228,13 +223,6 @@ def run(config):
 
             # Take a step inside optimizer
             optimizer.step()
-            
-            # if epoch == 0:
-            #     x1 = get_x(problem)
-            #     diff = (x1 - x0)*1000 
-            #     with open('g_test_%s.txt' %(optimizer_name),'w') as f_g_test: 
-            #         for i in diff:
-            #             f_g_test.write(str(i.detach().numpy())+'\n')
 
             # get max and min step size
             if config['optimizer']['name'] == 'adam':
@@ -251,8 +239,7 @@ def run(config):
                         mt = torch.concat((mt,state['exp_avg'].view(-1)))
                 H = H / (torch.sqrt(vt) + eps_adam)
                 values['H_max'] = torch.max(H)
-                values['H_min'] = torch.min(H)
-                # x0 - x1 should be equal to alpha_max * mt. They have small difference now. 
+                values['H_min'] = torch.min(H) 
             elif config['optimizer']['name'] == 'sqp':
                 values['alpha'] = optimizer.state['alpha_sqp']
                 values['merit_f'] = optimizer.state['cur_merit_f']

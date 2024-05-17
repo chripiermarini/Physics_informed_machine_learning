@@ -11,7 +11,7 @@ class StochasticSQP(Optimizer):
     !    >>> optimizer = StochasticSQP(model.parameters(), lr=0.1)
 
     Input:
-        params          : torch neural network paratemetrs to be optimized
+        params          : torch neural network parameters to be optimized
         lr              : initial stepsize \alpha
         n_parameters    : number of parameters to be optimized
         n_constrs       : number of constraints
@@ -90,8 +90,6 @@ class StochasticSQP(Optimizer):
                 and returns the loss.
         Before call this method, you have to assign the value of jacobian, gradient, 
             constraint, and objective to the state of keys: J, g, c and f.
-        Here, we also define an example of the Hessian matrix //
-        The H matrix is set as torch.eye(self.n_parameters)
         """
         
         ## Compute step
