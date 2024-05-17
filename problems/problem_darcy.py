@@ -4,18 +4,19 @@ import torch
 from neuralop.datasets import load_darcy_flow_small
 import matplotlib.pyplot as plt
 
-"""
-## Problem Statement Darcy
-"""
-
 class Darcy(BaseProblem):
+    """ It creates an instance of the Darcy problem. The forcing function value
+    is fixed as a class attribute."""
 
     name = 'Darcy'
     f = 1
     
     def __init__(self, device, conf):
   
-            
+        """ The problem and the neural network are initialized according to the settings described in the
+        conf_darcy.yaml file. The training and test datasets are loaded from the neuralop.datasets library.
+        """
+
         self.conf = conf
         
         self.regs = self.conf['regs']
@@ -64,13 +65,13 @@ class Darcy(BaseProblem):
 
     def generate_sample(self, device):
         """
-        Generate input tensor
+        This function generates the input tensor.
 
-        input_data is composed by n_obj points, which are 3 channels of 16x16 pixels
-        the first channel is nu, the second are values from 0 to 1 from left to right,
-        the third are values from 0 to 1 from top to bottom
+        The input_data is composed by n_obj points, which are 3 channels of 16x16 pixels.
+        The first channel is nu, the second are values from 0 to 1 from left to right,
+        the third are values from 0 to 1 from top to bottom.
 
-        ground_truth are labels, following the same structure (only one image for each data points)
+        The ground_truth are labels, following the same structure (only one image for each data points).
         """
         train_loader, test_loaders, data_processor = load_darcy_flow_small(
             n_train=self.n_train_group_pde_parameters,
@@ -94,8 +95,10 @@ class Darcy(BaseProblem):
         return input_data, ground_truth, test_input_data, test_ground_truth
 
     def set_boundary_and_interior_pixel_idx(self):
+
         """ This function creates all the indexes to select the points at the boundaries
         of the 16x16 pixel image"""
+
         boundary_idx = torch.zeros(self.n_boundary_pixels_each_sample,2)
 
         # Assign x1 idx
@@ -117,11 +120,7 @@ class Darcy(BaseProblem):
         boundary_idx[2*self.n_discretize:(3*self.n_discretize - 2),1] = 0
         # center left column
         boundary_idx[(3*self.n_discretize - 2):,1] = self.n_discretize-1
-                
-        # For checking boundary_idx are assigned correctly
-        #import matplotlib.pyplot as plt
-        #b = boundary_idx.numpy()
-        #plt.plot(b[:,0],b[:,1],'.')
+
         boundary_idx = boundary_idx.to(torch.int32)
         
         x1 = torch.arange(1,self.n_discretize-1)
@@ -132,6 +131,10 @@ class Darcy(BaseProblem):
         return boundary_idx, interior_idx
 
     def set_constraint_pixel_idx(self):
+
+        """ This function fixes the indices of the pixel samples selected
+        to evaluate the problem constraints."""
+
         # Selected sample for constraints
         sample_idx = torch.randperm(self.n_train_group_pde_parameters)[:self.n_constrs]
         
@@ -145,24 +148,12 @@ class Darcy(BaseProblem):
         constr_pixel_idx = torch.concatenate((sample_idx.reshape(self.n_constrs,1), pixel_idx),dim=1)
         constr_pixel_idx = constr_pixel_idx.to(torch.int32)
         return constr_pixel_idx
-
-    def apply_frame(self, tensor, discretize):
-        # Create a 16x16 tensor filled with zeros
-        tensor_16x16 = torch.zeros((tensor.shape[0], discretize, discretize))
-
-        # Place the 14x14 tensor at the center of the 16x16 tensor
-        tensor_16x16[:, 1:15, 1:15] = tensor[:]
-
-        # Set the first row, last row, first column, and last column to ones
-        tensor_16x16[:, 0, :] = 1  # Top row
-        tensor_16x16[:, -1, :] = 1  # Bottom row
-        tensor_16x16[:, :, 0] = 1  # Leftmost column
-        tensor_16x16[:, :, -1] = 1  # Rightmost column
-
-        return torch.Tensor(tensor_16x16)
     
     def pde(self, nu, x1, x2, out):
-        # Compute objective function value, where the Laplace operator need second order derivatives
+
+        """ This function computes the right-hand side of the Darcy PDE,
+        where the Laplace operator need second order derivatives"""
+
         first_derivative = torch.autograd.grad(outputs=out.sum(),
                                            inputs=(x1, x2),
                                            create_graph=True,
@@ -184,6 +175,9 @@ class Darcy(BaseProblem):
         return p_matrix
 
     def objective_func(self):
+
+        """ This function computes the neural network predictions, and evaluates the objective function value,
+         split into residual PDE, boundary and fitting terms."""
         
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.input.size(0))
@@ -227,7 +221,10 @@ class Darcy(BaseProblem):
         }
         return fs
 
-    def constraint_func(self):      
+    def constraint_func(self):
+
+        """The constraint function values are computed."""
+
         if self.n_constrs == 0:
           return torch.tensor([])
         # separate x1 and x2 from sample and set they require_grad
@@ -249,6 +246,9 @@ class Darcy(BaseProblem):
         return c
     
     def plot_prediction(self, save_path=None, epoch=None, save_label=False):
+
+        """ This function plots the predictions generated by the neural network on test data."""
+
         print_indices = self.conf['print_test_indices']
         # Ground-truth
         y = self.test_ground_truth[print_indices]

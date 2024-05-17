@@ -14,6 +14,14 @@ import yaml
 from utils import create_dir
 
 def create_output_folders(output_folder, sub_folders, problem_name):
+
+    """ This function creates the output folder in which the results are stored. It creates the following
+    subfolders:
+
+    -'log': it contains all the numerical information recorded during training;
+    -'plot' : it contains all the plots of the predictions on test data produced during training;
+    -'mdl': it contains the model parameters saved during training."""
+
     create_dir(output_folder)
     folders = {}
     for k,v in sub_folders.items():
@@ -42,6 +50,9 @@ def get_gif_path(folders, suffix):
     return path
     
 def printRow(log_f, type='header', headers=[],values={}):
+
+    """The information recorder during training are printed in a row."""
+
     for i, ele in enumerate(headers):
         if ele == 'epoch':
             if type == 'header':
@@ -103,11 +114,18 @@ def plot_prediction(folders, epoch, problem, config):
     return file
 
 def plot_gif(folders, problem, config, files):
+
+    """ For the Spring problem, it creates a gif image using all the plots of predictions on test data,
+    to show the evolution of the model during the training."""
+
     gif_path = get_gif_path(folders, config['file_suffix'])
     problem.save_gif_PIL(gif_path, files, fps=20, loop=0)
 
-def run(config):     
-    if config['problem']['batch_size'] == 'full':# 'full' or percentage of sample 
+def run(config):
+
+    """ This function performs one iteration of the algorithm."""
+
+    if config['problem']['batch_size'] == 'full': # 'full' or percentage of sample
         batch_seed = 0
     else:
         batch_seed = config['batch_seed'] 
@@ -167,12 +185,10 @@ def run(config):
     else:
         epoch_start=0
         iter = 0
-
         
     #printer header
     headers = printerBeginningSummary(config, log_f)
     values = {k:-1 for k in headers}
-
     
     files = []
     

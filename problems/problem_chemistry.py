@@ -7,13 +7,20 @@ from problems.problem_base import BaseProblem
 import random
 import os
 
-""" Problem statement Chemistry equation"""
-
 class Chemistry(BaseProblem):
+    """ It creates an instance of the Chemical engineering problem. The noise_level of the generated data
+    is fixed as a class attribute."""
+
     name = 'Chemistry'
     noise_level = 1
     
     def __init__(self, device, conf):
+
+        """ The problem and the neural network are initialized according to the settings described in the
+        conf_chemistry.yaml file. If a dataset is not present, the code will create one with the
+         features indicated below (rates, pde_rates) and the noise_level set as a class attribute.
+          If a dataset is available, the code will simply load it to perform training."""
+
         self.conf = conf
         
         # Initialize NN
@@ -46,6 +53,10 @@ class Chemistry(BaseProblem):
         self.mse_cost_function = torch.nn.MSELoss()  # Mean squared error
 
     def create_dataset(self, number_of_initial_cond, n_discretization = 100, save_name = None):
+
+        ''' It creates a dataset if one is not available. The time range is discretized, and realistic
+        x samples are created using the 'kinetic_kosir_gen' function.'''
+
         random.seed(number_of_initial_cond)
         np.random.seed(number_of_initial_cond)
 
@@ -77,7 +88,12 @@ class Chemistry(BaseProblem):
         #np.savetxt(save_name, samples, delimiter=',') 
         return samples.astype('float32')
     
-    def generate_sample(self,device):        
+    def generate_sample(self,device):
+
+        ''' The training and test datasets are created ex-novo or read from an existing file.
+        The 'constr_row-select' variable is computed to fix the indices of the samples selected
+        to evaluate the problem constraints.'''
+
         # Generate training data
         if not os.path.exists(self.conf['train_file_path']):
             train_sample = self.create_dataset(number_of_initial_cond =self.conf['n_initial_conditions'], 
@@ -106,18 +122,18 @@ class Chemistry(BaseProblem):
             'y_initial': torch.tensor(test_sample[:,1:5]).to(device),
             'y_label': torch.tensor(test_sample[:,5:]).to(device)
         }
-        
         return train, constr_row_select, test
     
     def pde(self, output, t):
-       
-        """ This function computes the complex right hand-side of the kinetic_kosir PDE"""
-        # A -> 2B; A <-> C; A <-> D
+
+        """ This function computes the complex right hand-side of the kinetic_kosir PDE."""
+
         rhs = torch.zeros_like(output)
-        rhs[:,0] =  -(self.pde_rates[0] + self.pde_rates[1] + self.pde_rates[3]) * output[:,0] + self.pde_rates[2] * output[:,2] + self.pde_rates[4] * output[:,3]
-        rhs[:,1] = 2 * self.pde_rates[0] * output[:,0]
-        rhs[:,2] = self.pde_rates[1] * output[:,0] - self.pde_rates[2] * output[:,2]
-        rhs[:,3] = self.pde_rates[3] * output[:,0] - self.pde_rates[4] * output[:,3]
+        rhs[:, 0] = (-(self.pde_rates[0] + self.pde_rates[1] + self.pde_rates[3]) * output[:,0] +
+                     self.pde_rates[2] * output[:, 2] + self.pde_rates[4] * output[:,3])
+        rhs[:, 1] = 2 * self.pde_rates[0] * output[:, 0]
+        rhs[:, 2] = self.pde_rates[1] * output[:, 0] - self.pde_rates[2] * output[:,2]
+        rhs[:, 3] = self.pde_rates[3] * output[:, 0] - self.pde_rates[4] * output[:,3]
 
         dt = torch.zeros(output.size())
         
@@ -127,11 +143,14 @@ class Chemistry(BaseProblem):
                                         create_graph=True,
                                         allow_unused=True
                                         )[0]
-        
         pde = dt - rhs
         return pde, dt
 
     def objective_func(self):
+
+        """ It computes the neural network predictions, and evaluates the objective function value,
+         split into residual PDE, mass-balance and fitting terms."""
+
         fitting_idx = self.fitting_sample_indices
         if self.conf['batch_size'] == 'full':
             batch_idx = torch.arange(self.train_sample_size)
@@ -143,14 +162,14 @@ class Chemistry(BaseProblem):
         output = self.net(torch.cat((y_initial_pde,t_pde), 1))
         pde_values, dt = self.pde(output, t_pde)
         
-        # PDE objective function
+        # PDE residual term
         pde_loss = self.mse_cost_function(pde_values, torch.zeros_like(pde_values))
 
-        # 'other MSE' loss function
+        # mass-balance term
         rate_product_values = torch.matmul(dt, self.rates)
         boundary_loss = self.mse_cost_function(rate_product_values, torch.zeros_like(rate_product_values))
         
-        # data fitting function
+        # data fitting term
         output_fitting = self.net(torch.cat((self.train['y_initial'][fitting_idx], self.train['t'][fitting_idx]), 1))
         fitting_loss = self.mse_cost_function(output_fitting, self.train['y_label'][fitting_idx])
 
@@ -162,6 +181,9 @@ class Chemistry(BaseProblem):
         return fs
 
     def constraint_func(self):
+
+        """The constraint function values are computed."""
+
         assert self.constraint_type == 'other'
         
         y_initial_constraint_input = self.train['y_initial'][self.constr_row_select]
@@ -175,6 +197,9 @@ class Chemistry(BaseProblem):
         return c
 
     def plot_prediction(self, save_path = None, epoch = None, save_label = False):
+
+        """ This function plots the predictions generated by the neural network on test data."""
+
         # Plot label
         y_max = torch.max(self.test['y_label']).cpu()+5
         y_min = torch.min(self.test['y_label']).cpu()-5
