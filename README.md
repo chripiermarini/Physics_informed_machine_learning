@@ -1,5 +1,5 @@
 # SQPPIML
-### Step[0] (Skip if Python3 (>=3.12) is installed)
+### Install Python (Skip if Python3 (>=3.12) is installed)
 (Suppose this repository is already put the ideal directory, and unzipped. Suppose Python3 (>=3.12) is installed. If you would like to create a new python environment and install python 3.12 with conda, you can use 
 ```
 conda create -n myenv python=3.12
@@ -50,4 +50,4 @@ Then configuration of this test run is in the file `./conf/spring_test.yaml`. Ot
 ```
 python3 run.py
 ```
-You may modify the settings in the top lines of `run.py` to run experiments for specific problems or algorithms. 
+You may modify the settings in the top lines of `run.py` to run experiments for a specific problem, an algorithm, or a learning rate. 
