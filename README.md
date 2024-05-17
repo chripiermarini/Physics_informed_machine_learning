@@ -11,7 +11,7 @@ conda activate myenv
 to source the python environment.
 )
 
-### Install requirement packages using
+### Install requirement packages
 ```
 pip3 install -r requirements.txt
 ```
