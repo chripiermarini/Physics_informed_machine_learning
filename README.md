@@ -42,10 +42,14 @@ results/
         └── plot_test_0_00001001.png
 ```
 
-The configuration for this test run is in the file `./conf/spring_test.yaml`. Other config files are also in the `./conf/` directory.
+The configuration for this test run is in the file `./conf/spring_test.yaml`. Other config files are also in the `./conf/` directory. The 'results' folder will 
+be created within the SQPPIML folder.
 
 ### Run experiments in the paper
 ```
 python3 run.py
 ```
-You may modify the settings in the top lines of `run.py` to run experiments for a specific problem, algorithm, or learning rate. 
+You may modify the settings in the top lines of `run.py` to run experiments for a specific problem, algorithm, or learning rate.
+The configurations for all the test problem, except the Spring problem, are set with the settings fixed for the experiments
+described in the paper. The Spring problem configuration must modified accordingly with the settings described in the paper
+to achieve the same results.
