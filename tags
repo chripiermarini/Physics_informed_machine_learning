@@ -59,7 +59,6 @@ d	problems/problem_spring.py	/^    d = 2$/;"	v	class:Spring
 debug	run.py	/^debug = False                                             # True or False. If it is True, then only a few epochs will be run.$/;"	v
 eps_singular_matrix	stochasticsqp.py	/^    eps_singular_matrix = 1 # parameter for modifying matrix to be nonsingular$/;"	v	class:StochasticSQP
 epsilon	stochasticsqp.py	/^    epsilon=1e-6            # parameter for computing merit parameter$/;"	v	class:StochasticSQP
-evaluate	utils.py	/^def evaluate(problem,epoch):$/;"	f
 f	problems/problem_darcy.py	/^    f = 1$/;"	v	class:Darcy
 figsize	problems/problem_base.py	/^    figsize=(4.2, 3.2) $/;"	v	class:BaseProblem
 figsize_rectangle	problems/problem_base.py	/^    figsize_rectangle =(4.2, 2.2)$/;"	v	class:BaseProblem
@@ -104,7 +103,6 @@ np	problems/problem_chemistry.py	/^import numpy as np$/;"	i
 np	problems/problem_spring.py	/^import numpy as np$/;"	i
 np	run.py	/^import numpy as np$/;"	i
 np	solve.py	/^import numpy as np$/;"	i
-np	utils.py	/^import numpy as np$/;"	i
 nu	problems/problem_burgers.py	/^    nu = 0.01   ##kinematic viscosity coefficient$/;"	v	class:Burgers
 objective_func	problems/problem_base.py	/^    def objective_func(self):$/;"	m	class:BaseProblem
 objective_func	problems/problem_burgers.py	/^    def objective_func(self):$/;"	m	class:Burgers
@@ -124,7 +122,7 @@ pde	problems/problem_burgers.py	/^    def pde(self, output, x_pde, t_pde):$/;"	m
 pde	problems/problem_chemistry.py	/^    def pde(self, output, t):$/;"	m	class:Chemistry
 pde	problems/problem_darcy.py	/^    def pde(self, nu, x1, x2, out):$/;"	m	class:Darcy
 pde	problems/problem_spring.py	/^    def pde(self, u_pde_pred, t_pde):$/;"	m	class:Spring
-plot	run.py	/^plot = True                                               # Generate plots of losses over epochs using results from `output_folder`$/;"	v
+plot	run.py	/^plot = True                                               # Generate plots of losses over epochs using results from `output_folder`. The generated plots will be saved under `output_folder\/loss_plots`$/;"	v
 plot	utils.py	/^def plot(u_true, u_pred, t, save_file_name):$/;"	f
 plot_batch_settings	run.py	/^plot_batch_settings =['mini-batch', 'full batch']$/;"	v
 plot_f	run.py	/^def plot_f(problem):$/;"	f
@@ -169,7 +167,7 @@ torch	problems/problem_spring.py	/^import torch$/;"	i
 torch	solve.py	/^import torch$/;"	i
 torch	stochasticsqp.py	/^import torch$/;"	i
 torch	utils.py	/^import torch$/;"	i
-train	run.py	/^train = False                                             # True or False. If it is True, then the model will be trained and produce output and saved$/;"	v
+train	run.py	/^train = True                                             # True or False. If it is True, then the model will be trained and produce output and saved$/;"	v
 true_burgers_solution	problems/problem_burgers.py	/^    def true_burgers_solution(self, xs, ts, u0):$/;"	m	class:Burgers
 w0	problems/problem_spring.py	/^    w0 = 20$/;"	v	class:Spring
 yaml	run.py	/^import yaml$/;"	i

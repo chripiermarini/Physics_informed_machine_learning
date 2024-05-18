@@ -165,7 +165,7 @@ class Chemistry(BaseProblem):
         # PDE residual term
         pde_loss = self.mse_cost_function(pde_values, torch.zeros_like(pde_values))
 
-        # mass-balance term
+        # mass-balance term. Although we use "boundary_loss" as its key, it represents the mass-balance loss
         rate_product_values = torch.matmul(dt, self.rates)
         boundary_loss = self.mse_cost_function(rate_product_values, torch.zeros_like(rate_product_values))
         

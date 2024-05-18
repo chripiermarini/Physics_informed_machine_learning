@@ -40,10 +40,8 @@ settings = {
 
 # Dict of learning rates. Keys are indices and values are learning rate values.
 lrs = {
-  1:5e-3,
-  2:1e-3,
-  3:5e-4,
-  4:1e-4,
+  1:1e-3,
+  2:5e-4,
 }
 
 # Dict of batch seeds. Key are indices and values are random seed for problem which distinguishes mini-batch generation
