@@ -9,8 +9,8 @@ from utils import create_dir
 
 # --------------------- Modify settings below if required --------------------------------------
 debug = False                                             # True or False. If it is True, then only a few epochs will be run.
-plot = True                                               # Generate plots of losses over epochs using results from `output_folder`
-train = False                                             # True or False. If it is True, then the model will be trained and produce output and saved
+plot = True                                               # Generate plots of losses over epochs using results from `output_folder`. The generated plots will be saved under `output_folder/loss_plots`
+train = True                                             # True or False. If it is True, then the model will be trained and produce output and saved
                                                           #   in `output_folder`
 problems = ['spring', 'chemistry', 'burgers', 'darcy']    # list of problems
 output_folder = 'results'                                 # Output folder, under current directory
@@ -46,7 +46,7 @@ lrs = {
   4:1e-4,
 }
 
-# Dict of batch seeds. Key are indices and values are random seed for problem which distinguishs mini-batch generation
+# Dict of batch seeds. Key are indices and values are random seed for problem which distinguishes mini-batch generation
 batch_seeds = {
   0:0,
   1:1,
@@ -86,8 +86,8 @@ def main():
                         config['batch_seed'] = batch_seed    
 
                         if problem_name == 'chemistry' and k in [1,2,3]:   # full batch for chemistry, run 100000 epochs
-                            config['n_epoch'] = 10000
-                        elif problem_name == 'darcy' and k in [1,2,3]:   # full batch for chemistry, run 4000 epochs
+                            config['n_epoch'] = 100000
+                        elif problem_name == 'darcy' and k in [1,2,3]:   # full batch for darcy, run 4000 epochs
                             config['n_epoch'] = 4000
                         
                         config['optimizer']['lr'] = lr

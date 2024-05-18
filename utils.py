@@ -1,7 +1,6 @@
 import os
 import torch
 import matplotlib.pyplot as plt
-import numpy as np
 
 def create_dir(dir):
     if not os.path.isdir(dir):
@@ -23,18 +22,6 @@ def plot(u_true, u_pred, t, save_file_name):
     ax1.plot(t, u_pred)
     ax1.set_ylabel('u_pred')
     fig.savefig(save_file_name)
-
-def evaluate(problem,epoch):
-    #u_true = problem.get_u_true(
-    u_pred = problem.net(problem.domain_interior_tensor)
-    u_pred = u_pred.reshape(-1)
-    u_pred = u_pred.detach().numpy()
-    err = np.linalg.norm(u_true - u_pred,2)
-    t_np = problem.domain_interior_tensor[:,1].detach().numpy()
-    if epoch == 200:
-        plot(u_true, u_pred, t_np, '%s_%s.png' %(problem.name, epoch))
-    print(err)
-    
     
 def check_gradient(optimizer, problem):
     
