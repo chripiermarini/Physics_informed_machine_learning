@@ -23,18 +23,12 @@ FNOLocal	nn_architecture.py	/^class FNOLocal(nn.Module):$/;"	c
 IN_COLAB	run.py	/^      IN_COLAB = False$/;"	v
 IN_COLAB	run.py	/^      IN_COLAB = True$/;"	v
 Image	problems/problem_base.py	/^from PIL import Image$/;"	i
-Image	problems/problem_chemistry.py	/^from PIL import Image$/;"	i
-OneHiddenLayerFCNN	nn_architecture.py	/^class OneHiddenLayerFCNN(nn.Module):$/;"	c
 Optimizer	stochasticsqp.py	/^from torch.optim.optimizer import Optimizer, required$/;"	i
 Spring	problems/problem_spring.py	/^class Spring(BaseProblem):$/;"	c
 Spring	solve.py	/^from problems.problem_spring import Spring$/;"	i
 StochasticSQP	stochasticsqp.py	/^class StochasticSQP(Optimizer):$/;"	c
-TwoHiddenLayerFCNN	nn_architecture.py	/^class TwoHiddenLayerFCNN(nn.Module):$/;"	c
-Variable	problems/problem_chemistry.py	/^from torch.autograd import Variable$/;"	i
 __init__	nn_architecture.py	/^    def __init__(self, N_INPUT, N_OUTPUT, N_HIDDEN, N_LAYERS,is_darcy=False):$/;"	m	class:FCN
 __init__	nn_architecture.py	/^    def __init__(self, n_discretize=16, hidden_channels=16):$/;"	m	class:FNOLocal
-__init__	nn_architecture.py	/^    def __init__(self, n_input, n_output, n_neurons=16):$/;"	m	class:TwoHiddenLayerFCNN
-__init__	nn_architecture.py	/^    def __init__(self, n_input, n_output, n_neurons=64):$/;"	m	class:OneHiddenLayerFCNN
 __init__	problems/problem_base.py	/^    def __init__(self):$/;"	m	class:BaseProblem
 __init__	problems/problem_burgers.py	/^    def __init__(self, device, conf):$/;"	m	class:Burgers
 __init__	problems/problem_chemistry.py	/^    def __init__(self, device, conf):$/;"	m	class:Chemistry
@@ -43,9 +37,7 @@ __init__	problems/problem_spring.py	/^    def __init__(self, device, conf):$/;"	
 __init__	stochasticsqp.py	/^    def __init__(self, params, lr=required, $/;"	m	class:StochasticSQP
 __setstate__	stochasticsqp.py	/^    def __setstate__(self, state):$/;"	m	class:StochasticSQP	file:
 abstractmethod	problems/problem_base.py	/^from abc import ABC, abstractmethod$/;"	i
-apply_frame	problems/problem_darcy.py	/^    def apply_frame(self, tensor, discretize):$/;"	m	class:Darcy
 batch_seeds	run.py	/^batch_seeds = {$/;"	v
-buffer	stochasticsqp.py	/^    buffer=0$/;"	v	class:StochasticSQP
 burg_system	problems/problem_burgers.py	/^        def burg_system(u,t,k,mu,nu):$/;"	f	function:Burgers.true_burgers_solution
 check_gradient	utils.py	/^def check_gradient(optimizer, problem):$/;"	f
 colab	run.py	/^      import google.colab$/;"	i
@@ -54,10 +46,9 @@ config	solve.py	/^        config = yaml.load(f, Loader=yaml.FullLoader)$/;"	v
 constraint_func	problems/problem_base.py	/^    def constraint_func(self):$/;"	m	class:BaseProblem
 constraint_func	problems/problem_burgers.py	/^    def constraint_func(self):$/;"	m	class:Burgers
 constraint_func	problems/problem_chemistry.py	/^    def constraint_func(self):$/;"	m	class:Chemistry
-constraint_func	problems/problem_darcy.py	/^    def constraint_func(self):      $/;"	m	class:Darcy
+constraint_func	problems/problem_darcy.py	/^    def constraint_func(self):$/;"	m	class:Darcy
 constraint_func	problems/problem_spring.py	/^    def constraint_func(self):$/;"	m	class:Spring
 constraint_func_and_grad	problems/problem_base.py	/^    def constraint_func_and_grad(self, optimizer, no_grad = False):$/;"	m	class:BaseProblem
-copy	stochasticsqp.py	/^import copy$/;"	i
 count_parameters	problems/problem_base.py	/^    def count_parameters(self, nn_net):$/;"	m	class:BaseProblem
 create_dataset	problems/problem_chemistry.py	/^    def create_dataset(self, number_of_initial_cond, n_discretization = 100, save_name = None):$/;"	m	class:Chemistry
 create_dir	run.py	/^from utils import create_dir$/;"	i
@@ -65,22 +56,16 @@ create_dir	solve.py	/^from utils import create_dir$/;"	i
 create_dir	utils.py	/^def create_dir(dir):$/;"	f
 create_output_folders	solve.py	/^def create_output_folders(output_folder, sub_folders, problem_name):$/;"	f
 d	problems/problem_spring.py	/^    d = 2$/;"	v	class:Spring
-debug	run.py	/^debug = True$/;"	v
-eps_singular_matrix	stochasticsqp.py	/^    eps_singular_matrix = 1$/;"	v	class:StochasticSQP
-epsilon	stochasticsqp.py	/^    epsilon=1e-6$/;"	v	class:StochasticSQP
-eta	stochasticsqp.py	/^    eta=1e-4 # line search parameter$/;"	v	class:StochasticSQP
+debug	run.py	/^debug = False                                             # True or False. If it is True, then only a few epochs will be run.$/;"	v
+eps_singular_matrix	stochasticsqp.py	/^    eps_singular_matrix = 1 # parameter for modifying matrix to be nonsingular$/;"	v	class:StochasticSQP
+epsilon	stochasticsqp.py	/^    epsilon=1e-6            # parameter for computing merit parameter$/;"	v	class:StochasticSQP
 evaluate	utils.py	/^def evaluate(problem,epoch):$/;"	f
 f	problems/problem_darcy.py	/^    f = 1$/;"	v	class:Darcy
 figsize	problems/problem_base.py	/^    figsize=(4.2, 3.2) $/;"	v	class:BaseProblem
 figsize_rectangle	problems/problem_base.py	/^    figsize_rectangle =(4.2, 2.2)$/;"	v	class:BaseProblem
-figsize_rectangle2_vertical	problems/problem_base.py	/^    figsize_rectangle2_vertical =(4, 5.3)$/;"	v	class:BaseProblem
-figsize_rectangle_horizontal	problems/problem_base.py	/^    figsize_rectangle_horizontal =(5.3, 2.2)$/;"	v	class:BaseProblem
-figsize_rectangle_vertical	problems/problem_base.py	/^    figsize_rectangle_vertical =(2.2, 5.3)$/;"	v	class:BaseProblem
 figsize_square	problems/problem_base.py	/^    figsize_square =(2.2, 2.2)$/;"	v	class:BaseProblem
 find_header_row_number	run.py	/^def find_header_row_number(file, first_header):$/;"	f
 forward	nn_architecture.py	/^    def forward(self, inputs):$/;"	m	class:FNOLocal
-forward	nn_architecture.py	/^    def forward(self, inputs):$/;"	m	class:OneHiddenLayerFCNN
-forward	nn_architecture.py	/^    def forward(self, inputs):$/;"	m	class:TwoHiddenLayerFCNN
 forward	nn_architecture.py	/^    def forward(self, x):$/;"	m	class:FCN
 generate_one_group	problems/problem_burgers.py	/^    def generate_one_group(self, xs, ts, device):$/;"	m	class:Burgers
 generate_sample	problems/problem_base.py	/^    def generate_sample(self):$/;"	m	class:BaseProblem
@@ -95,7 +80,6 @@ get_plot_path	solve.py	/^def get_plot_path(folders, epoch, suffix):$/;"	f
 get_x	utils.py	/^def get_x(problem):$/;"	f
 google	run.py	/^      import google.colab$/;"	i
 initial_function	problems/problem_burgers.py	/^    def initial_function(self, xs, initial_rand_phase):$/;"	m	class:Burgers
-initialize_param	stochasticsqp.py	/^    def initialize_param(self, initial_value = 1):$/;"	m	class:StochasticSQP
 kinetic_kosir_gen	problems/problem_chemistry.py	/^        def kinetic_kosir_gen(x, t) -> np.ndarray:$/;"	f	function:Chemistry.create_dataset
 load_darcy_flow_small	problems/problem_darcy.py	/^from neuralop.datasets import load_darcy_flow_small$/;"	i
 load_net	problems/problem_base.py	/^    def load_net(self,path,device):$/;"	m	class:BaseProblem
@@ -107,7 +91,6 @@ matplotlib	problems/problem_chemistry.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	problems/problem_darcy.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	problems/problem_spring.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	run.py	/^import matplotlib.pyplot as plt$/;"	i
-matplotlib	solve.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	utils.py	/^import matplotlib.pyplot as plt$/;"	i
 mu	problems/problem_burgers.py	/^    mu = 1    $/;"	v	class:Burgers
 name	problems/problem_burgers.py	/^    name = 'Burgers'$/;"	v	class:Burgers
@@ -121,7 +104,6 @@ np	problems/problem_chemistry.py	/^import numpy as np$/;"	i
 np	problems/problem_spring.py	/^import numpy as np$/;"	i
 np	run.py	/^import numpy as np$/;"	i
 np	solve.py	/^import numpy as np$/;"	i
-np	stochasticsqp.py	/^import numpy as np$/;"	i
 np	utils.py	/^import numpy as np$/;"	i
 nu	problems/problem_burgers.py	/^    nu = 0.01   ##kinematic viscosity coefficient$/;"	v	class:Burgers
 objective_func	problems/problem_base.py	/^    def objective_func(self):$/;"	m	class:BaseProblem
@@ -134,17 +116,15 @@ odeint	problems/problem_burgers.py	/^from scipy.integrate import odeint$/;"	i
 odeint	problems/problem_chemistry.py	/^from scipy.integrate import odeint$/;"	i
 os	problems/problem_chemistry.py	/^import os$/;"	i
 os	run.py	/^import os$/;"	i
-os	solve.py	/^import os$/;"	i
 os	utils.py	/^import os$/;"	i
 oscillator	problems/problem_spring.py	/^def oscillator(d, w0, x):$/;"	f
-output_folder	run.py	/^output_folder = 'result' $/;"	v
-pd	problems/problem_chemistry.py	/^import pandas as pd$/;"	i
+output_folder	run.py	/^output_folder = 'results'                                 # Output folder, under current directory$/;"	v
 pd	run.py	/^import pandas as pd$/;"	i
 pde	problems/problem_burgers.py	/^    def pde(self, output, x_pde, t_pde):$/;"	m	class:Burgers
 pde	problems/problem_chemistry.py	/^    def pde(self, output, t):$/;"	m	class:Chemistry
 pde	problems/problem_darcy.py	/^    def pde(self, nu, x1, x2, out):$/;"	m	class:Darcy
 pde	problems/problem_spring.py	/^    def pde(self, u_pde_pred, t_pde):$/;"	m	class:Spring
-plot	run.py	/^plot = False$/;"	v
+plot	run.py	/^plot = True                                               # Generate plots of losses over epochs using results from `output_folder`$/;"	v
 plot	utils.py	/^def plot(u_true, u_pred, t, save_file_name):$/;"	f
 plot_batch_settings	run.py	/^plot_batch_settings =['mini-batch', 'full batch']$/;"	v
 plot_f	run.py	/^def plot_f(problem):$/;"	f
@@ -159,15 +139,14 @@ plt	problems/problem_chemistry.py	/^import matplotlib.pyplot as plt$/;"	i
 plt	problems/problem_darcy.py	/^import matplotlib.pyplot as plt$/;"	i
 plt	problems/problem_spring.py	/^import matplotlib.pyplot as plt$/;"	i
 plt	run.py	/^import matplotlib.pyplot as plt$/;"	i
-plt	solve.py	/^import matplotlib.pyplot as plt$/;"	i
 plt	utils.py	/^import matplotlib.pyplot as plt$/;"	i
 printRow	solve.py	/^def printRow(log_f, type='header', headers=[],values={}):$/;"	f
 printerBeginningSummary	solve.py	/^def printerBeginningSummary(config, log_f):$/;"	f
-problems	run.py	/^problems = ['spring', 'chemistry', 'burgers', 'darcy'] $/;"	v
+problems	run.py	/^problems = ['spring', 'chemistry', 'burgers', 'darcy']    # list of problems$/;"	v
 random	problems/problem_chemistry.py	/^import random$/;"	i
 required	stochasticsqp.py	/^from torch.optim.optimizer import Optimizer, required$/;"	i
 run	run.py	/^from solve import run $/;"	i
-run	solve.py	/^def run(config):     $/;"	f
+run	solve.py	/^def run(config):$/;"	f
 save_gif_PIL	problems/problem_base.py	/^    def save_gif_PIL(self, outfile, files, fps=5, loop=0):$/;"	m	class:BaseProblem
 save_model	solve.py	/^def save_model(folders, epoch, problem, optimizer, config):$/;"	f
 save_net	problems/problem_base.py	/^    def save_net(self,path):$/;"	m	class:BaseProblem
@@ -175,13 +154,12 @@ save_pretrain_state	stochasticsqp.py	/^    def save_pretrain_state(self,optim_pa
 set_boundary_and_interior_pixel_idx	problems/problem_darcy.py	/^    def set_boundary_and_interior_pixel_idx(self):$/;"	m	class:Darcy
 set_constraint_pixel_idx	problems/problem_darcy.py	/^    def set_constraint_pixel_idx(self):$/;"	m	class:Darcy
 set_torch_random_seed	problems/problem_base.py	/^    def set_torch_random_seed(self, seed):$/;"	m	class:BaseProblem
-settings	run.py	/^settings = {$/;"	v
-sigma	stochasticsqp.py	/^    sigma=0.5$/;"	v	class:StochasticSQP
+settings	run.py	/^settings = {                                              $/;"	v
+sigma	stochasticsqp.py	/^    sigma=0.5               # parameter for computing merit parameter$/;"	v	class:StochasticSQP
 solve_linsys	stochasticsqp.py	/^    def solve_linsys(self, A,b, i = 0):$/;"	m	class:StochasticSQP
 step	stochasticsqp.py	/^    def step(self, closure=None):$/;"	m	class:StochasticSQP
 sys	solve.py	/^import sys$/;"	i
 time	solve.py	/^import time$/;"	i
-torch	nn_architecture.py	/^import torch$/;"	i
 torch	nn_architecture.py	/^import torch.nn as nn$/;"	i
 torch	problems/problem_base.py	/^import torch$/;"	i
 torch	problems/problem_burgers.py	/^import torch$/;"	i
@@ -191,7 +169,7 @@ torch	problems/problem_spring.py	/^import torch$/;"	i
 torch	solve.py	/^import torch$/;"	i
 torch	stochasticsqp.py	/^import torch$/;"	i
 torch	utils.py	/^import torch$/;"	i
-train	run.py	/^train = True$/;"	v
+train	run.py	/^train = False                                             # True or False. If it is True, then the model will be trained and produce output and saved$/;"	v
 true_burgers_solution	problems/problem_burgers.py	/^    def true_burgers_solution(self, xs, ts, u0):$/;"	m	class:Burgers
 w0	problems/problem_spring.py	/^    w0 = 20$/;"	v	class:Spring
 yaml	run.py	/^import yaml$/;"	i

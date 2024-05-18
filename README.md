@@ -20,10 +20,10 @@ To run a test, use:
 ```
 python3 solve.py spring_test
 ```
-A folder `results` will be created with the structure shown below:
+A folder `result_test` will be created with the structure shown below:
 
 ```
-results/
+result_test/
 ├── log
 │   └── Spring
 │       └── test_0.txt

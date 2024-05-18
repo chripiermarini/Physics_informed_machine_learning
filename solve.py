@@ -115,7 +115,7 @@ def plot_prediction(folders, epoch, problem, config):
 
 def plot_gif(folders, problem, config, files):
 
-    """ For the Spring problem, it creates a gif image using all the plots of predictions on test data,
+    """ It creates a gif image using all the plots of predictions on test data,
     to show the evolution of the model during the training."""
 
     gif_path = get_gif_path(folders, config['file_suffix'])
@@ -162,7 +162,6 @@ def run(config):
                             n_constrs = problem.n_constrs,
                             merit_param_init = 1, 
                             ratio_param_init = 1,
-                            step_opt= 2,
                             problem = problem,)
     
     # Open log file IO

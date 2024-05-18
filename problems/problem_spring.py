@@ -32,9 +32,10 @@ class Spring(BaseProblem):
 
     name = "Spring"
     # Spring parameters
-    mu = 4
-    k = 400
-    
+    d = 2
+    w0 = 20
+    mu, k = 2*d, w0**2
+     
     def __init__(self, device, conf):
 
         """ The problem and the neural network are initialized according to the settings described in the

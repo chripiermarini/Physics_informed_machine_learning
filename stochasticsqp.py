@@ -1,39 +1,35 @@
 import torch
 from torch.optim.optimizer import Optimizer, required
-import copy
-import numpy as np
 
 class StochasticSQP(Optimizer):
-    r"""Implements the algorithm proposed in
-    [Sequential Quadratic Optimization for Nonlinear Equality Constrained Stochastic Optimization]
-    Example:
-    !    >>> from stochasticsqp import *
-    !    >>> optimizer = StochasticSQP(model.parameters(), lr=0.1)
-
+    """
     Input:
-        params          : torch neural network parameters to be optimized
-        lr              : initial stepsize \alpha
-        n_parameters    : number of parameters to be optimized
-        n_constrs       : number of constraints
-        merit_param_init: initial \tau 
-        ratio_param_init: initial \xi
-        step_size_decay : factor for decreasing stepsize, i.e., alpha = step_size_decay * alpha
-        sigma :
-        step_opt: option variable to set specific stepsize selection ( 1 for simple function reduction, 2 for Armijo)
+        params          : <class 'generator'>
+            torch neural network parameters to be optimized
+        lr              : float
+            stepsize 
+        n_parameters    : int
+            number of parameters to be optimized
+        n_constrs       : int
+            number of constraints
+        merit_param_init: float
+            initial merit parameter 
+        ratio_param_init: float
+            initial ratio parameter
+        problem         : class BaseProblem
+        config          : dict
+            contain keys of 'mu', 'beta2', 'alpha_type', 'beta1'
     """
     
-    sigma=0.5
-    epsilon=1e-6
-    eta=1e-4 # line search parameter
-    buffer=0
-    eps_singular_matrix = 1
+    sigma=0.5               # parameter for computing merit parameter
+    epsilon=1e-6            # parameter for computing merit parameter
+    eps_singular_matrix = 1 # parameter for modifying matrix to be nonsingular
+    
     def __init__(self, params, lr=required, 
                  n_parameters = 0, 
                  n_constrs = 0, 
                  merit_param_init = 1,
                  ratio_param_init = 1, 
-                 step_size_decay = 0.5,
-                 step_opt= 1,
                  problem=None,
                  config=None,
                  ):
@@ -44,13 +40,9 @@ class StochasticSQP(Optimizer):
         self.merit_param = merit_param_init
         self.ratio_param = ratio_param_init
         self.step_size = lr
-        self.step_size_init = lr
-        self.step_size_decay = step_size_decay
         self.trial_merit = 1.0
         self.trial_ratio = 1.0
         self.norm_d = 0.0
-        self.initial_params = params
-        self.step_opt = step_opt
         self.problem = problem
         self.mu = config['mu']
         self.beta2 = config['beta2']
@@ -60,15 +52,21 @@ class StochasticSQP(Optimizer):
     def __setstate__(self, state):
         super(StochasticSQP, self).__setstate__(state)
 
-    def initialize_param(self, initial_value = 1):
-        ## Update parameters
-        assert len(self.param_groups) == 1
-        group = self.param_groups[0]
-        for p in group['params']:
-            p.data.add_(initial_value, alpha=1)
-        return
-
     def solve_linsys(self, A,b, i = 0):
+        """
+        Solve linear system Ax = b, if A is singular, a loop will begin and self.eps_singular_matrix will be added to the diagonal elements of A until the linear system is solved.
+        
+        Parameters
+        ----------
+        A and b: tensor of A and b for computing Ax = b
+        
+        Returns
+        -------
+        x : tensor
+            solution of Ax = b
+        i : int
+            value that is added to the diagonal of A for ensuring A to be nonsingular
+        """
         solved = False
         i = i
         while not solved:
@@ -92,12 +90,15 @@ class StochasticSQP(Optimizer):
             constraint, and objective to the state of keys: J, g, c and f.
         """
         
-        ## Compute step
+        ## obtain value of J, q, c, f
         J = self.state['J']
         g = self.state['g']
         c = self.state['c']
         f = self.state['f']
         
+        ## compute right hand side value of p_k as in Algorithm 2 Line 6 in the paper
+        ## for Adam, p_k(grad) is gradient
+        ## for P-Adam, p_k(grad) is projected gradient
         if self.alpha_type == 'adam':
             grad = g
             singular_add_i = 0
@@ -105,6 +106,7 @@ class StochasticSQP(Optimizer):
             Pg,singular_add_i = self.solve_linsys(J @ J.T, J@g)
             grad = g - J.T @ Pg
         
+        ## Compute accumulated sum and sum of square of grad 
         if 'iter' not in self.state:
             self.state['iter'] = 0
             self.state['g_square_sum'] = (1-self.beta2) * grad**2
@@ -114,18 +116,18 @@ class StochasticSQP(Optimizer):
             self.state['g_square_sum'] = self.beta2 * self.state['g_square_sum'] +  (1-self.beta2) * grad**2
             self.state['g_sum'] = self.beta1 * self.state['g_sum'] +  (1-self.beta1) * grad
         
-
+        ## Compute p_k^had and q_k^had as in Algorithm Line 4 and 5 in the paper
         m_hat = self.state['g_sum'] / (1 - self.beta1**(self.state['iter'] + 1))
         v_hat = self.state['g_square_sum'] / (1 - self.beta2**(self.state['iter'] + 1))
         
         loss = None
-
+        
         H_diag = torch.sqrt(v_hat + self.mu)
         
         self.state['H_diag'] = H_diag
         
         if 0:
-            # Old method to compute d
+            # Solve linear system in Algorithm 2 Line 6 directly. 
             H =  torch.diag(H_diag) 
             ls_matrix = torch.cat((torch.cat((H, J.T), 1),
                                 torch.cat((J, torch.zeros(self.n_constrs,self.n_constrs)), 1)), 0)
@@ -134,6 +136,7 @@ class StochasticSQP(Optimizer):
             system_solution = torch.linalg.solve(ls_matrix, ls_rhs)
             d = system_solution[:self.n_parameters]
         else:
+            # Solve linear system by decomposed step u and v. We use this method for efficiency.
             v = - J.T @ self.solve_linsys(J @ J.T, c, i = singular_add_i)[0] 
             JHinvJT = J*(1/H_diag) @ J.T
             Hinvm_plus_v = 1/H_diag * m_hat + v
@@ -171,65 +174,36 @@ class StochasticSQP(Optimizer):
                 self.ratio_param = self.trial_ratio * (1 - self.epsilon) 
 
         
-        """
-        step-size
-
-        """
-        #get current values of parameters, f is the current phi
         self.state['merit_param'] = self.merit_param
         self.state['cur_merit_f'] = self.merit_param * f + torch.linalg.norm(c, 1)
-        self.state['phi_new'] = self.state['cur_merit_f']
-        self.state['search_rhs'] = 0
-        
-        alpha_pre = 0.0
-        phi = self.merit_param * f + torch.linalg.norm(c, 1)
-        self.ls_k = 0
-        self.step_size = self.step_size_init
-        
-        # no line search, only one iteration
-        for self.ls_k in range(1):
 
-            ## Update parameters
-            assert len(self.param_groups) == 1
-            group = self.param_groups[0]
-            d_p_i_start = 0
-            for p in group['params']:
-                #print(p.view(-1).shape)
-                d_p_i_end = d_p_i_start + len(p.view(-1))
-                d_p = d[d_p_i_start:d_p_i_end].reshape(p.shape)
-                p.data.add_(d_p, alpha=self.step_size-alpha_pre)
-                d_p_i_start = d_p_i_end
-
-            #compute objective, constraints in new point using new values
-            f_new = self.state["f_g_hand"](self, no_grad = True)
-            f_new = f_new['f'].data
-            c_new = self.state["c_J_hand"](self, no_grad = True)
-            self.state['phi_new']= self.merit_param*f_new + torch.linalg.norm(c_new, ord= 1)
-            self.state['alpha_sqp'] = self.step_size-alpha_pre
-            
-            #perfrom linesearch procedure
-            if self.step_opt == 1: #simple decrease
-                self.state['search_rhs'] = self.state['cur_merit_f']
-            elif self.step_opt == 2: #armijo
-                delta_q = - self.merit_param * (gd + 0.5 * torch.max(dHd, torch.tensor(0))) + c_norm_1
-                self.state['search_rhs'] = self.state['cur_merit_f'] - self.eta*self.step_size*delta_q
-            
-            #either accept the new point or reduce step_size, add buffer for computation precision
-            if self.state['phi_new'] < self.state['search_rhs'] + self.buffer:
-                break
-            else:
-                alpha_pre = self.step_size
-                self.step_size = self.step_size * self.step_size_decay
+        ## Update parameters
+        assert len(self.param_groups) == 1
+        group = self.param_groups[0]
+        d_p_i_start = 0
+        for p in group['params']:
+            #print(p.view(-1).shape)
+            d_p_i_end = d_p_i_start + len(p.view(-1))
+            d_p = d[d_p_i_start:d_p_i_end].reshape(p.shape)
+            p.data.add_(d_p, alpha=self.step_size)
+            d_p_i_start = d_p_i_end
+        self.state['alpha_sqp'] = self.step_size
 
         return loss
 
     def load_pretrain_state(self,optim_path,device):
+        """
+        load pretrained optimizer state
+        """
         state = torch.load(optim_path,map_location=device)
         self.state['iter'] = state['iter']
         self.state['g_square_sum'] = state['g_square_sum']
         self.state['g_sum'] = state['g_sum']
         
     def save_pretrain_state(self,optim_path):
+        """
+        load optimizer state
+        """
         state = {'iter': self.state['iter'], 
                 'g_square_sum': self.state['g_square_sum'],
                 'g_sum':self.state['g_sum'],}

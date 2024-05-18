@@ -2,6 +2,9 @@ import torch.nn as nn
 from neuralop.models import FNO
 
 class FNOLocal(nn.Module):
+    """
+    Class of fourier neural operator 
+    """
     def __init__(self, n_discretize=16, hidden_channels=16):
         super(FNOLocal, self).__init__()
         self.FNO = FNO(n_modes = (n_discretize, n_discretize), 
@@ -14,8 +17,9 @@ class FNOLocal(nn.Module):
         return out
 
 class FCN(nn.Module):
-    "Defines a connected network"
-    
+    """
+    Class of fully connected neural network
+    """
     def __init__(self, N_INPUT, N_OUTPUT, N_HIDDEN, N_LAYERS,is_darcy=False):
         super().__init__()
         activation = nn.Tanh

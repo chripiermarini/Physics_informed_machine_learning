@@ -1,4 +1,4 @@
-output_folder: ./results        # Main output folder. All the outputs (log, plots, models) will be saved to this folder
+output_folder: ./result_test        # Main output folder. All the outputs (log, plots, models) will be saved to this folder
 sub_folders:                    # Subfolder names for model, plot, and log                  
   model : mdl
   plot  : plot

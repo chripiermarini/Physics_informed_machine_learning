@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 from problems.problem_base import BaseProblem
 from scipy.integrate import odeint
 
-""" Problem statement Burgers' equation"""
-
 class Burgers(BaseProblem):
+    """ 
+    Problem statement Burgers' equation
+    """
     name = 'Burgers'
     nu = 0.01   ##kinematic viscosity coefficient
     mu = 1    
@@ -82,7 +83,9 @@ class Burgers(BaseProblem):
     
     
     def generate_one_group(self, xs, ts, device):
-        
+        """
+        Method for generation sample of same initial condition
+        """
         initial_rand_phase = torch.randint(100,(1,))/50* torch.pi*0.1
         
         # Compute Initial condition
