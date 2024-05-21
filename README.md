@@ -11,6 +11,7 @@ conda activate myenv
 to activate the Python environment.
 
 ### Install required packages
+cd to this repository, e.g., `cd [your path]/SQPPIML`, and then install the required packages by
 ```
 pip3 install -r requirements.txt
 ```
