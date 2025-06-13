@@ -1,4 +1,4 @@
-# SQPPIML
+# Informed machine learning with a stochastic gradient-based algorithm
 
 Under review as a conference paper at ICLR 2025, 
 authors: Qi Wang (Lehigh University), Christian Piermarini (Sapienza University of Rome), Frank E. Curtis (Lehigh University).
