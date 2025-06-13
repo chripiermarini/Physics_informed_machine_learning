@@ -1,4 +1,8 @@
 # SQPPIML
+
+Under review as a conference paper at ICLR 2025, 
+authors: Qi Wang (Lehigh University), Christian Piermarini (Sapienza University of Rome), Frank E. Curtis (Lehigh University).
+
 ### Install Python (Skip if Python3 (>=3.12) is already installed)
 If you need to create a new Python environment and install Python 3.12 with conda, you can use the following command:
 ```
